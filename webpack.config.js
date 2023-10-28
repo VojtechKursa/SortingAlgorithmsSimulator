@@ -2,6 +2,7 @@
 
 const path = require('path');
 const HtmlBundlerPlugin = require('html-bundler-webpack-plugin');
+const Handlebars = require('handlebars');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -19,14 +20,32 @@ const config = {
         compress: true,
         open: true,
         host: 'localhost',
+        hot: true
     },
     plugins: [
         new HtmlBundlerPlugin({
             entry: {
                 // define HTML files here
-        
-                // output dist/index.html
-                index: 'src/index.html',
+                
+                index: {
+                    import: "src/index.html",
+                    data: {
+                        algorithms: [
+                            {
+                                name: "Bubble sort",
+                                nameMachine: "bubbleSort",
+                                description: "Description of Bubble sort here."
+                            }
+                        ]
+                    }
+                },
+                bubbleSort: {
+                    import: 'src/simulator.html',
+                    data: {
+                        algorithmName: "Bubble sort",
+                        algorithmMachineName: "bubbleSort"
+                    }
+                }
             },
             js: {
                 // output filename of extracted JS
@@ -46,6 +65,9 @@ const config = {
             {   // HTML files
                 test: /\.html$/,
                 loader: HtmlBundlerPlugin.loader, // HTML template loader
+                options: {
+                    preprocessor: (content, {data}) => Handlebars.compile(content)(data)
+                }
             },
             {   // TypeScript files
                 test: /\.(ts|tsx)$/i,
@@ -54,11 +76,11 @@ const config = {
             },
             {   // CSS files
                 test: /\.css$/i,
-                use: [/*stylesHandler,*/'css-loader'],
+                use: ['css-loader'],
             },
             {   // SASS files
                 test: /\.s[ac]ss$/i,
-                use: [/*stylesHandler,*/'css-loader', 'sass-loader'],
+                use: ['css-loader', 'sass-loader'],
             },
             {   // Assets
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,

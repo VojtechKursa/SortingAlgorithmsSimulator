@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Sorting algorithms simulator</title>
+
+        <script src="./scripts/{{algorithmMachineName}}.ts" defer="defer"></script>
+
+        <link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+        <link href="bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
+
+        <link href="./styles/simulator.scss" rel="stylesheet">
+    </head>
+    <body data-bs-theme="dark">
+        <div id="topbar" class="container-fluid">
+			<a class="navbar-brand" href="#">Sorting algorithms simulator - {{algorithmName}}</a>
+		</div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="col">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Menu</a></li>
+                        <li class="breadcrumb-item" active>{{algorithmName}}</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div id="row_main" class="row">
+                <div id="col_left" class="col-lg-8">
+                    <div id="canvas">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="400px" height="400px">
+                            
+                        </svg>
+                    </div>
+                </div>
+                <div id="col_right" class="col-lg-4 row align-items-center">
+                    <div class="col">
+                        <div class="control_module">
+                            <label for="preset_select">Presets</label>
+                            <select id="preset_select" class="form-select">
+                                <option value="random" selected>Random</option>
+                                <option value="sorted">Sorted</option>
+                                <option value="reverse">Reversed</option>
+                            </select>
+                            <button id="preset_load" class="btn btn-primary confirm_button">Load</button>
+                        </div>
+                        
+                        <div class="control_module">
+                            <div>
+                                <label for="numbers_input" class="block">Input</label>
+                                <input id="numbers_input" type="text">
+                            </div>
+                            <button id="numbers_set" class="btn btn-primary confirm_button">Set</button>
+                        </div>
+                        
+                        <div class="control_module">
+                            <label for="stepping" class="block">Stepping</label>
+                            <div id="stepping" class="btn-group" role="group">
+                                <button id="step_back" type="button" class="btn btn-primary"><i class="bi bi-skip-backward-fill"></i></button>
+                                <output id="step_id" type="number" class="btn btn-secondary disabled">0</output>
+                                <button id="step_next" type="button" class="btn btn-primary"><i class="bi bi-skip-forward-fill"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="control_module">
+                            <label for="player_control" class="block">Continuous control</label>
+                            <div id="player_control" class="btn-group" role="group">
+                                <input id="player_control_pause" name="player_control_play" value="0" type="radio" class="btn-check" checked>
+                                <label for="player_control_pause" class="btn btn-outline-warning"><i class="bi bi-pause-fill"></i></label>
+
+                                <input id="player_control_play" name="player_control_play" value="1" type="radio" class="btn-check">
+                                <label for="player_control_play" class="btn btn-outline-success"><i class="bi bi-play-fill"></i></label>
+                            </div>
+                        </div>
+                        
+                        <div class="control_module">
+                            <button id="button_reset" class="btn btn-danger"><i class="bi bi-arrow-repeat"></i> Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script src="bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

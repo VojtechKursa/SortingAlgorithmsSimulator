@@ -1,0 +1,40 @@
+@use "common";
+
+div.control_module {
+    @include common.margin-vertical();
+}
+
+.confirm_button {
+    margin-top: 8px;
+}
+
+label {
+    margin-bottom: 4px;
+}
+
+#button_reset {
+    margin-top: 8px;
+}
+
+#row_main {
+    $border: 2px solid black;
+    
+    border: $border;
+    text-align: center;
+
+
+    #col_left {
+        @media (max-width: 992px) {
+            border-bottom: $border
+        }
+        @media (min-width: 992px) {
+            border-right: $border;
+        }
+    }
+
+    #col_right {
+        padding: 1rem;
+        --bs-gutter-x: 0;
+    }
+}
+

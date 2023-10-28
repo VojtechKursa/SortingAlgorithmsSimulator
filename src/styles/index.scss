@@ -1,0 +1,15 @@
+@use "common";
+
+
+
+div#card_container {
+    margin: 1rem;
+
+    div.card {
+        width: 20rem;
+
+        div.card-link_container {
+            text-align: center;
+        }
+    }
+}
