@@ -6,7 +6,7 @@
 
         <title>Sorting algorithms simulator</title>
 
-        <script src="./scripts/pages/{{nameMachine}}.ts" defer="defer"></script>
+        <script src="./scripts/pages/{{nameMachine}}.ts" defer></script>
 
         <link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
         <link href="bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -30,20 +30,15 @@
 
             <div id="row_main" class="row">
                 <div id="col_left" class="col-lg-8">
-                    <div id="canvas">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="400px" height="400px">
-                            
-                        </svg>
-                    </div>
+                    <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+                        
+                    </svg>
                 </div>
                 <div id="col_right" class="col-lg-4 row align-items-center">
                     <div class="col">
                         <div class="control_module">
                             <label for="preset_select">Presets</label>
                             <select id="preset_select" class="form-select">
-                                <option value="random" selected>Random</option>
-                                <option value="sorted">Sorted</option>
-                                <option value="reverse">Reversed</option>
                             </select>
                             <button id="preset_load" class="btn btn-primary confirm_button">Load</button>
                         </div>

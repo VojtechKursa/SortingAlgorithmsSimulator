@@ -1,12 +1,14 @@
 import { PlayerController } from "./PlayerController";
 
+export type PresetDefinition = Map<string, Array<number> | ((length: number) => number[])>;
+
 export class SimulatorController {
     private playerController: PlayerController;
 
     private presetSelect: HTMLSelectElement;
     private inputElement: HTMLInputElement;
 
-    private extraPresets?: Map<string, number[] | ((length: number) => number[])>
+    private extraPresets?: PresetDefinition;
 
     public constructor(
         playerController: PlayerController,
@@ -14,7 +16,7 @@ export class SimulatorController {
         presetLoadButton: HTMLButtonElement,
         inputElement: HTMLInputElement,
         inputSetButton: HTMLButtonElement,
-        extraPresets?: Map<string, Array<number>>
+        extraPresets?: PresetDefinition
     ) {
         this.playerController = playerController;
         this.presetSelect = presetSelect;
@@ -34,7 +36,7 @@ export class SimulatorController {
             }
         }
 
-        presetLoadButton.addEventListener("click", this.presetLoadButtonHandler);
+        presetLoadButton.addEventListener("click", _ => this.presetLoadButtonHandler());
         inputSetButton.addEventListener("click", _ => {
             let newInput = new Array<number>();
 
@@ -45,9 +47,11 @@ export class SimulatorController {
 
             this.playerController.setInput(newInput);
         });
+
+        presetLoadButton.click();
     }
 
-    private presetLoadButtonHandler(_: MouseEvent) {
+    private presetLoadButtonHandler() {
         const generatedNumbers = 10;
 
         let newInput: number[] | null = null;
@@ -58,7 +62,7 @@ export class SimulatorController {
                 const maxRandom = 50;
 
                 for(let i = 0; i < newInput.length; i++) {
-                    newInput[i] = Math.random() * maxRandom;
+                    newInput[i] = Math.floor(Math.random() * maxRandom);
                 }
 
                 break;

@@ -30,6 +30,13 @@ label {
         @media (min-width: 992px) {
             border-right: $border;
         }
+
+        display: flex;
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
     }
 
     #col_right {

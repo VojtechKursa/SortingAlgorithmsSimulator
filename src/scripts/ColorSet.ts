@@ -4,8 +4,13 @@ export class ColorSet {
     private map: Map<PresetColor, string>;
     private defaultValue: string;
 
-    public constructor(map: Map<PresetColor, string>, defaultValue: string) {
-        this.map = map;
+    public constructor(map: Iterable<readonly [PresetColor, string]>, defaultValue: string) {
+        this.map = new Map<PresetColor, string>();
+
+        for (const item of map) {
+            this.map.set(item[0], item[1]);
+        }
+
         this.defaultValue = defaultValue;
     }
 
