@@ -40,12 +40,21 @@ export class SimulatorController {
         inputSetButton.addEventListener("click", _ => {
             let newInput = new Array<number>();
 
-            // TO DO: Input filtering
-            this.inputElement.value.split(",").forEach(item => {
-                newInput.push(Number.parseInt(item.trim()));
-            });
+            let text = this.inputElement.value;
 
-            this.playerController.setInput(newInput);
+            if(text.match(/^(?:\d+,)*\d+$/i))
+            {
+                text.split(",").forEach(item => {
+                    newInput.push(Number.parseInt(item.trim()));
+                });
+
+                this.playerController.setInput(newInput);
+
+                this.inputElement.classList.remove("wrong");
+            }
+            else {
+                this.inputElement.classList.add("wrong");
+            }
         });
 
         presetLoadButton.click();

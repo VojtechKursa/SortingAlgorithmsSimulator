@@ -1,5 +1,7 @@
 @use "common";
 
+
+
 div.control_module {
     @include common.margin-vertical();
 }
@@ -45,3 +47,11 @@ label {
     }
 }
 
+.wrong {
+    $primary-color: red;
+
+    color: $primary-color;
+
+    border-width: 2px;
+    border-color: $primary-color;
+}
