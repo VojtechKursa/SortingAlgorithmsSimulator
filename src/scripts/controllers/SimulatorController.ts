@@ -8,7 +8,7 @@ export class SimulatorController {
     private presetSelect: HTMLSelectElement;
     private inputElement: HTMLInputElement;
 
-    private extraPresets?: PresetDefinition;
+    private presets: PresetDefinition;
 
     public constructor(
         playerController: PlayerController,
@@ -21,20 +21,29 @@ export class SimulatorController {
         this.playerController = playerController;
         this.presetSelect = presetSelect;
         this.inputElement = inputElement;
-        this.extraPresets = extraPresets;
+        this.presets = new Map<string, Array<number> | ((length: number) => number[])>(SimulatorController.getDefaultPresets());
 
-        SimulatorController.addDefaultPresets(this.presetSelect);
+        if(extraPresets) {
+            for(const key of extraPresets.keys()) {
+                let val = extraPresets.get(key);
 
-        if(extraPresets != undefined) {
-            for (const key in extraPresets.keys()) {
-                let optionElement = document.createElement("option");
-
-                optionElement.text = key;
-                optionElement.value = key;
-
-                this.presetSelect.add(optionElement);
+                if(val)
+                    this.presets.set(key, val);
             }
         }
+
+
+
+        for (const key of this.presets.keys()) {
+            let optionElement = document.createElement("option");
+
+            optionElement.text = key;
+            optionElement.value = key;
+
+            this.presetSelect.add(optionElement);
+        }
+
+        
 
         presetLoadButton.addEventListener("click", _ => this.presetLoadButtonHandler());
         inputSetButton.addEventListener("click", _ => {
@@ -65,46 +74,15 @@ export class SimulatorController {
 
         let newInput: number[] | null = null;
 
-        switch (this.presetSelect.value) {
-            case "random":
-                newInput = new Array(generatedNumbers);
-                const maxRandom = 50;
+        let numbers = this.presets.get(this.presetSelect.value);
 
-                for(let i = 0; i < newInput.length; i++) {
-                    newInput[i] = Math.floor(Math.random() * maxRandom);
-                }
-
-                break;
-            case "sorted":
-                newInput = new Array(generatedNumbers);
-
-                for(let i = 0; i < newInput.length; i++) {
-                    newInput[i] = i;
-                }
-
-                break;
-            case "reversed":
-                newInput = new Array(generatedNumbers);
-
-                for(let i = 0; i < newInput.length; i++) {
-                    newInput[i] = newInput.length - i;
-                }
-                
-                break;
-            default:
-                if(this.extraPresets != undefined) {
-                    let numbers = this.extraPresets.get(this.presetSelect.value);
-
-                    if (numbers != undefined) {
-                        if(typeof numbers === "function") {
-                            newInput = numbers(generatedNumbers);
-                        }
-                        else {
-                            newInput = numbers;
-                        }
-                    }
-                }
-                break;
+        if (numbers != undefined) {
+            if(typeof numbers === "function") {
+                newInput = numbers(generatedNumbers);
+            }
+            else {
+                newInput = numbers;
+            }
         }
 
         if(newInput != null) {
@@ -112,22 +90,40 @@ export class SimulatorController {
         }
     }
 
-    private static addDefaultPresets(presetSelectElement: HTMLSelectElement) {
-        let random = document.createElement("option");
-        random.text = "Random";
-        random.value = "random";
-        random.selected = true;
+    private static getDefaultPresets() {
+        let result: PresetDefinition = new Map<string, (number[] | ((length: number) => number[]))>();
 
-        let sorted = document.createElement("option");
-        sorted.text = "Sorted";
-        sorted.value = "sorted";
+        result.set("Random", amount => {
+            let ret = new Array(amount);
+            const maxRandom = 50;
 
-        let reversed = document.createElement("option");
-        reversed.text = "Reversed";
-        reversed.value = "reversed";
+            for(let i = 0; i < ret.length; i++) {
+                ret[i] = Math.floor(Math.random() * maxRandom);
+            }
 
-        presetSelectElement.add(random);
-        presetSelectElement.add(sorted);
-        presetSelectElement.add(reversed);
+            return ret;
+        });
+
+        result.set("Sorted", amount => {
+            let newInput = new Array(amount);
+
+            for(let i = 0; i < newInput.length; i++) {
+                newInput[i] = i;
+            }
+
+            return newInput;
+        });
+
+        result.set("Reversed", amount => {
+            let newInput = new Array(amount);
+
+            for(let i = 0; i < newInput.length; i++) {
+                newInput[i] = newInput.length - i;
+            }
+
+            return newInput;
+        });
+        
+        return result;
     }
 }
