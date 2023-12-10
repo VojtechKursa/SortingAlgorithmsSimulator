@@ -2,14 +2,31 @@
 
 
 
+
 div#card_container {
-    margin: 1rem;
+    padding: 1rem;
 
-    div.card {
-        width: 20rem;
+    div.row {
 
-        div.card-link_container {
-            text-align: center;
+        div.col {
+            margin-bottom: 1rem;
+
+            div.card {
+            
+                div.card-footer {
+                    padding-top: 0px;
+                    padding-bottom: var(--bs-card-spacer-y);
+                    
+                    border-top: 0px;
+                    background-color: inherit;
+                    
+                    text-align: center;
+
+                    .btn {
+                        width: 100%;
+                    }
+                }
+            }
         }
     }
 }
