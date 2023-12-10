@@ -44,6 +44,19 @@ label {
     #col_right {
         padding: 1rem;
         --bs-gutter-x: 0;
+
+        #numbers_input {
+            width: 96%;
+            text-align: center;
+        }
+
+        #period_container {
+            padding: 8px;
+
+            #player_control_period {
+                width: 4.5em;
+            }
+        }
     }
 }
 

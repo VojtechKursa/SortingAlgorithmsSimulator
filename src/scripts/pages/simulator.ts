@@ -12,6 +12,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let next = document.getElementById("step_next") as HTMLButtonElement;
     let pause = document.getElementById("player_control_pause") as HTMLInputElement;
     let play = document.getElementById("player_control_play") as HTMLInputElement;
+    let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
     let output = document.getElementById("canvas") as HTMLElement;
@@ -25,7 +26,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let colorSet = new ColorSet(colorMap, "white");
 
-    let playerController = new PlayerController(output, colorSet, sortingAlgorithm, back, next, step, play, pause, reset);
+    let playerController = new PlayerController(output, colorSet, sortingAlgorithm, back, next, step, play, pause, periodInput, reset);
 
 
     window.addEventListener("resize", _ => playerController.redraw());

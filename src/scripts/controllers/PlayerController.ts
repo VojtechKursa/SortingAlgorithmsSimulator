@@ -15,6 +15,7 @@ export class PlayerController {
     private stepOutput: HTMLOutputElement;
     private playButton: HTMLInputElement;
     private pauseButton: HTMLInputElement;
+    private periodInput: HTMLInputElement;
     private resetButton: HTMLButtonElement;
 
     public colorSet: ColorSet;
@@ -25,6 +26,7 @@ export class PlayerController {
         stepOutput: HTMLOutputElement,
         playButton: HTMLInputElement,
         pauseButton: HTMLInputElement,
+        periodInput: HTMLInputElement,
         resetButton: HTMLButtonElement
     ) {
         this.outputElement = outputElement;
@@ -36,6 +38,7 @@ export class PlayerController {
         this.stepOutput = stepOutput;
         this.playButton = playButton;
         this.pauseButton = pauseButton;
+        this.periodInput = periodInput;
         this.resetButton = resetButton;
 
         this.results = new Array<StepResult>();
@@ -104,6 +107,10 @@ export class PlayerController {
                 
                 this.pauseButton.checked = true;
             }
+
+            if(this.periodInput.disabled) {
+                this.periodInput.disabled = false;
+            }
         }
         else if(this.forwardButton.disabled) {
             this.forwardButton.disabled = false;
@@ -128,8 +135,24 @@ export class PlayerController {
         return this.endStep;
     }
 
-    private play(intervalMs: number = 1000) {
+    private play() {
         if(this.autoPlayTimerId == null) {
+            this.periodInput.disabled = true;
+            let value = this.periodInput.valueAsNumber
+
+            let intervalMs: number;
+
+            if(value <= 0 || Number.isNaN(value)) {
+                let min = Number.parseFloat(this.periodInput.min);
+                
+                intervalMs = min * 1000;
+
+                this.periodInput.valueAsNumber = min;
+            }
+            else {
+                intervalMs = this.periodInput.valueAsNumber * 1000;
+            }
+
             this.forward();
 
             this.autoPlayTimerId = setInterval(() => this.forward(), intervalMs);
@@ -140,6 +163,8 @@ export class PlayerController {
         if(this.autoPlayTimerId != null) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
+
+            this.periodInput.disabled = false;
         }
     }
 
