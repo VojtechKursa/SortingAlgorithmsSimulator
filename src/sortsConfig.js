@@ -6,6 +6,11 @@ module.exports = {
             name: "Bubble sort",
             nameMachine: "bubbleSort",
             description: "Description of Bubble sort here."
+        },
+        {
+            name: "Bubble sort Optimized",
+            nameMachine: "bubbleSortOptimized",
+            description: "Description of Optimized Bubble sort here."
         }
     ]
 };
