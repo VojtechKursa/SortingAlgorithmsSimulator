@@ -26,14 +26,14 @@ label {
 
 
     #col_left {
+        display: flex;
+
         @media (max-width: 992px) {
             border-bottom: $border
         }
         @media (min-width: 992px) {
             border-right: $border;
         }
-
-        display: flex;
 
         #canvas {
             width: 100%;

@@ -90,7 +90,15 @@ const config = {
             },
             {   // SASS files
                 test: /\.s[ac]ss$/i,
-                use: ['css-loader', 'sass-loader'],
+                use: [
+                    'css-loader',
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            api: 'modern'
+                        }
+                    }
+                ],
             },
             {   // Assets
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
