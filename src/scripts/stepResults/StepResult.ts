@@ -16,5 +16,5 @@ export abstract class StepResult {
         this.codeHighlights = codeHighlights;
     }
 
-    public abstract draw(parent: OutputElement, colorSet: ColorSet): boolean;
+    public abstract draw(parent: OutputElement, colorSet: ColorSet): void;
 }

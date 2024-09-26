@@ -15,7 +15,7 @@ export class StepResultArray extends StepResult {
         this.highlights = highlights;
     }
 
-    public draw(parent: OutputElement, colorSet: ColorSet): boolean {
+    public draw(parent: OutputElement, colorSet: ColorSet): void {
         let borderWidth = 2;
 
         let boxSize = Math.min((parent.clientWidth / this.array.length) - borderWidth, parent.clientHeight - borderWidth);
@@ -24,13 +24,11 @@ export class StepResultArray extends StepResult {
 
         let resultBuilder = new Array<string>;
 
-        for(let i = 0; i < this.array.length; i++) {
-            resultBuilder.push(`<rect x="${leftOffset + i*boxSize}" y="${y}" width="${boxSize}" height="${boxSize}" stroke="black" stroke-width="${borderWidth}px" fill="${colorSet.get(this.highlights != null ? this.highlights.get(i) : undefined)}" />`);
+        for (let i = 0; i < this.array.length; i++) {
+            resultBuilder.push(`<rect x="${leftOffset + i * boxSize}" y="${y}" width="${boxSize}" height="${boxSize}" stroke="black" stroke-width="${borderWidth}px" fill="${colorSet.get(this.highlights != null ? this.highlights.get(i) : undefined)}" />`);
             resultBuilder.push(`<text x="${leftOffset + (i + 0.5) * boxSize}" y="${y + (boxSize / 2)}" color="black" alignment-baseline="central" text-anchor="middle">${this.array[i]}</text>`)
         }
 
         parent.innerHTML = resultBuilder.join("\n");
-
-        return true;
     }
 }

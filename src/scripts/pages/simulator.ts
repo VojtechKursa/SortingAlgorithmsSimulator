@@ -1,7 +1,8 @@
 import { ColorSet } from "../ColorSet";
 import { PresetColor } from "../PresetColor";
+import { PresetDefinition } from "../PresetDefinition";
 import { PlayerController } from "../controllers/PlayerController";
-import { PresetDefinition, SimulatorController } from "../controllers/SimulatorController";
+import { SimulatorController } from "../controllers/SimulatorController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 
 

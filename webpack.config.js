@@ -36,15 +36,9 @@ htmlBundlerPluginConfig.entry.index.data.algorithms = AlgorithmsConfig.algorithm
 
 // Data for individual simulator pages
 AlgorithmsConfig.algorithms.forEach(algorithm => {
-    let data = {};
-
-    AlgorithmsConfig.keys.forEach(property => {
-        data[property] = algorithm[property]
-    });
-    
     htmlBundlerPluginConfig.entry[algorithm.nameMachine] = {
         import: 'src/simulator.html',
-        data: data
+        data: algorithm
     };
 });
 

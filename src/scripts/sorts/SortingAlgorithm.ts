@@ -14,29 +14,13 @@ export abstract class SortingAlgorithm {
         this.generator = this.stepForwardInternal();
     }
 
-    public setInput(input: number[]) {
+    public setInput(input: number[]): void {
         this.input = input.slice();
 
         this.reset();
     }
 
-    public isCompleted() {
-        return this.finalStepResult != null;
-    }
-
-    public stepForward() {
-        if(this.finalStepResult != null)
-            return this.finalStepResult;
-
-        let result = this.generator.next().value as StepResult;
-
-        if(result.final)
-            this.finalStepResult = result;
-
-        return result;
-    }
-
-    public reset() {
+    public reset(): StepResult {
         this.current = this.input.slice();
         this.finalStepResult = null;
 
@@ -47,7 +31,23 @@ export abstract class SortingAlgorithm {
         return this.currentStepResult();
     }
 
-    protected swapCurrent(indexA: number, indexB: number) {
+    public isCompleted(): boolean {
+        return this.finalStepResult != null;
+    }
+
+    public stepForward(): StepResult {
+        if (this.finalStepResult != null)
+            return this.finalStepResult;
+
+        let result = this.generator.next().value as StepResult;
+
+        if (result.final)
+            this.finalStepResult = result;
+
+        return result;
+    }
+
+    protected swapCurrent(indexA: number, indexB: number): void {
         let tmp = this.current[indexA];
         this.current[indexA] = this.current[indexB];
         this.current[indexB] = tmp;

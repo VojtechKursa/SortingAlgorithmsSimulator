@@ -10,16 +10,16 @@ export class BubbleSortOptimized extends BubbleSort {
         this.l = this.current.length;
     }
 
-    protected* stepForwardInternal(): Generator<StepResult> {
+    protected * stepForwardInternal(): Generator<StepResult> {
         let next_l = this.current.length;
 
-        while(next_l >= 2) {
+        while (next_l >= 2) {
             this.l = next_l;
             next_l = 0;
 
-            for(this.k = 0; this.k < this.l - 1; this.k++) {
-                if(this.current[this.k] > this.current[this.k + 1]) {
-                    this.swapCurrent(this.k, this.k+1);
+            for (this.k = 0; this.k < this.l - 1; this.k++) {
+                if (this.current[this.k] > this.current[this.k + 1]) {
+                    this.swapCurrent(this.k, this.k + 1);
                     next_l = this.k + 1;
                 }
 

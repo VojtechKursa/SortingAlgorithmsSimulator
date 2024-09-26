@@ -20,7 +20,7 @@ export class PlayerController {
 
     public colorSet: ColorSet;
 
-    public constructor(outputElement: OutputElement, colorSet: ColorSet, algorithm: SortingAlgorithm, 
+    public constructor(outputElement: OutputElement, colorSet: ColorSet, algorithm: SortingAlgorithm,
         backButton: HTMLButtonElement,
         forwardButton: HTMLButtonElement,
         stepOutput: HTMLOutputElement,
@@ -55,25 +55,25 @@ export class PlayerController {
         this.resetButton.addEventListener("click", _ => this.reset());
     }
 
-    public redraw() {
+    public redraw(): void {
         this.results[this.currentStep].draw(this.outputElement, this.colorSet);
 
-        this.stepOutput.value = `${this.currentStep} / ${this.endStep == null ? "?" : this.endStep}`
+        this.stepOutput.value = `${this.currentStep} / ${this.endStep == null ? "?" : this.endStep}`;
     }
 
-    private forward() {
-        if(this.currentStep + 1 < this.results.length) {
+    private forward(): void {
+        if (this.currentStep + 1 < this.results.length) {
             this.currentStep++;
             this.redraw();
         }
         else {
-            if(!this.algorithm.isCompleted()) {
+            if (!this.algorithm.isCompleted()) {
                 let result = this.algorithm.stepForward();
 
                 this.results.push(result);
                 this.currentStep++;
 
-                if(result.final) {
+                if (result.final) {
                     this.endStep = this.currentStep;
                 }
 
@@ -84,7 +84,7 @@ export class PlayerController {
         this.stepUpdate();
     }
 
-    private backward() {
+    private backward(): void {
         if (this.currentStep > 0) {
             this.currentStep--;
 
@@ -94,57 +94,49 @@ export class PlayerController {
         this.stepUpdate();
     }
 
-    private stepUpdate() {
-        if(this.endStep != null && this.currentStep == this.endStep) {
+    private stepUpdate(): void {
+        if (this.endStep != null && this.currentStep == this.endStep) {
             if (!this.forwardButton.disabled) {
                 this.forwardButton.disabled = true;
                 this.playButton.disabled = true;
             }
 
-            if(this.autoPlayTimerId != null) {
+            if (this.autoPlayTimerId != null) {
                 clearInterval(this.autoPlayTimerId);
                 this.autoPlayTimerId = null;
-                
+
                 this.pauseButton.checked = true;
             }
 
-            if(this.periodInput.disabled) {
+            if (this.periodInput.disabled) {
                 this.periodInput.disabled = false;
             }
         }
-        else if(this.forwardButton.disabled) {
+        else if (this.forwardButton.disabled) {
             this.forwardButton.disabled = false;
             this.playButton.disabled = false;
         }
 
-        if(this.currentStep <= 0) {
-            if(!this.backButton.disabled) {
+        if (this.currentStep <= 0) {
+            if (!this.backButton.disabled) {
                 this.backButton.disabled = true;
             }
         }
-        else if(this.backButton.disabled) {
+        else if (this.backButton.disabled) {
             this.backButton.disabled = false;
         }
     }
 
-    public getStep() {
-        return this.currentStep;
-    }
-
-    public getEndStep() {
-        return this.endStep;
-    }
-
-    private play() {
-        if(this.autoPlayTimerId == null) {
+    private play(): void {
+        if (this.autoPlayTimerId == null) {
             this.periodInput.disabled = true;
             let value = this.periodInput.valueAsNumber
 
             let intervalMs: number;
 
-            if(value <= 0 || Number.isNaN(value)) {
+            if (value <= 0 || Number.isNaN(value)) {
                 let min = Number.parseFloat(this.periodInput.min);
-                
+
                 intervalMs = min * 1000;
 
                 this.periodInput.valueAsNumber = min;
@@ -159,8 +151,8 @@ export class PlayerController {
         }
     }
 
-    private pause() {
-        if(this.autoPlayTimerId != null) {
+    private pause(): void {
+        if (this.autoPlayTimerId != null) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
 
@@ -168,8 +160,8 @@ export class PlayerController {
         }
     }
 
-    private reset() {
-        if(this.autoPlayTimerId != null) {
+    private reset(): void {
+        if (this.autoPlayTimerId != null) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
         }
@@ -183,11 +175,19 @@ export class PlayerController {
         this.endStep = null;
 
         this.redraw();
-        
+
         this.stepUpdate();
     }
 
-    public setInput(input: number[]) {
+    public getStep(): number {
+        return this.currentStep;
+    }
+
+    public getEndStep(): number | null {
+        return this.endStep;
+    }
+
+    public setInput(input: number[]): void {
         this.algorithm.setInput(input);
 
         this.reset();

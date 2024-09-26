@@ -1,4 +1,4 @@
-import {PresetColor} from "./PresetColor";
+import { PresetColor } from "./PresetColor";
 
 export class ColorSet {
     private map: Map<PresetColor, string>;
@@ -15,12 +15,12 @@ export class ColorSet {
     }
 
     public get(color: PresetColor | undefined): string {
-        if(color == undefined)
+        if (color == undefined)
             return this.defaultValue;
-        
+
         let result = this.map.get(color);
 
-        if(result == undefined) {
+        if (result == undefined) {
             return this.defaultValue;
         }
         else {

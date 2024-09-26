@@ -1,6 +1,5 @@
+import { PresetDefinition } from "../PresetDefinition";
 import { PlayerController } from "./PlayerController";
-
-export type PresetDefinition = Map<string, Array<number> | ((length: number) => number[])>;
 
 export class SimulatorController {
     private playerController: PlayerController;
@@ -23,11 +22,11 @@ export class SimulatorController {
         this.inputElement = inputElement;
         this.presets = new Map<string, Array<number> | ((length: number) => number[])>(SimulatorController.getDefaultPresets());
 
-        if(extraPresets) {
-            for(const key of extraPresets.keys()) {
+        if (extraPresets) {
+            for (const key of extraPresets.keys()) {
                 let val = extraPresets.get(key);
 
-                if(val)
+                if (val)
                     this.presets.set(key, val);
             }
         }
@@ -43,33 +42,15 @@ export class SimulatorController {
             this.presetSelect.add(optionElement);
         }
 
-        
+
 
         presetLoadButton.addEventListener("click", _ => this.presetLoadButtonHandler());
-        inputSetButton.addEventListener("click", _ => {
-            let newInput = new Array<number>();
-
-            let text = this.inputElement.value;
-
-            if(text.match(/^(?:\d+,)*\d+$/i))
-            {
-                text.split(",").forEach(item => {
-                    newInput.push(Number.parseInt(item.trim()));
-                });
-
-                this.playerController.setInput(newInput);
-
-                this.inputElement.classList.remove("wrong");
-            }
-            else {
-                this.inputElement.classList.add("wrong");
-            }
-        });
+        inputSetButton.addEventListener("click", _ => this.inputSetButtonHandler());
 
         presetLoadButton.click();
     }
 
-    private presetLoadButtonHandler() {
+    private presetLoadButtonHandler(): void {
         const generatedNumbers = 10;
 
         let newInput: number[] | null = null;
@@ -77,7 +58,7 @@ export class SimulatorController {
         let numbers = this.presets.get(this.presetSelect.value);
 
         if (numbers != undefined) {
-            if(typeof numbers === "function") {
+            if (typeof numbers === "function") {
                 newInput = numbers(generatedNumbers);
             }
             else {
@@ -85,19 +66,38 @@ export class SimulatorController {
             }
         }
 
-        if(newInput != null) {
+        if (newInput != null) {
             this.playerController.setInput(newInput);
         }
     }
 
-    private static getDefaultPresets() {
+    private inputSetButtonHandler(): void {
+        let newInput = new Array<number>();
+
+        let text = this.inputElement.value;
+
+        if (text.match(/^(?:\d+,)*\d+$/i)) {
+            text.split(",").forEach(item => {
+                newInput.push(Number.parseInt(item.trim()));
+            });
+
+            this.playerController.setInput(newInput);
+
+            this.inputElement.classList.remove("wrong");
+        }
+        else {
+            this.inputElement.classList.add("wrong");
+        }
+    }
+
+    private static getDefaultPresets(): PresetDefinition {
         let result: PresetDefinition = new Map<string, (number[] | ((length: number) => number[]))>();
 
         result.set("Random", amount => {
             let ret = new Array(amount);
             const maxRandom = 50;
 
-            for(let i = 0; i < ret.length; i++) {
+            for (let i = 0; i < ret.length; i++) {
                 ret[i] = Math.floor(Math.random() * maxRandom);
             }
 
@@ -107,7 +107,7 @@ export class SimulatorController {
         result.set("Sorted", amount => {
             let newInput = new Array(amount);
 
-            for(let i = 0; i < newInput.length; i++) {
+            for (let i = 0; i < newInput.length; i++) {
                 newInput[i] = i;
             }
 
@@ -117,13 +117,13 @@ export class SimulatorController {
         result.set("Reversed", amount => {
             let newInput = new Array(amount);
 
-            for(let i = 0; i < newInput.length; i++) {
+            for (let i = 0; i < newInput.length; i++) {
                 newInput[i] = newInput.length - i;
             }
 
             return newInput;
         });
-        
+
         return result;
     }
 }
