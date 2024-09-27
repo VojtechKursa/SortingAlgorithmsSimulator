@@ -2,6 +2,12 @@
 
 
 
+:root {
+    --code-highlight-color: yellow;
+}
+
+
+
 div.control_module {
     @include common.margin-vertical();
 }
@@ -38,6 +44,44 @@ label {
         #canvas {
             width: 100%;
             height: 100%;
+        }
+    }
+    
+    #col_debugger {
+        background-color: black;
+        color: white;
+
+        text-align: left;
+        align-content: center;
+        max-width: fit-content;
+
+        .code-line {
+            display: grid;
+            grid-template-columns: 3em auto;
+
+            font-family: monospace;
+
+            .code-header {
+                grid-column: 1;
+
+                background-color: grey;
+
+                text-align: right;
+                padding-right: 0.5em;
+
+                user-select: none;  /* Make the text un-selectable */
+            }
+
+            .code-text {
+                grid-column: 2;
+
+                padding-left: 0.5em;
+                white-space: pre;
+            }
+        }
+
+        .code-highlight {
+            background-color: var(--code-highlight-color);
         }
     }
 

@@ -39,5 +39,25 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let numbersInput = document.getElementById("numbers_input") as HTMLInputElement;
     let numbersSet = document.getElementById("numbers_set") as HTMLButtonElement;
 
+    let debug_view = document.getElementById("col_debugger") as HTMLDivElement;
+
+    sortingAlgorithm.getPseudocode().forEach((codeLine, lineNum) => {
+        let line = document.createElement("div");
+        line.classList.add("code-line");
+
+        let header = document.createElement("div");
+        header.classList.add("code-header");
+        header.textContent = (lineNum + 1).toString();
+
+        let text = document.createElement("div");
+        text.classList.add("code-text")
+        text.textContent = codeLine.replace(/\t/g, " ".repeat(4));
+
+        line.appendChild(header);
+        line.appendChild(text);
+
+        debug_view.appendChild(line);
+    });
+
     return new SimulatorController(playerController, presetSelect, presetSelectButton, numbersInput, numbersSet, extraPresets);
 }
