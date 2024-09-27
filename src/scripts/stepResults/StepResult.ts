@@ -1,20 +1,9 @@
-import { Highlights } from "../Highlights"
-import { ColorSet } from "../ColorSet"
-
-
-
-export type OutputElement = HTMLElement;
-
 export abstract class StepResult {
-    public readonly final: boolean;
     public readonly text: string;
-    public readonly codeHighlights: Highlights | null;
+    public readonly isFullStep: boolean;    // false for code steps
 
-    protected constructor(final: boolean, text: string, codeHighlights: Highlights | null) {
-        this.final = final;
+    protected constructor(text: string, isFullStep: boolean) {
         this.text = text;
-        this.codeHighlights = codeHighlights;
+        this.isFullStep = isFullStep;
     }
-
-    public abstract draw(parent: OutputElement, colorSet: ColorSet): void;
 }

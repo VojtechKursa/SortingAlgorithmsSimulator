@@ -1,21 +1,22 @@
 import { ColorSet } from "../ColorSet";
 import { Highlights } from "../Highlights";
-import { OutputElement, StepResult } from "./StepResult";
+import { CodeStepResult } from "./CodeStepResult";
+import { VisualizationElement, FullStepResult } from "./FullStepResult";
 
 
 
-export class StepResultArray extends StepResult {
+export class StepResultArray extends FullStepResult {
     public readonly array: number[];
     public readonly highlights: Highlights | null
 
-    public constructor(final: boolean, text: string, codeHighlights: Highlights | null, array: number[], highlights: Highlights | null) {
-        super(final, text, codeHighlights);
+    public constructor(final: boolean, text: string, codeStepResult: CodeStepResult, array: number[], highlights: Highlights | null) {
+        super(final, text, codeStepResult);
 
         this.array = array.slice();
         this.highlights = highlights;
     }
 
-    public draw(parent: OutputElement, colorSet: ColorSet): void {
+    public draw(parent: VisualizationElement, colorSet: ColorSet): void {
         let borderWidth = 2;
 
         let boxSize = Math.min((parent.clientWidth / this.array.length) - borderWidth, parent.clientHeight - borderWidth);
@@ -30,5 +31,9 @@ export class StepResultArray extends StepResult {
         }
 
         parent.innerHTML = resultBuilder.join("\n");
+    }
+
+    public redraw(parent: VisualizationElement, colorSet: ColorSet): void {
+        this.draw(parent, colorSet);
     }
 }
