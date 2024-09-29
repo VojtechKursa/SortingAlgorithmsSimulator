@@ -1,9 +1,11 @@
+import { CodeStepResult } from "../stepResults/CodeStepResult";
+import { FullStepResult } from "../stepResults/FullStepResult";
 import { StepResult } from "../stepResults/StepResult";
 
 export abstract class SortingAlgorithm {
     private input: Array<number>;
     protected current: Array<number>;
-    private finalStepResult: StepResult | null;
+    private finalStepResult: FullStepResult | null;
     private generator: Generator<StepResult>;
 
     protected constructor(input: number[]) {
@@ -20,7 +22,7 @@ export abstract class SortingAlgorithm {
         this.reset();
     }
 
-    public reset(): StepResult {
+    public reset(): FullStepResult {
         this.current = this.input.slice();
         this.finalStepResult = null;
 
@@ -28,11 +30,33 @@ export abstract class SortingAlgorithm {
 
         this.generator = this.stepForwardInternal();
 
-        return this.currentStepResult();
+        return this.getInitialStepResult();
     }
 
     public isCompleted(): boolean {
         return this.finalStepResult != null;
+    }
+
+    public stepForwardFull(): [StepResult, CodeStepResult[]] {
+        if (this.finalStepResult != null)
+            return [this.finalStepResult, []];
+
+        let codeResults = new Array<CodeStepResult>();
+        let stepResult: FullStepResult | null = null;
+
+        do {
+            let result = this.stepForward();
+
+            if (result instanceof FullStepResult)
+                stepResult = result as FullStepResult;
+            else
+                codeResults.push(result as CodeStepResult);
+        } while (stepResult == null);
+        
+        if (stepResult.final)
+            this.finalStepResult = stepResult;
+
+        return [stepResult, codeResults];
     }
 
     public stepForward(): StepResult {
@@ -40,9 +64,6 @@ export abstract class SortingAlgorithm {
             return this.finalStepResult;
 
         let result = this.generator.next().value as StepResult;
-
-        if (result.final)
-            this.finalStepResult = result;
 
         return result;
     }
@@ -56,6 +77,6 @@ export abstract class SortingAlgorithm {
     protected abstract stepForwardInternal(): Generator<StepResult>;
     protected abstract resetInternal(): void;
 
-    public abstract currentStepResult(): StepResult;
+    public abstract getInitialStepResult(): FullStepResult;
     public abstract getPseudocode(): string[];
 }

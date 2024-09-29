@@ -1,14 +1,17 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 import { ColorSet } from "../ColorSet";
-import { OutputElement, StepResult } from "../stepResults/StepResult";
+import { VisualizationElement, FullStepResult } from "../stepResults/FullStepResult";
+import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepResults/CodeStepResult";
+import { StepResultCollection } from "../StepResultCollection";
 
 export class PlayerController {
     private readonly algorithm: SortingAlgorithm;
-    private results: Array<StepResult>;
-    private currentStep: number;
-    private endStep: number | null;
-    private readonly outputElement: OutputElement;
+    private steps: StepResultCollection;
     private autoPlayTimerId: NodeJS.Timeout | null;
+
+    private readonly visualizationElement: VisualizationElement;
+    private readonly debuggerElement: DebuggerElement;
+    private readonly variableWatchElement: VariableWatchElement;
 
     private backButton: HTMLButtonElement;
     private forwardButton: HTMLButtonElement;
@@ -20,7 +23,10 @@ export class PlayerController {
 
     public colorSet: ColorSet;
 
-    public constructor(outputElement: OutputElement, colorSet: ColorSet, algorithm: SortingAlgorithm,
+    public constructor(colorSet: ColorSet, algorithm: SortingAlgorithm,
+        outputElement: VisualizationElement,
+        debuggerElement: DebuggerElement,
+        variableWatchElement: VariableWatchElement, 
         backButton: HTMLButtonElement,
         forwardButton: HTMLButtonElement,
         stepOutput: HTMLOutputElement,
@@ -29,9 +35,12 @@ export class PlayerController {
         periodInput: HTMLInputElement,
         resetButton: HTMLButtonElement
     ) {
-        this.outputElement = outputElement;
         this.colorSet = colorSet;
         this.algorithm = algorithm;
+
+        this.visualizationElement = outputElement;
+        this.debuggerElement = debuggerElement;
+        this.variableWatchElement = variableWatchElement;
 
         this.backButton = backButton;
         this.forwardButton = forwardButton;
@@ -41,10 +50,9 @@ export class PlayerController {
         this.periodInput = periodInput;
         this.resetButton = resetButton;
 
-        this.results = new Array<StepResult>();
-        this.currentStep = 0;
-        this.endStep = null;
         this.autoPlayTimerId = null;
+
+        this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
 
         this.reset();
 
@@ -56,46 +64,73 @@ export class PlayerController {
     }
 
     public redraw(): void {
-        this.results[this.currentStep].draw(this.outputElement, this.colorSet);
+        let currentStep = this.steps.getCurrentStep();
 
-        this.stepOutput.value = `${this.currentStep} / ${this.endStep == null ? "?" : this.endStep}`;
+        if (currentStep instanceof FullStepResult) {
+            let step = currentStep as FullStepResult;
+            step.display(this.visualizationElement, this.colorSet, this.debuggerElement, this.variableWatchElement);
+        }
+        else {
+            let step = currentStep as CodeStepResult;
+            step.display(this.debuggerElement, this.variableWatchElement);
+        }
+
+        let endStepNumber = this.steps.getEndStepNumber();
+        this.stepOutput.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
     }
 
     private forward(): void {
-        if (this.currentStep + 1 < this.results.length) {
-            this.currentStep++;
+        if (this.steps.forwardFull())
             this.redraw();
-        }
         else {
             if (!this.algorithm.isCompleted()) {
-                let result = this.algorithm.stepForward();
+                let result = this.algorithm.stepForwardFull();
 
-                this.results.push(result);
-                this.currentStep++;
-
-                if (result.final) {
-                    this.endStep = this.currentStep;
-                }
+                result[1].forEach(codeStepResult => this.steps.add(codeStepResult));
+                this.steps.addAndAdvance(result[0]);
 
                 this.redraw();
             }
         }
 
-        this.stepUpdate();
+        this.updateStepControls();
     }
 
     private backward(): void {
-        if (this.currentStep > 0) {
-            this.currentStep--;
-
+        if (this.steps.backwardFull())
             this.redraw();
-        }
 
-        this.stepUpdate();
+        this.updateStepControls();
     }
 
-    private stepUpdate(): void {
-        if (this.endStep != null && this.currentStep == this.endStep) {
+    private forwardCode(): void {
+        if (this.steps.forward())
+            this.redraw();
+        else {
+            if (!this.algorithm.isCompleted()) {
+                let result = this.algorithm.stepForward();
+
+                this.steps.addAndAdvance(result);
+                
+                this.redraw();
+            }
+        }
+
+        this.updateStepControls();
+    }
+
+    private backwardCode(): void {
+        if (this.steps.backward())
+            this.redraw();
+
+        this.updateStepControls();
+    }
+
+    private updateStepControls(): void {
+        let endStep = this.steps.getEndStepNumber();
+        let currentStep = this.steps.getCurrentStepNumber();
+
+        if (endStep != null && currentStep == endStep) {
             if (!this.forwardButton.disabled) {
                 this.forwardButton.disabled = true;
                 this.playButton.disabled = true;
@@ -117,7 +152,7 @@ export class PlayerController {
             this.playButton.disabled = false;
         }
 
-        if (this.currentStep <= 0) {
+        if (currentStep <= 0) {
             if (!this.backButton.disabled) {
                 this.backButton.disabled = true;
             }
@@ -168,23 +203,11 @@ export class PlayerController {
 
         this.algorithm.reset();
 
-        this.results = new Array<StepResult>();
-        this.results.push(this.algorithm.currentStepResult());
-
-        this.currentStep = 0;
-        this.endStep = null;
+        this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
 
         this.redraw();
 
-        this.stepUpdate();
-    }
-
-    public getStep(): number {
-        return this.currentStep;
-    }
-
-    public getEndStep(): number | null {
-        return this.endStep;
+        this.updateStepControls();
     }
 
     public setInput(input: number[]): void {

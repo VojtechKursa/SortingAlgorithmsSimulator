@@ -4,14 +4,14 @@ import { StepResult } from "./StepResult";
 
 
 
-export type VisualizationElement = SVGElement;
+export type VisualizationElement = SVGSVGElement;
 
 export abstract class FullStepResult extends StepResult {
     public readonly final: boolean;
     public readonly codeStepResult: CodeStepResult;
 
     protected constructor(final: boolean, text: string, codeStepResult: CodeStepResult) {
-		super(text, true);
+		super(text);
 
         this.final = final;
         this.codeStepResult = codeStepResult;

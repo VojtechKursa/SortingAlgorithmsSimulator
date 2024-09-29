@@ -2,6 +2,8 @@ import { StepResult } from "../stepResults/StepResult";
 import { BubbleSort } from "./BubbleSort";
 
 export class BubbleSortOptimized extends BubbleSort {
+    // TODO: Update
+    
     private l: number;
 
     public constructor(input: number[]) {

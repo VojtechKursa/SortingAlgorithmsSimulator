@@ -3,6 +3,8 @@ import { StepResultArray } from "../stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
 import { Highlights } from "../Highlights";
 import { PresetColor } from "../PresetColor";
+import { CodeStepResult } from "../stepResults/CodeStepResult";
+import { FullStepResult } from "../stepResults/FullStepResult";
 
 export class BubbleSort extends SortingAlgorithm {
     protected k: number;
@@ -46,10 +48,11 @@ export class BubbleSort extends SortingAlgorithm {
         let codeHighlights: Highlights = new Map<number, PresetColor>();
         highlightedLines.forEach(item => codeHighlights.set(item, PresetColor.CodeHighlight_1));
 
-        return new StepResultArray(final, text, codeHighlights, this.current, highlights);
+        return new StepResultArray(final, text, new CodeStepResult("", new Map<number, PresetColor>(), new Map<string, any>()), this.current, highlights);
     }
 
     protected * stepForwardInternal(): Generator<StepResult> {
+        // TODO: Adapt to debugger
         do {
             this.swapped = false;
 
@@ -79,8 +82,8 @@ export class BubbleSort extends SortingAlgorithm {
         this.swapped = false;
     }
 
-    public currentStepResult(): StepResult {
-        return new StepResultArray(this.current.length <= 1, "", null, this.current, null);
+    public getInitialStepResult(): FullStepResult {
+        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult("", new Map<number, PresetColor>(), new Map<string, any>()), this.current, null);
     }
 
     public getPseudocode(): string[] {

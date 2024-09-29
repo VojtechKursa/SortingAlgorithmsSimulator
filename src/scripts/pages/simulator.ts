@@ -6,6 +6,14 @@ import { SimulatorController } from "../controllers/SimulatorController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 
 
+function findOutputElement(id: string): SVGSVGElement {
+    for (const element of document.getElementsByTagName("svg")) {
+        if (element.id == id)
+            return element;
+    }
+
+    throw new Error("Output element not found");
+}
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: PresetDefinition): SimulatorController {
     let back = document.getElementById("step_back") as HTMLButtonElement;
@@ -16,7 +24,8 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
-    let output = document.getElementById("canvas") as HTMLElement;
+    let output = findOutputElement("canvas");
+    let debug_view = document.getElementById("col_debugger") as HTMLDivElement;
 
     let colorMap = new Map<PresetColor, string>();
     colorMap.set(PresetColor.Highlight_1, "blue");
@@ -27,7 +36,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let colorSet = new ColorSet(colorMap, "white");
 
-    let playerController = new PlayerController(output, colorSet, sortingAlgorithm, back, next, step, play, pause, periodInput, reset);
+    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, back, next, step, play, pause, periodInput, reset);
 
 
     window.addEventListener("resize", _ => playerController.redraw());
@@ -38,8 +47,6 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let numbersInput = document.getElementById("numbers_input") as HTMLInputElement;
     let numbersSet = document.getElementById("numbers_set") as HTMLButtonElement;
-
-    let debug_view = document.getElementById("col_debugger") as HTMLDivElement;
 
     sortingAlgorithm.getPseudocode().forEach((codeLine, lineNum) => {
         let line = document.createElement("div");

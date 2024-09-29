@@ -1,0 +1,19 @@
+# TO DO list
+
+- Update class diagram (aliases)
+
+- Prepare UI for debugger
+- Implement debugging for BubbleSort
+- Make debugging fully functional
+
+- Document code
+
+- Reorganize UI
+
+- Implement Variable Watch
+
+- Implement settings (colors, dark mode, ...)
+
+- Update Optimized Bubble Sort to be up-to-standard
+
+- Make UI phone-compatible
