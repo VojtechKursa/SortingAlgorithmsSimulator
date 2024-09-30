@@ -1,4 +1,5 @@
 import { ColorSet } from "../ColorSet";
+import { PlayerElementContainer } from "../PlayerElementContainer";
 import { PresetColor } from "../PresetColor";
 import { PresetDefinition } from "../PresetDefinition";
 import { PlayerController } from "../controllers/PlayerController";
@@ -16,12 +17,30 @@ function findOutputElement(id: string): SVGSVGElement {
 }
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: PresetDefinition): SimulatorController {
-    let back = document.getElementById("step_back") as HTMLButtonElement;
-    let step = document.getElementById("step_id") as HTMLOutputElement;
-    let next = document.getElementById("step_next") as HTMLButtonElement;
-    let pause = document.getElementById("player_control_pause") as HTMLInputElement;
-    let play = document.getElementById("player_control_play") as HTMLInputElement;
-    let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
+    let playerElementContainer: PlayerElementContainer;
+    {
+        let back = document.getElementById("step_back") as HTMLButtonElement;
+        let step = document.getElementById("step_id") as HTMLOutputElement;
+        let next = document.getElementById("step_next") as HTMLButtonElement;
+        let pause = document.getElementById("player_control_pause") as HTMLInputElement;
+        let play = document.getElementById("player_control_play") as HTMLInputElement;
+        let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
+
+        playerElementContainer = new PlayerElementContainer(back, step, next, pause, play, periodInput);
+    }
+
+    let debuggerElementContainer: PlayerElementContainer;
+    {
+        let backCode = document.getElementById("step_code_back") as HTMLButtonElement;
+        let stepCode = document.getElementById("step_code_id") as HTMLOutputElement;
+        let nextCode = document.getElementById("step_code_next") as HTMLButtonElement;
+        let pauseCode = document.getElementById("player_control_code_pause") as HTMLInputElement;
+        let playCode = document.getElementById("player_control_code_play") as HTMLInputElement;
+        let periodInputCode = document.getElementById("player_control_code_period") as HTMLInputElement;
+
+        debuggerElementContainer = new PlayerElementContainer(backCode, stepCode, nextCode, pauseCode, playCode, periodInputCode);
+    }
+
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
     let output = findOutputElement("canvas");
@@ -36,7 +55,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let colorSet = new ColorSet(colorMap, "white");
 
-    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, back, next, step, play, pause, periodInput, reset);
+    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, reset);
 
 
     window.addEventListener("resize", _ => playerController.redraw());
