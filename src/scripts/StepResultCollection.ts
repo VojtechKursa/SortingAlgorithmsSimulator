@@ -114,13 +114,10 @@ export class StepResultCollection {
 			return this.fullStepIndexes[this.fullStepIndexes.length - 1];
 		
 		let l = 0;
-		let r = this.fullStepIndexes.length;
+		let r = this.fullStepIndexes.length - 1;
 
-		while (true) {
-			if (l > r)
-				throw new Error("Unreachable Code Reached");
-
-			let i = (l + r) / 2;
+		while (l <= r) {
+			let i = Math.floor((l + r) / 2);
 
 			let current = this.fullStepIndexes[i];
 			let next = i + 1 < this.fullStepIndexes.length ? this.fullStepIndexes[i + 1] : null;
@@ -128,10 +125,12 @@ export class StepResultCollection {
 			if (current <= this.pointer && (next == null || this.pointer < next))
 				return i;
 			else if (this.pointer < current)
-				r = i;
+				r = i - 1;
 			else	// current < this.pointer
-				l = i;
+				l = i + 1;
 		}
+
+		throw new Error("Unreachable code reached");
 	}
 
 	public getEndStepNumber(): number | null {
