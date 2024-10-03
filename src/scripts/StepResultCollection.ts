@@ -111,7 +111,7 @@ export class StepResultCollection {
 
 	public getCurrentFullStepNumber(): number {
 		if (this.pointer >= this.fullStepIndexes[this.fullStepIndexes.length - 1])
-			return this.fullStepIndexes[this.fullStepIndexes.length - 1];
+			return this.fullStepIndexes.length - 1;
 		
 		let l = 0;
 		let r = this.fullStepIndexes.length - 1;
