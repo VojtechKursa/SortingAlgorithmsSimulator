@@ -1,15 +1,17 @@
 # TO DO list
 
-- Implement debugging for BubbleSort
-- Make debugging fully functional
+- Properly name everything
+- Add controls for skipping to the end and beginning
 
 - Document code
 
 - Reorganize UI
-
-- Implement Variable Watch
+- Add text area to renderer for displaying text notes from step results
 
 - Implement settings (colors, dark mode, ...)
+- Switch icons from being defined as fonts to being defined as downloaded images
+
+- Implement Variable Watch
 
 - Update Optimized Bubble Sort to be up-to-standard
 

@@ -6,6 +6,12 @@ import { PresetColor } from "../PresetColor";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
 
+enum HighlightState {
+    Selected,
+    OrderCorrect,
+    OrderSwapped
+};
+
 export class BubbleSort extends SortingAlgorithm {
     protected k: number;
     protected swapped: boolean;
@@ -17,8 +23,12 @@ export class BubbleSort extends SortingAlgorithm {
         this.swapped = false;
     }
 
-    protected makeStepResult(final: boolean, text: string, highlightedLines: number[], l?: number, additionalHighlights?: Highlights): StepResult {
+    protected makeFullStepResult(final: boolean, text: string, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: Highlights): StepResult {
         let highlights: Highlights = new Map<number, PresetColor>();
+
+        if (typeof highlightedLines == "number") {
+            highlightedLines = [highlightedLines];
+        }
 
         if (final) {
             for (let i = 0; i < this.current.length; i++) {
@@ -26,8 +36,18 @@ export class BubbleSort extends SortingAlgorithm {
             }
         }
         else {
-            highlights.set(this.k, PresetColor.Highlight_1);
-            highlights.set(this.k + 1, PresetColor.Highlight_2);
+            if (highlightState == HighlightState.Selected) {
+                highlights.set(this.k, PresetColor.Highlight_1);
+                highlights.set(this.k + 1, PresetColor.Highlight_2);
+            }
+            else if (highlightState == HighlightState.OrderCorrect) {
+                highlights.set(this.k, PresetColor.ElementOrderCorrect);
+                highlights.set(this.k + 1, PresetColor.ElementOrderCorrect);
+            }
+            else if (highlightState == HighlightState.OrderSwapped) {
+                highlights.set(this.k, PresetColor.ElementOrderSwapped);
+                highlights.set(this.k + 1, PresetColor.ElementOrderSwapped);
+            }
 
             if (l != undefined) {
                 for (let i = l; i < this.current.length; i++) {
@@ -45,36 +65,52 @@ export class BubbleSort extends SortingAlgorithm {
             }
         }
 
-        let codeHighlights: Highlights = new Map<number, PresetColor>();
-        highlightedLines.forEach(item => codeHighlights.set(item, PresetColor.CodeHighlight_1));
+        return new StepResultArray(final, text, this.makeCodeStepResult(highlightedLines), this.current, highlights);
+    }
 
-        return new StepResultArray(final, text, new CodeStepResult("", new Map<number, PresetColor>(), new Map<string, any>()), this.current, highlights);
+    protected makeCodeStepResult(highlightedLines: number[] | number, variables: Map<string, any> | undefined = undefined, text: string | undefined = undefined): CodeStepResult {
+        if (typeof highlightedLines == "number")
+            highlightedLines = [highlightedLines];
+
+        let highlights = new Map<number, PresetColor>();
+        highlightedLines.forEach(line => highlights.set(line, PresetColor.CodeHighlight_1));
+
+        return new CodeStepResult(text != undefined ? text : "", highlights, variables != undefined ? variables : new Map<string, any>())
     }
 
     protected * stepForwardInternal(): Generator<StepResult> {
-        // TODO: Adapt to debugger
+        yield this.makeCodeStepResult(1);
+
         do {
             this.swapped = false;
 
-            //yield this.makeStepResult(false, "Reset 'swapped' and start next pass.", [2, 3, 4]);
+            yield this.makeCodeStepResult(2);
+
+            yield this.makeCodeStepResult(4);
 
             for (this.k = 0; this.k < this.current.length - 1; this.k++) {
+                yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}`, HighlightState.Selected, 5)
+
                 if (this.current[this.k] > this.current[this.k + 1]) {
                     this.swapCurrent(this.k, this.k + 1);
                     this.swapped = true;
 
-                    yield this.makeStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger and will be swapped.`, [5, 6, 7, 8])
+                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger, elements will be swapped.`, HighlightState.OrderSwapped, [6, 7]);
+
+                    yield this.makeCodeStepResult(8);
                 }
                 else {
-                    yield this.makeStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, [5, 8]);
+                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, HighlightState.OrderCorrect, 8);
                 }
+
+                yield this.makeCodeStepResult(4);
             }
 
-            //yield this.makeStepResult(false, "", [10]);
-
+            yield this.makeCodeStepResult(9);
+            yield this.makeCodeStepResult(10);
         } while (this.swapped)
 
-        yield this.makeStepResult(true, "Array is sorted.", [this.getPseudocode.length - 1]);
+        yield this.makeFullStepResult(true, "Array is sorted.", undefined, [this.getPseudocode().length - 1]);
     }
 
     protected resetInternal(): void {

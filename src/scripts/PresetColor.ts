@@ -4,5 +4,7 @@ export const enum PresetColor {
     Highlight_2,
     Highlight_3,
     Sorted,
+    ElementOrderCorrect,
+    ElementOrderSwapped,
     CodeHighlight_1
 }

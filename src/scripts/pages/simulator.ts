@@ -51,6 +51,8 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     colorMap.set(PresetColor.Highlight_2, "green");
     colorMap.set(PresetColor.Highlight_3, "red");
     colorMap.set(PresetColor.Sorted, "grey");
+    colorMap.set(PresetColor.ElementOrderCorrect, "limegreen");
+    colorMap.set(PresetColor.ElementOrderSwapped, "red");
     colorMap.set(PresetColor.CodeHighlight_1, "yellow");
 
     let colorSet = new ColorSet(colorMap, "white");

@@ -4,7 +4,7 @@ import { BubbleSort } from "./BubbleSort";
 export class BubbleSortOptimized extends BubbleSort {
     // TODO: Update
     
-    private l: number;
+    protected l: number;
 
     public constructor(input: number[]) {
         super(input);
@@ -25,11 +25,11 @@ export class BubbleSortOptimized extends BubbleSort {
                     next_l = this.k + 1;
                 }
 
-                yield this.makeStepResult(false, "", [], this.l);
+                yield this.makeFullStepResult(false, "", undefined, [], this.l);
             }
         }
 
-        yield this.makeStepResult(true, "", []);
+        yield this.makeFullStepResult(true, "", undefined, []);
     }
 
     protected resetInternal(): void {
