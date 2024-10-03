@@ -3,7 +3,7 @@ import { BubbleSort } from "./BubbleSort";
 
 export class BubbleSortOptimized extends BubbleSort {
     // TODO: Update
-    
+
     protected l: number;
 
     public constructor(input: number[]) {

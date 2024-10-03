@@ -2,14 +2,14 @@ import { FullStepResult } from "./stepResults/FullStepResult";
 import { StepResult } from "./stepResults/StepResult";
 
 export class StepResultCollection {
-	private readonly collection : Array<StepResult>;
-	private readonly fullStepIndexes : Array<number>;
+	private readonly collection: Array<StepResult>;
+	private readonly fullStepIndexes: Array<number>;
 	private pointer: number;
 
 	private endStep: number | null;
 	private endFullStep: number | null;
 
-	public constructor (initialStep: StepResult) {
+	public constructor(initialStep: StepResult) {
 		this.collection = new Array<StepResult>();
 		this.fullStepIndexes = new Array<number>();
 		this.pointer = -1;
@@ -48,7 +48,7 @@ export class StepResultCollection {
 			this.pointer++;
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -112,7 +112,7 @@ export class StepResultCollection {
 	public getCurrentFullStepNumber(): number {
 		if (this.pointer >= this.fullStepIndexes[this.fullStepIndexes.length - 1])
 			return this.fullStepIndexes.length - 1;
-		
+
 		let l = 0;
 		let r = this.fullStepIndexes.length - 1;
 

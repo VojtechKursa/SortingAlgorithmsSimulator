@@ -13,7 +13,7 @@ export class CodeStepResult extends StepResult {
 
 	public constructor(text: string, codeHighlights: Highlights, variables: Map<string, any>) {
 		super(text);
-		
+
 		this.codeHighlights = codeHighlights;
 		this.variables = variables;
 	}

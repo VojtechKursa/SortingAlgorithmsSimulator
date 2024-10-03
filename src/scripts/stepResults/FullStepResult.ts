@@ -11,7 +11,7 @@ export abstract class FullStepResult extends StepResult {
     public readonly codeStepResult: CodeStepResult;
 
     protected constructor(final: boolean, text: string, codeStepResult: CodeStepResult) {
-		super(text);
+        super(text);
 
         this.final = final;
         this.codeStepResult = codeStepResult;
