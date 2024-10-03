@@ -1,13 +1,13 @@
-import { PresetDefinition } from "../PresetDefinition";
+import { InputPresetDefinition } from "../InputPresetDefinition";
 import { PlayerController } from "./PlayerController";
 
-export class SimulatorController {
+export class SimulatorPageController {
     private playerController: PlayerController;
 
     private presetSelect: HTMLSelectElement;
     private inputElement: HTMLInputElement;
 
-    private presets: PresetDefinition;
+    private presets: InputPresetDefinition;
 
     public constructor(
         playerController: PlayerController,
@@ -15,12 +15,12 @@ export class SimulatorController {
         presetLoadButton: HTMLButtonElement,
         inputElement: HTMLInputElement,
         inputSetButton: HTMLButtonElement,
-        extraPresets?: PresetDefinition
+        extraPresets?: InputPresetDefinition
     ) {
         this.playerController = playerController;
         this.presetSelect = presetSelect;
         this.inputElement = inputElement;
-        this.presets = new Map<string, Array<number> | ((length: number) => number[])>(SimulatorController.getDefaultPresets());
+        this.presets = new Map<string, Array<number> | ((length: number) => number[])>(SimulatorPageController.getDefaultPresets());
 
         if (extraPresets) {
             for (const key of extraPresets.keys()) {
@@ -90,8 +90,8 @@ export class SimulatorController {
         }
     }
 
-    private static getDefaultPresets(): PresetDefinition {
-        let result: PresetDefinition = new Map<string, (number[] | ((length: number) => number[]))>();
+    private static getDefaultPresets(): InputPresetDefinition {
+        let result: InputPresetDefinition = new Map<string, (number[] | ((length: number) => number[]))>();
 
         result.set("Random", amount => {
             let ret = new Array(amount);

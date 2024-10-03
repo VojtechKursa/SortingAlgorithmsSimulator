@@ -3,19 +3,19 @@ import { ColorSet } from "../ColorSet";
 import { VisualizationElement, FullStepResult } from "../stepResults/FullStepResult";
 import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
-import { PlayerElementContainer } from "../PlayerElementContainer";
+import { PlayerControls } from "../PlayerControls";
 
 export class PlayerController {
     private readonly algorithm: SortingAlgorithm;
     private steps: StepResultCollection;
-    private autoPlayTimerId: NodeJS.Timeout | null;
+    private autoPlayTimerId: NodeJS.Timeout | number | null;
 
     private readonly visualizationElement: VisualizationElement;
     private readonly debuggerElement: DebuggerElement;
     private readonly variableWatchElement: VariableWatchElement;
 
-    private playerElementContainer: PlayerElementContainer;
-    private debuggerElementContainer: PlayerElementContainer;
+    private playerElementContainer: PlayerControls;
+    private debuggerElementContainer: PlayerControls;
 
     private resetButton: HTMLButtonElement;
 
@@ -25,8 +25,8 @@ export class PlayerController {
         outputElement: VisualizationElement,
         debuggerElement: DebuggerElement,
         variableWatchElement: VariableWatchElement, 
-        playerElementContainer: PlayerElementContainer,
-        debuggerElementContainer: PlayerElementContainer,
+        playerElementContainer: PlayerControls,
+        debuggerElementContainer: PlayerControls,
         resetButton: HTMLButtonElement
     ) {
         this.colorSet = colorSet;

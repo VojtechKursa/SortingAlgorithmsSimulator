@@ -1,4 +1,4 @@
-export class PlayerElementContainer {
+export class PlayerControls {
 	public readonly back: HTMLButtonElement;
 	public readonly step: HTMLOutputElement;
 	public readonly forward: HTMLButtonElement;

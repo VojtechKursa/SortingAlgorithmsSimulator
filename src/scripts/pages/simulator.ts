@@ -1,9 +1,9 @@
 import { ColorSet } from "../ColorSet";
-import { PlayerElementContainer } from "../PlayerElementContainer";
+import { PlayerControls } from "../PlayerControls";
 import { PresetColor } from "../PresetColor";
-import { PresetDefinition } from "../PresetDefinition";
+import { InputPresetDefinition } from "../InputPresetDefinition";
 import { PlayerController } from "../controllers/PlayerController";
-import { SimulatorController } from "../controllers/SimulatorController";
+import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 
 
@@ -16,8 +16,8 @@ function findOutputElement(id: string): SVGSVGElement {
     throw new Error("Output element not found");
 }
 
-export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: PresetDefinition): SimulatorController {
-    let playerElementContainer: PlayerElementContainer;
+export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPresetDefinition): SimulatorPageController {
+    let playerElementContainer: PlayerControls;
     {
         let back = document.getElementById("step_back") as HTMLButtonElement;
         let step = document.getElementById("step_id") as HTMLOutputElement;
@@ -26,10 +26,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
         let play = document.getElementById("player_control_play") as HTMLInputElement;
         let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
 
-        playerElementContainer = new PlayerElementContainer(back, step, next, pause, play, periodInput);
+        playerElementContainer = new PlayerControls(back, step, next, pause, play, periodInput);
     }
 
-    let debuggerElementContainer: PlayerElementContainer;
+    let debuggerElementContainer: PlayerControls;
     {
         let backCode = document.getElementById("step_code_back") as HTMLButtonElement;
         let stepCode = document.getElementById("step_code_id") as HTMLOutputElement;
@@ -38,7 +38,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
         let playCode = document.getElementById("player_control_code_play") as HTMLInputElement;
         let periodInputCode = document.getElementById("player_control_code_period") as HTMLInputElement;
 
-        debuggerElementContainer = new PlayerElementContainer(backCode, stepCode, nextCode, pauseCode, playCode, periodInputCode);
+        debuggerElementContainer = new PlayerControls(backCode, stepCode, nextCode, pauseCode, playCode, periodInputCode);
     }
 
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
@@ -87,5 +87,5 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
         debug_view.appendChild(line);
     });
 
-    return new SimulatorController(playerController, presetSelect, presetSelectButton, numbersInput, numbersSet, extraPresets);
+    return new SimulatorPageController(playerController, presetSelect, presetSelectButton, numbersInput, numbersSet, extraPresets);
 }

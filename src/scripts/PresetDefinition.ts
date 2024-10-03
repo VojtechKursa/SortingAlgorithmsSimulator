@@ -1,1 +1,0 @@
-export type PresetDefinition = Map<string, Array<number> | ((length: number) => number[])>;
