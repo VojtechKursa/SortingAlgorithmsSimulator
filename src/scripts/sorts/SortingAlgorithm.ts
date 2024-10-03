@@ -52,7 +52,7 @@ export abstract class SortingAlgorithm {
             else
                 codeResults.push(result as CodeStepResult);
         } while (stepResult == null);
-        
+
         if (stepResult.final)
             this.finalStepResult = stepResult;
 
@@ -64,6 +64,9 @@ export abstract class SortingAlgorithm {
             return this.finalStepResult;
 
         let result = this.generator.next().value as StepResult;
+
+        if (result instanceof FullStepResult && result.final)
+            this.finalStepResult = result as FullStepResult;
 
         return result;
     }

@@ -3,7 +3,7 @@
 
 
 :root {
-    --code-highlight-color: yellow;
+    --code-highlight-color: rgba(255, 255, 0, 0.5);
 }
 
 
@@ -22,6 +22,16 @@ label {
 
 #button_reset {
     margin-top: 8px;
+}
+
+#navbar {
+    display: flex;
+    
+    #settings_button_wrapper {
+        width: fit-content;
+        
+        @extend .right-align;
+    }
 }
 
 #row_main {
@@ -98,10 +108,10 @@ label {
             text-align: center;
         }
 
-        #period_container {
+        .period_container {
             padding: 8px;
 
-            #player_control_period {
+            input {
                 width: 4.5em;
             }
         }

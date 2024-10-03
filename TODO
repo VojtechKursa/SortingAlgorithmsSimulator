@@ -1,14 +1,11 @@
 # TO DO list
 
-- Properly name everything
-- Add controls for skipping to the end and beginning
-
 - Document code
 
 - Reorganize UI
 - Add text area to renderer for displaying text notes from step results
 
-- Implement settings (colors, dark mode, ...)
+- Implement settings (colors, dark mode, tab spaces, ...)
 - Switch icons from being defined as fonts to being defined as downloaded images
 
 - Implement Variable Watch

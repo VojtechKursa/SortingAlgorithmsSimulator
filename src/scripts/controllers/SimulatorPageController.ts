@@ -7,6 +7,8 @@ export class SimulatorPageController {
     private presetSelect: HTMLSelectElement;
     private inputElement: HTMLInputElement;
 
+    private settingsOpenButton: HTMLButtonElement;
+
     private presets: InputPresetDefinition;
 
     public constructor(
@@ -15,11 +17,14 @@ export class SimulatorPageController {
         presetLoadButton: HTMLButtonElement,
         inputElement: HTMLInputElement,
         inputSetButton: HTMLButtonElement,
+        settingsOpenButton: HTMLButtonElement,
         extraPresets?: InputPresetDefinition
     ) {
         this.playerController = playerController;
         this.presetSelect = presetSelect;
         this.inputElement = inputElement;
+        this.settingsOpenButton = settingsOpenButton;
+
         this.presets = new Map<string, Array<number> | ((length: number) => number[])>(SimulatorPageController.getDefaultPresets());
 
         if (extraPresets) {

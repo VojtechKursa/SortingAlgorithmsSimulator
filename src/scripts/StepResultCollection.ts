@@ -141,6 +141,14 @@ export class StepResultCollection {
 		return this.endFullStep;
 	}
 
+	public getLastKnownStepNumber(): number {
+		return this.collection.length - 1;
+	}
+
+	public getLastKnownFullStepNumber(): number {
+		return this.fullStepIndexes.length - 1;
+	}
+
 	public isCurrentStepFull(): boolean {
 		return this.collection[this.pointer] instanceof FullStepResult;
 	}

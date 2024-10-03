@@ -3,19 +3,23 @@ import { ColorSet } from "../ColorSet";
 import { VisualizationElement, FullStepResult } from "../stepResults/FullStepResult";
 import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
-import { PlayerControls } from "../PlayerControls";
+import { ControlElements } from "../controlElements/ControlElements";
+import { RendererControlElements } from "../controlElements/RendererControlElements";
+import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
 
 export class PlayerController {
     private readonly algorithm: SortingAlgorithm;
     private steps: StepResultCollection;
+
     private autoPlayTimerId: NodeJS.Timeout | number | null;
+    private playingCode: boolean = false;
 
     private readonly visualizationElement: VisualizationElement;
     private readonly debuggerElement: DebuggerElement;
     private readonly variableWatchElement: VariableWatchElement;
 
-    private playerElementContainer: PlayerControls;
-    private debuggerElementContainer: PlayerControls;
+    private playerElementContainer: RendererControlElements;
+    private debuggerElementContainer: DebuggerControlElements;
 
     private resetButton: HTMLButtonElement;
 
@@ -24,9 +28,9 @@ export class PlayerController {
     public constructor(colorSet: ColorSet, algorithm: SortingAlgorithm,
         outputElement: VisualizationElement,
         debuggerElement: DebuggerElement,
-        variableWatchElement: VariableWatchElement, 
-        playerElementContainer: PlayerControls,
-        debuggerElementContainer: PlayerControls,
+        variableWatchElement: VariableWatchElement,
+        playerElementContainer: RendererControlElements,
+        debuggerElementContainer: DebuggerControlElements,
         resetButton: HTMLButtonElement
     ) {
         this.colorSet = colorSet;
@@ -47,13 +51,17 @@ export class PlayerController {
 
         this.reset();
 
-        this.playerElementContainer.back.addEventListener("click", _ => this.backward());
-        this.playerElementContainer.forward.addEventListener("click", _ => this.forward());
-        this.playerElementContainer.play.addEventListener("click", _ => this.play());
-        this.playerElementContainer.pause.addEventListener("click", _ => this.pause());
+        this.playerElementContainer.backButton.addEventListener("click", _ => this.backward());
+        this.playerElementContainer.forwardButton.addEventListener("click", _ => this.forward());
+        this.playerElementContainer.beginningButton.addEventListener("click", _ => this.toBeginning());
+        this.playerElementContainer.endButton.addEventListener("click", _ => this.toEnd());
+        this.playerElementContainer.playButton.addEventListener("click", _ => this.play());
+        this.playerElementContainer.pauseButton.addEventListener("click", _ => this.pause());
 
-        this.debuggerElementContainer.back.addEventListener("click", _ => this.backwardCode());
-        this.debuggerElementContainer.forward.addEventListener("click", _ => this.forwardCode());
+        this.debuggerElementContainer.backButton.addEventListener("click", _ => this.backwardCode());
+        this.debuggerElementContainer.forwardButton.addEventListener("click", _ => this.forwardCode());
+        this.debuggerElementContainer.playButton.addEventListener("click", _ => this.playCode());
+        this.debuggerElementContainer.pauseButton.addEventListener("click", _ => this.pauseCode());
 
         this.resetButton.addEventListener("click", _ => this.reset());
     }
@@ -71,13 +79,13 @@ export class PlayerController {
         }
 
         let endStepNumberFull = this.steps.getEndFullStepNumber();
-        this.playerElementContainer.step.value = `${this.steps.getCurrentFullStepNumber()} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
+        this.playerElementContainer.stepOutput.value = `${this.steps.getCurrentFullStepNumber()} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
 
         let endStepNumber = this.steps.getEndStepNumber();
-        this.debuggerElementContainer.step.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
+        this.debuggerElementContainer.stepOutput.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
     }
 
-    private forward(): void {
+    public forward(): void {
         if (this.steps.forwardFull())
             this.redraw();
         else {
@@ -94,14 +102,40 @@ export class PlayerController {
         this.updateStepControls();
     }
 
-    private backward(): void {
+    public backward(): void {
         if (this.steps.backwardFull())
             this.redraw();
 
         this.updateStepControls();
     }
 
-    private forwardCode(): void {
+    public toBeginning(): void {
+        this.steps.goToStep(0);
+
+        this.redraw();
+        this.updateStepControls();
+    }
+
+    public toEnd(): void {
+        let endStepNumber = this.steps.getEndStepNumber();
+
+        if (endStepNumber != null) {
+            this.steps.goToStep(endStepNumber);
+        }
+        else {
+            while (!this.algorithm.isCompleted()) {
+                let result = this.algorithm.stepForward();
+                this.steps.add(result);
+            }
+
+            this.steps.goToStep(this.steps.getLastKnownStepNumber());
+        }
+
+        this.redraw();
+        this.updateStepControls();
+    }
+
+    public forwardCode(): void {
         if (this.steps.forward())
             this.redraw();
         else {
@@ -109,7 +143,7 @@ export class PlayerController {
                 let result = this.algorithm.stepForward();
 
                 this.steps.addAndAdvance(result);
-                
+
                 this.redraw();
             }
         }
@@ -117,7 +151,7 @@ export class PlayerController {
         this.updateStepControls();
     }
 
-    private backwardCode(): void {
+    public backwardCode(): void {
         if (this.steps.backward())
             this.redraw();
 
@@ -128,55 +162,117 @@ export class PlayerController {
         let endStep = this.steps.getEndStepNumber();
         let currentStep = this.steps.getCurrentStepNumber();
 
-        if (endStep != null && currentStep == endStep) {
-            if (!this.playerElementContainer.forward.disabled) {
-                this.playerElementContainer.forward.disabled = true;
-                this.playerElementContainer.play.disabled = true;
+        if (currentStep == endStep) {
+            if (!this.playerElementContainer.forwardButton.disabled) {
+                this.playerElementContainer.forwardButton.disabled = true;
+                this.playerElementContainer.playButton.disabled = true;
+                this.playerElementContainer.endButton.disabled = true;
+
+                this.debuggerElementContainer.forwardButton.disabled = true;
             }
 
             if (this.autoPlayTimerId != null) {
-                clearInterval(this.autoPlayTimerId);
-                this.autoPlayTimerId = null;
-
-                this.playerElementContainer.pause.checked = true;
-            }
-
-            if (this.playerElementContainer.periodInput.disabled) {
-                this.playerElementContainer.periodInput.disabled = false;
+                if (this.playingCode) {
+                    this.pauseCode();
+                }
+                else {
+                    this.pause();
+                }
             }
         }
-        else if (this.playerElementContainer.forward.disabled) {
-            this.playerElementContainer.forward.disabled = false;
-            this.playerElementContainer.play.disabled = false;
+        else if (this.playerElementContainer.forwardButton.disabled) {
+            this.playerElementContainer.forwardButton.disabled = false;
+            this.playerElementContainer.playButton.disabled = false;
+            this.playerElementContainer.endButton.disabled = false;
+
+            this.debuggerElementContainer.forwardButton.disabled = false;
         }
 
         if (currentStep <= 0) {
-            if (!this.playerElementContainer.back.disabled) {
-                this.playerElementContainer.back.disabled = true;
+            if (!this.playerElementContainer.backButton.disabled) {
+                this.playerElementContainer.backButton.disabled = true;
+                this.playerElementContainer.beginningButton.disabled = true;
+
+                this.debuggerElementContainer.backButton.disabled = true;
             }
         }
-        else if (this.playerElementContainer.back.disabled) {
-            this.playerElementContainer.back.disabled = false;
+        else if (this.playerElementContainer.backButton.disabled) {
+            this.playerElementContainer.backButton.disabled = false;
+            this.playerElementContainer.beginningButton.disabled = false;
+
+            this.debuggerElementContainer.backButton.disabled = false;
         }
     }
 
-    private play(): void {
-        if (this.autoPlayTimerId == null) {
-            this.playerElementContainer.periodInput.disabled = true;
-            let value = this.playerElementContainer.periodInput.valueAsNumber
+    private getPlayInterval(inputElement: HTMLInputElement): number {
+        let value = inputElement.valueAsNumber;
 
-            let intervalMs: number;
+        if (value <= 0 || Number.isNaN(value)) {
+            value = Number.parseFloat(inputElement.min);
 
-            if (value <= 0 || Number.isNaN(value)) {
-                let min = Number.parseFloat(this.playerElementContainer.periodInput.min);
+            inputElement.valueAsNumber = value;
+        }
 
-                intervalMs = min * 1000;
+        return value * 1000;
+    }
 
-                this.playerElementContainer.periodInput.valueAsNumber = min;
+    private updatePlayControls(starting: boolean, playingCode: boolean): void {
+        if (starting) {
+            if (playingCode) {
+                this.playerElementContainer.pauseButton.disabled = true;
+                this.playerElementContainer.playButton.disabled = true;
+
+                this.debuggerElementContainer.periodInput.disabled = true;
+
+                if (!this.debuggerElementContainer.playButton.checked) {
+                    this.debuggerElementContainer.playButton.checked = true;
+                }
             }
             else {
-                intervalMs = this.playerElementContainer.periodInput.valueAsNumber * 1000;
+                this.debuggerElementContainer.pauseButton.disabled = true;
+                this.debuggerElementContainer.playButton.disabled = true;
+
+                this.playerElementContainer.periodInput.disabled = true;
+
+                if (!this.playerElementContainer.playButton.checked) {
+                    this.playerElementContainer.playButton.checked = true;
+                }
             }
+        }
+        else {
+            if (playingCode) {
+                this.playerElementContainer.pauseButton.disabled = false;
+                this.playerElementContainer.playButton.disabled = false;
+
+                this.debuggerElementContainer.periodInput.disabled = false;
+
+                if (!this.debuggerElementContainer.pauseButton.checked) {
+                    this.debuggerElementContainer.pauseButton.checked = true;
+                }
+            }
+            else {
+                this.debuggerElementContainer.pauseButton.disabled = false;
+                this.debuggerElementContainer.playButton.disabled = false;
+
+                this.playerElementContainer.periodInput.disabled = false;
+
+                if (!this.playerElementContainer.pauseButton.checked) {
+                    this.playerElementContainer.pauseButton.checked = true;
+                }
+            }
+        }
+
+        if (starting)
+            this.playingCode = playingCode;
+        else
+            this.playingCode = false;
+    }
+
+    public play(): void {
+        if (this.autoPlayTimerId == null) {
+            let intervalMs = this.getPlayInterval(this.playerElementContainer.periodInput);
+
+            this.updatePlayControls(true, false);
 
             this.forward();
 
@@ -184,16 +280,37 @@ export class PlayerController {
         }
     }
 
-    private pause(): void {
-        if (this.autoPlayTimerId != null) {
+    public pause(): void {
+        if (this.autoPlayTimerId != null && !this.playingCode) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
 
-            this.playerElementContainer.periodInput.disabled = false;
+            this.updatePlayControls(false, false);
         }
     }
 
-    private reset(): void {
+    public playCode(): void {
+        if (this.autoPlayTimerId == null) {
+            let intervalMs = this.getPlayInterval(this.debuggerElementContainer.periodInput);
+
+            this.updatePlayControls(true, true);
+
+            this.forwardCode();
+
+            this.autoPlayTimerId = setInterval(() => this.forwardCode(), intervalMs);
+        }
+    }
+
+    public pauseCode(): void {
+        if (this.autoPlayTimerId != null && this.playingCode) {
+            clearInterval(this.autoPlayTimerId);
+            this.autoPlayTimerId = null;
+
+            this.updatePlayControls(false, true);
+        }
+    }
+
+    public reset(): void {
         if (this.autoPlayTimerId != null) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
