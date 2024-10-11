@@ -34,4 +34,12 @@ to build the application in development mode.
 
 ### Output
 
-The built application will be located in the `dist` folder.
+The built application will be located in the `dist` folder in the root directory of the repo.
+
+### Development server
+
+Repo contains a simple HTTP server that will serve the built application on a loopback interface, to run it, use the command
+
+```sh
+npm run serve
+```
