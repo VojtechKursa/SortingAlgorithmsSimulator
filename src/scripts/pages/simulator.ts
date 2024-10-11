@@ -47,7 +47,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
     let output = findOutputElement("canvas");
-    let debug_view = document.getElementById("col_debugger") as HTMLDivElement;
+    let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
     let colorMap = new Map<PresetColor, string>();
     colorMap.set(PresetColor.Highlight_1, "blue");
