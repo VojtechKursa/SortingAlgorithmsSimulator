@@ -86,27 +86,29 @@
                 <div id="col_controls" class="col-lg row align-items-center">
                     <div class="col">
                         <div class="control_module">
-                            <label for="preset_select">Presets</label>
-                            <select id="preset_select" class="form-select">
-                            </select>
-                            <button id="preset_load" class="btn btn-primary confirm_button">Load</button>
-                        </div>
-                        
-                        <div class="control_module">
-                            <div>
-                                <label for="numbers_input" class="block">Input</label>
-                                <input id="numbers_input" type="text">
-                            </div>
-                            <button id="numbers_set" class="btn btn-primary confirm_button">Set</button>
-                        </div>
-
-                        <div class="control_module">
                             <button id="button_reset" class="btn btn-danger"><i class="bi bi-arrow-repeat"></i> Reset</button>
+                            <button id="button_show_dialog_input" class="btn btn-primary">Show input dialog</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+        <dialog id="dialog_input">
+            <div class="select_wrapper">
+                <label for="dialog_input-method">Input method</label>
+                <select id="dialog_input-method" class="form-select"></select>
+            </div>
+            <div id="dialog_input-method_area">
+
+            </div>
+            <div class="dialog_buttons">
+                <button id="dialog_input_ok_button" class="btn btn-primary">Load</button>
+                <button id="dialog_input_close_button" class="btn btn-primary">Close</button>
+            </div>
+        </dialog>
 
 
 
