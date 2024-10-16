@@ -1,4 +1,6 @@
+import { FileInputMethod } from "../input/methods/FileInputMethod";
 import { InputMethod } from "../input/methods/InputMethod";
+import { ManualInputMethod } from "../input/methods/ManualInputMethod";
 import { PresetInputMethod } from "../input/methods/PresetInputMethod";
 import { InputFunctionRandom } from "../input/presets/functions/InputFunctionRandom";
 import { InputFunctionReversed } from "../input/presets/functions/InputFunctionReversed";
@@ -21,7 +23,6 @@ export class InputController {
 	private previousMethod: InputMethod;
 
 	public inputMethods: InputMethod[];
-	public inputPresets: InputPreset[];
 
 	public constructor(
 		playerController: PlayerController,
@@ -45,13 +46,13 @@ export class InputController {
 		this.dialog_okButton = dialog_okButton;
 		this.dialog_closeButton = dialog_closeButton;
 
-		this.inputPresets = InputController.getDefaultPresets();
+		let inputPresets = InputController.getDefaultPresets();
 
-		if(extraPresets) {
-			this.inputPresets.concat(extraPresets);
+		if (extraPresets) {
+			inputPresets = inputPresets.concat(extraPresets);
 		}
 
-		this.inputMethods = this.createInputMethods();
+		this.inputMethods = this.createInputMethods(inputPresets);
 		this.previousMethod = this.inputMethods[0];
 
 		this.inputMethods.forEach((method, index) => {
@@ -86,8 +87,17 @@ export class InputController {
 		this.body.classList.remove("blur");
 	}
 
-	public loadInput() {
+	public async loadInput() {
+		let input = await this.getCurrentMethod().getInput();
 
+		if (input != null) {
+			this.playerController.setInput(input);
+			this.dialog.close();
+		}
+	}
+
+	public getCurrentMethod(): InputMethod {
+		return this.inputMethods[this.dialog_methodSelector.selectedIndex];
 	}
 
 	public switchToMethod(index: number) {
@@ -108,9 +118,11 @@ export class InputController {
 		return new InputFunctionRandom().getArray();
 	}
 
-	private createInputMethods(): InputMethod[] {
+	private createInputMethods(inputPresets: InputPreset[]): InputMethod[] {
 		return [
-			new PresetInputMethod(this.inputPresets),
+			new PresetInputMethod(inputPresets),
+			new ManualInputMethod(),
+			new FileInputMethod(),
 		];
 	}
 

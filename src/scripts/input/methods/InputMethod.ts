@@ -5,5 +5,5 @@ export interface InputMethod {
 	createForm(methodArea: HTMLDivElement, loadButton: HTMLButtonElement): void;
 	onClear(): void;
 
-	getInput(): number[] | null;
+	getInput(): Promise<number[] | null>;
 }

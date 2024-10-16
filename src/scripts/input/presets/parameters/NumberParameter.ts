@@ -38,6 +38,8 @@ export class NumberParameter extends InputPresetParameter {
 		super.createForm(parametersDiv, loadButton);
 
 		if (this.input != null) {
+			this.input.type = "number";
+
 			if (this.min != undefined)
 				this.input.min = this.min.toString();
 			if (this.max != undefined)

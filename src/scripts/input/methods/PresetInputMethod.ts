@@ -78,7 +78,14 @@ export class PresetInputMethod implements InputMethod {
 		this.loadButton = undefined;
 	}
 
-	public getInput(): number[] | null {
-		throw new Error("Method not implemented.");
+	public getCurrentPreset(): InputPreset {
+		if (this.select == undefined)
+			throw new Error("Attempted to retrieve preset when preset input method isn't active");
+
+		return this.presets[this.select.selectedIndex];
+	}
+
+	public async getInput(): Promise<number[]> {
+		return this.getCurrentPreset().getArray();
 	}
 }
