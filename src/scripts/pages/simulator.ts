@@ -69,10 +69,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let inputDialogMethodSelector = document.getElementById("dialog_input-method") as HTMLSelectElement;
     let inputDialogMethodArea = document.getElementById("dialog_input-method_area") as HTMLDivElement;
     let inputDialogOkButton = document.getElementById("dialog_input_ok_button") as HTMLButtonElement;
-    let inputDialogCloseButton = document.getElementById("dialog_input_close_button") as HTMLButtonElement; 
+    let inputDialogCloseButton = document.getElementById("dialog_input_close_button") as HTMLButtonElement;
 
     let inputController = new InputController(playerController, body, inputDialog, inputDialogOpenButton, inputDialogMethodSelector, inputDialogMethodArea, inputDialogOkButton, inputDialogCloseButton, extraPresets);
 
+    window.addEventListener("load", _ => playerController.redraw());    // ensure the first drawing is correct
     window.addEventListener("resize", _ => playerController.redraw());
 
     let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
