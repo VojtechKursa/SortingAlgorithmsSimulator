@@ -3,7 +3,6 @@ import { ColorSet } from "../ColorSet";
 import { VisualizationElement, FullStepResult } from "../stepResults/FullStepResult";
 import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
-import { ControlElements } from "../controlElements/ControlElements";
 import { RendererControlElements } from "../controlElements/RendererControlElements";
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
 
@@ -70,7 +69,7 @@ export class PlayerController {
         let currentStep = this.steps.getCurrentStep();
 
         if (currentStep instanceof FullStepResult) {
-            let step = currentStep as FullStepResult;
+            let step = currentStep;
             step.display(this.visualizationElement, this.colorSet, this.debuggerElement, this.variableWatchElement);
         }
         else {

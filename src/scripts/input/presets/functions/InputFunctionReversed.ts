@@ -7,7 +7,7 @@ export class InputFunctionReversed extends InputFunction {
 
 	public getArray(): number[] {
 		const length = this.lengthParameter.getValueNumberMandatory();
-		
+
 		let result = new Array(length);
 
 		for (let i = 0; i < result.length; i++) {

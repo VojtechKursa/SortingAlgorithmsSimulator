@@ -22,11 +22,11 @@ export class InputFunctionRandom extends InputFunction {
 		const min = this.minParameter.getValueNumberMandatory();
 		const max = this.maxParameter.getValueNumberMandatory();
 
-		if(min <= max)
+		if (min <= max)
 			return null;
 		else {
 			const problemString = `${this.minParameter.readableName} must be less or equal to ${this.maxParameter.readableName}.`;
-			
+
 			this.minParameter.setProblem(problemString);
 			this.maxParameter.setProblem(problemString);
 
@@ -38,7 +38,7 @@ export class InputFunctionRandom extends InputFunction {
 		const length = this.lengthParameter.getValueNumberMandatory();
 		const min = this.minParameter.getValueNumberMandatory();
 		const max = this.maxParameter.getValueNumberMandatory();
-		
+
 		const diff = max - min;
 
 		let result = new Array(length);

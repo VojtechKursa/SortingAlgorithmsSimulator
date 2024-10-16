@@ -14,7 +14,7 @@ export class SimulatorPageController {
     ) {
         this.playerController = playerController;
         this.inputController = inputController;
-        
+
         this.settingsOpenButton = settingsOpenButton;
     }
 

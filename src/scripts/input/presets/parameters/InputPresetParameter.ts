@@ -90,7 +90,7 @@ export class InputPresetParameter {
 				break;
 		}
 
-		if(result != null)
+		if (result != null)
 			this.setProblem(result);
 		else
 			this.unsetProblem();
@@ -109,7 +109,7 @@ export class InputPresetParameter {
 		return null;
 	}
 
-	public setProblem(problem: string | null = null) {
+	public setProblem(problem: string | null = null): void {
 		if (this.problemActive)
 			return;
 
@@ -129,8 +129,8 @@ export class InputPresetParameter {
 		this.problemActive = true;
 	}
 
-	public unsetProblem() {
-		if(!this.problemActive)
+	public unsetProblem(): void {
+		if (!this.problemActive)
 			return;
 
 		if (this.wrapper != undefined)
@@ -147,7 +147,7 @@ export class InputPresetParameter {
 		this.problemActive = false;
 	}
 
-	public onClear() {
+	public onClear(): void {
 		this.label = undefined;
 		this.input = undefined;
 		this.problemDescriptionDiv = undefined;

@@ -10,12 +10,12 @@ export abstract class InputFunction implements InputPreset {
 
 	protected constructor(name: string) {
 		this.name = name;
-		
+
 		this.lengthParameter = new NumberParameter("length", "Length", 10, true, 0, undefined, 1, RoundBehavior.Round);
 		this.parameters = [this.lengthParameter];
 	}
 
-	public createForm(parametersDiv: HTMLDivElement, loadButton: HTMLButtonElement) {
+	public createForm(parametersDiv: HTMLDivElement, loadButton: HTMLButtonElement): void {
 		this.parameters.forEach(parameter => parameter.createForm(parametersDiv, loadButton));
 	}
 
