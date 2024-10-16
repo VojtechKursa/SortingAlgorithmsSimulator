@@ -67,7 +67,11 @@ label {
 
 
     #col_renderer {
+        display: flex;
+        flex-flow: column;
+
         @media (max-width: 992px) {
+            height: fit-content;
             border-bottom: $border
         }
         @media (min-width: 992px) {
