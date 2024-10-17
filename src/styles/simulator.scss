@@ -6,6 +6,14 @@
     --code-highlight-color: rgba(255, 255, 0, 0.5);
 }
 
+select {
+    margin-top: 4px;
+}
+
+.btn-group output {
+    text-align: center;
+    align-content: center;
+}
 
 .control_module {
     @include common.margin-vertical();
@@ -32,18 +40,22 @@
     }
 }
 
-.btn-group output {
-    text-align: center;
-    align-content: center;
+.input_parameter_module {
+    .input_wrapper {
+        display: flex;
+
+        label {
+            width: 100px;
+    
+            margin-right: 1em;
+        }
+    
+        input {
+            flex-grow: 1;
+        }
+    }
 }
 
-select {
-    margin-top: 4px;
-}
-
-#button_reset {
-    margin-top: 8px;
-}
 
 #navbar {
     display: flex;
@@ -120,18 +132,31 @@ select {
             }
         }
     }
+}
 
-    #col_controls {
-        padding: 1em;
-        --bs-gutter-x: 0;
+#row_simulator_controls {
+    display: flex;
+    justify-content: space-between;
 
-        @media (min-width: 992px) {
-            max-width: 370px;
+    margin-top: 1em;
+
+    min-width: fit-content;
+
+    button {
+        @include common.margin-horizontal(1em);
+
+        width: 100%;
+        max-width: 250px;
+        min-width: fit-content;
+
+        height: 50px;
+
+        &:first-child {
+            margin-left: 0;
         }
 
-        #numbers_input {
-            width: 96%;
-            text-align: center;
+        &:last-child {
+            margin-right: 0;
         }
     }
 }
@@ -160,22 +185,6 @@ select {
                     margin-top: 0;
                 }
             }
-        }
-    }
-}
-
-.input_parameter_module {
-    .input_wrapper {
-        display: flex;
-
-        label {
-            width: 100px;
-    
-            margin-right: 1em;
-        }
-    
-        input {
-            flex-grow: 1;
         }
     }
 }
