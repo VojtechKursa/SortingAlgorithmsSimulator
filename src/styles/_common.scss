@@ -57,6 +57,14 @@
     padding: 8px 12px;
 }
 
+.btn-group {
+    min-width: max-content;
+}
+
+.container-fluid {
+    min-width: min-content;
+}
+
 .breadcrumb {
     @include margin-vertical(0.5rem);
 }

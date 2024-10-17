@@ -24,6 +24,10 @@ select {
     * {
         min-height: 100%;
     }
+    
+    > * {
+        min-width: max-content;
+    }
 
     .continuous_control {
         @extend .right-align;
@@ -34,7 +38,7 @@ select {
             margin-right: 16px;
 
             input {
-                width: 4em;
+                width: 3em;
             }
         }
     }
@@ -59,6 +63,8 @@ select {
 
 #navbar {
     display: flex;
+
+    @include common.margin-vertical(8px);
     
     #settings_button_wrapper {
         width: fit-content;
@@ -78,7 +84,7 @@ select {
         display: flex;
         flex-flow: column;
 
-        @media (max-width: 992px) {
+        @media (max-width: 991px) {
             height: fit-content;
             border-bottom: $border
         }
