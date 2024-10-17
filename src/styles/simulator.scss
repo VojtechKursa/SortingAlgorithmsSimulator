@@ -37,12 +37,8 @@
     align-content: center;
 }
 
-.confirm_button {
-    margin-top: 8px;
-}
-
-label {
-    margin-bottom: 4px;
+select {
+    margin-top: 4px;
 }
 
 #button_reset {
@@ -140,11 +136,65 @@ label {
     }
 }
 
-.wrong {
-    $primary-color: red;
+#dialog_input {
+    #dialog_input-method_area {
+        @include common.margin-vertical(2em);
 
-    color: $primary-color;
+        label {
+            width: 100px;
 
-    border-width: 2px;
-    border-color: $primary-color;
+            margin-right: 1em;
+        }
+
+        > div {
+            margin-top: 1em;
+
+            &:first-child {
+                margin-top: 0;
+            }
+
+            div {
+                margin-top: 0.5em;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+            }
+        }
+    }
+}
+
+.input_parameter_module {
+    .input_wrapper {
+        display: flex;
+
+        label {
+            width: 100px;
+    
+            margin-right: 1em;
+        }
+    
+        input {
+            flex-grow: 1;
+        }
+    }
+}
+
+.dialog_buttons {
+    display: flex;
+    flex-flow: row;
+
+    button {
+        width: 100%;
+
+        @include common.margin-horizontal(0.5em);
+        
+        &:first-child {
+            margin-left: 0;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
 }

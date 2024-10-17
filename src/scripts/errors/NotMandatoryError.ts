@@ -1,7 +1,7 @@
 /**
  * Error which is thrown when a non-mandatory InputPresetParameter is requested as if it was mandatory.
  */
-export class MandatoryError extends Error {
+export class NotMandatoryError extends Error {
 	public readonly parameterName: string;
 
 	public constructor(parameterName: string) {

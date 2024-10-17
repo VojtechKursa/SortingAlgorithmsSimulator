@@ -1,4 +1,5 @@
-import { NumberParameter, RoundBehavior } from "../parameters/NumberParameter";
+import { InputParameter } from "../../parameters/InputParameter";
+import { NumberParameter, RoundBehavior } from "../../parameters/NumberParameter";
 import { InputFunction } from "./InputFunction";
 
 export class InputFunctionRandom extends InputFunction {
@@ -11,27 +12,28 @@ export class InputFunctionRandom extends InputFunction {
 		this.minParameter = new NumberParameter("min", "Minimum", 0, true);
 		this.maxParameter = new NumberParameter("max", "Maximum", 50, true);
 
-		this.minParameter.addInputListener(this.minMaxCorrectnessEnsurer);
-		this.maxParameter.addInputListener(this.minMaxCorrectnessEnsurer);
+		this.minParameter.addInputListener((_, event, parameter) => this.minMaxCorrectnessEnsurer(event, parameter));
+		this.maxParameter.addInputListener((_, event, parameter) => this.minMaxCorrectnessEnsurer(event, parameter));
 
 		this.parameters.push(this.minParameter);
 		this.parameters.push(this.maxParameter);
 	}
 
-	private minMaxCorrectnessEnsurer(): string | null {
-		const min = this.minParameter.getValueNumberMandatory();
-		const max = this.maxParameter.getValueNumberMandatory();
+	private minMaxCorrectnessEnsurer(event: Event, parameter: InputParameter): void {
+		const min = this.minParameter.getValueNumber();
+		const max = this.maxParameter.getValueNumber();
 
-		if (min <= max)
-			return null;
-		else {
+		if (min != null && max != null && max < min) {
 			const problemString = `${this.minParameter.readableName} must be less or equal to ${this.maxParameter.readableName}.`;
 
-			this.minParameter.setProblem(problemString);
-			this.maxParameter.setProblem(problemString);
-
-			return problemString;
+			this.minParameter.addProblem(problemString);
+			this.maxParameter.addProblem(problemString);
 		}
+
+		if (parameter == this.minParameter)
+			this.maxParameter.startProblemCheck(event);
+		else if (parameter == this.maxParameter)
+			this.minParameter.startProblemCheck(event);
 	}
 
 	public getArray(): number[] {
@@ -44,7 +46,7 @@ export class InputFunctionRandom extends InputFunction {
 		let result = new Array(length);
 
 		for (let i = 0; i < result.length; i++) {
-			result[i] = Math.floor(Math.random() * diff + min);
+			result[i] = Math.round(Math.random() * diff + min);
 		}
 
 		return result;

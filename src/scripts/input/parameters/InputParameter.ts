@@ -1,15 +1,17 @@
-import { inputPresetDivClass, problemClass } from "../../../CssInterface";
-import { MandatoryError } from "./MandatoryError";
+import { inputPresetDivClass, problemInputClass, problemDescriptionDivClass, inputWrapperClass } from "../../CssInterface";
+import { NotMandatoryError } from "../../errors/NotMandatoryError";
 
 export const nullInputErrorMessage: string = "Attempted to get value from PresetParameter that doesn't have associated input.";
 
-export class InputPresetParameter {
+export type InputCorrectnessListener = (inputElement: HTMLInputElement, event: Event, parameter: InputParameter) => void;
+
+export class InputParameter {
 	public readonly machineName: string;
 	public readonly readableName: string;
 
 	protected readonly initialValue: string;
 
-	protected listeners: Array<(inputElement: HTMLInputElement, event: Event) => string | null> = [];
+	protected listeners: Array<InputCorrectnessListener> = [];
 
 	protected wrapper: HTMLDivElement | undefined;
 	protected label: HTMLLabelElement | undefined;
@@ -27,7 +29,7 @@ export class InputPresetParameter {
 				this.setProblem(`${this.readableName} is mandatory.`);
 			}
 		} else {
-			if (this.wrapper?.classList.contains(problemClass)) {
+			if (this.wrapper?.classList.contains(problemInputClass)) {
 				this.unsetProblem();
 			}
 		}
@@ -36,7 +38,8 @@ export class InputPresetParameter {
 		return this.mandatory;
 	}
 
-	private problemActive = false;
+	private problems: string[] = [];
+	private problemCheckOngoing: boolean = false;
 
 	public constructor(machineName: string, readableName: string, initialValue: string, mandatory: boolean) {
 		this.machineName = machineName;
@@ -44,7 +47,7 @@ export class InputPresetParameter {
 		this.initialValue = initialValue;
 		this.mandatory = mandatory;
 
-		this.listeners.push(this.mandatoryEnsurer);
+		this.listeners.push((input, event, parameter) => this.mandatoryEnsurer(input, event, parameter));
 	}
 
 	public createForm(parametersDiv: HTMLDivElement, loadButton: HTMLButtonElement): void {
@@ -59,92 +62,95 @@ export class InputPresetParameter {
 		this.input = document.createElement("input");
 		this.input.id = id;
 		this.input.value = this.initialValue;
-		this.input.addEventListener("change", (event) => this.correctnessEnsurer(this.input, event));
+		this.input.addEventListener("input", (event) => this.startProblemCheck(event));
+
+		let inputWrapper = document.createElement("div");
+		inputWrapper.classList.add(inputWrapperClass);
+
+		inputWrapper.appendChild(this.label);
+		inputWrapper.appendChild(this.input);
+
 
 		this.problemDescriptionDiv = document.createElement("div");
+		this.problemDescriptionDiv.classList.add(problemDescriptionDivClass);
 
 		this.wrapper = document.createElement("div");
 		this.wrapper.classList.add(inputPresetDivClass);
 
-		this.wrapper.appendChild(this.label);
-		this.wrapper.appendChild(this.input);
+		this.wrapper.appendChild(inputWrapper);
 		this.wrapper.appendChild(this.problemDescriptionDiv);
 
 		parametersDiv.appendChild(this.wrapper);
 	}
 
-	public addInputListener(listener: (inputElement: HTMLInputElement, event: Event) => string | null): void {
+	public addInputListener(listener: InputCorrectnessListener): void {
 		this.listeners.push(listener);
 	}
 
-	private correctnessEnsurer(inputElement: HTMLInputElement | undefined, event: Event): void {
-		if (inputElement == undefined)
+	private correctnessEnsurer(event: Event): void {
+		if (this.input == undefined)
 			return;
-
-		let result = null;
 
 		for (const listener of this.listeners) {
-			result = listener(inputElement, event);
-
-			if (result != null)
-				break;
+			listener(this.input, event, this);
 		}
 
-		if (result != null)
-			this.setProblem(result);
-		else
+		this.resolveProblemCheck();
+	}
+
+	private mandatoryEnsurer(input: HTMLInputElement, _: Event, parameter: InputParameter): void {
+		if (this.mandatory) {
+			if (input.value == "") {
+				parameter.addProblem(`${this.readableName} is mandatory.`);
+			}
+		}
+	}
+
+	public addProblem(problem: string) {
+		if (!this.problems.includes(problem))
+			this.problems.push(problem);
+	}
+
+	public resolveProblemCheck() {
+		if (this.problems.length > 0) {
+			this.setProblem(this.problems.join("<br />"));
+			this.problems = [];
+		}
+		else {
 			this.unsetProblem();
-	}
-
-	private mandatoryEnsurer(): string | null {
-		if (this.wrapper != undefined && this.input != undefined && this.mandatory) {
-			if (this.input.value == "") {
-				return `${this.readableName} is mandatory.`;
-			}
-			else if (this.wrapper.classList.contains(problemClass)) {
-				return null;
-			}
 		}
 
-		return null;
+		this.problemCheckOngoing = false;
 	}
 
-	public setProblem(problem: string | null = null): void {
-		if (this.problemActive)
-			return;
+	public startProblemCheck(event: Event) {
+		if (!this.problemCheckOngoing) {
+			this.problemCheckOngoing = true;
+			this.correctnessEnsurer(event);
+		}
+	}
 
+	private setProblem(problem: string): void {
 		if (this.wrapper != undefined)
-			this.wrapper.classList.add(problemClass);
+			this.wrapper.classList.add(problemInputClass);
 
 		if (this.loadButton != undefined)
 			this.loadButton.disabled = true;
 
 		if (this.problemDescriptionDiv != undefined) {
-			this.problemDescriptionDiv.textContent = problem;
-
-			if (problem != null && problem != "")
-				this.problemDescriptionDiv.classList.remove("hidden");
+			this.problemDescriptionDiv.innerHTML = problem;
 		}
-
-		this.problemActive = true;
 	}
 
-	public unsetProblem(): void {
-		if (!this.problemActive)
-			return;
-
+	private unsetProblem(): void {
 		if (this.wrapper != undefined)
-			this.wrapper.classList.remove(problemClass);
+			this.wrapper.classList.remove(problemInputClass);
 
 		if (this.loadButton != undefined)
 			this.loadButton.disabled = false;
 
-		if (this.problemDescriptionDiv != undefined) {
+		if (this.problemDescriptionDiv != undefined)
 			this.problemDescriptionDiv.textContent = null;
-			this.problemDescriptionDiv.classList.add("hidden");
-		}
-
-		this.problemActive = false;
 	}
 
 	public onClear(): void {
@@ -155,19 +161,20 @@ export class InputPresetParameter {
 		this.wrapper = undefined;
 
 		this.loadButton = undefined;
+
+		this.problems = [];
 	}
 
 	public getValue(): string {
-		if (this.input == undefined) {
+		if (this.input == undefined)
 			return this.initialValue;
-		}
 
 		return this.input.value;
 	}
 
 	public getValueMandatory(): string {
 		if (!this.mandatory)
-			throw new MandatoryError(this.machineName);
+			throw new NotMandatoryError(this.machineName);
 
 		let value = this.getValue();
 
@@ -178,6 +185,6 @@ export class InputPresetParameter {
 	}
 
 	protected getInputId(): string {
-		return "input_preset_parameter_" + this.machineName;
+		return "input_parameter_" + this.machineName;
 	}
 }

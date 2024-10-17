@@ -1,3 +1,4 @@
+import { InputParameter } from "../parameters/InputParameter";
 import { InputMethod } from "./InputMethod";
 
 export class ManualInputMethod implements InputMethod {
@@ -5,46 +6,48 @@ export class ManualInputMethod implements InputMethod {
 	public readonly loadButtonName: string = "Set";
 
 	protected loadButton: HTMLButtonElement | undefined;
-	protected inputElement: HTMLInputElement | undefined;
+	protected readonly input: InputParameter;
 
-	public static readonly inputRegEx: RegExp = new RegExp("^\d+(?:,\d+)*$");
+	public static readonly inputRegEx: RegExp = new RegExp(/^\d+(?:,\d+)*$/);
+
+	public constructor() {
+		this.input = new InputParameter("input_manual", "Input", "", true);
+		this.input.addInputListener((input, event, parameter) => this.formatTestEvent(parameter))
+	}
+
 
 	public createForm(methodArea: HTMLDivElement, loadButton: HTMLButtonElement): void {
-		let inputElement = document.createElement("input");
-		inputElement.type = "text";
-		inputElement.pattern = ManualInputMethod.inputRegEx.source;
-		inputElement.id = "input_manual";
+		this.input.createForm(methodArea, loadButton);
 
-		let label = document.createElement("label");
-		label.textContent = "Input";
-		label.setAttribute("for", inputElement.id);
-
-		methodArea.appendChild(label);
-		methodArea.appendChild(inputElement);
-
-		this.inputElement = inputElement;
 		this.loadButton = loadButton;
+
+		this.input.startProblemCheck(new Event("input"));
 	}
 
 	public onClear(): void {
 		this.loadButton = undefined;
-		this.inputElement = undefined;
+	}
+
+	private formatTestEvent(input: InputParameter) {
+		const text = input.getValue();
+
+		if (text == "")
+			return;
+
+		if (!ManualInputMethod.testInput(text))
+			input.addProblem("Input is in incorrect format.<br />(Expected colon separated integers)");
 	}
 
 	public async getInput(): Promise<number[] | null> {
-		if (!this.inputElement)
-			throw new Error("Attempted to get input from ManualInputMethod that doesn't currently exist.");
+		return ManualInputMethod.parseNumbers(this.input.getValueMandatory());
+	}
 
-		let text = this.inputElement.value;
-
-		if (ManualInputMethod.inputRegEx.test(text))
-			throw new Error("Input is in incorrect format.");
-
-		return text.split(",").map(numStr => Number.parseInt(numStr));
+	public static testInput(text: string): boolean {
+		return ManualInputMethod.inputRegEx.test(text);
 	}
 
 	public static parseNumbers(text: string): number[] {
-		if (ManualInputMethod.inputRegEx.test(text))
+		if (!this.testInput(text))
 			throw new Error("Input is in incorrect format.");
 
 		return text.split(",").map(numStr => Number.parseInt(numStr));

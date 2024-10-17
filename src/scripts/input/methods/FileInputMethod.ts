@@ -12,6 +12,10 @@ export class FileInputMethod implements InputMethod {
 		let inputElement = document.createElement("input");
 		inputElement.type = "file";
 		inputElement.id = "input_file";
+		inputElement.addEventListener("input", _ => {
+			if (this.loadButton != undefined)
+				this.loadButton.disabled = !this.inputElement?.value;
+		});
 
 		let label = document.createElement("label");
 		label.textContent = "Input file";
@@ -19,6 +23,8 @@ export class FileInputMethod implements InputMethod {
 
 		methodArea.appendChild(label);
 		methodArea.appendChild(inputElement);
+
+		loadButton.disabled = true;
 
 		this.inputElement = inputElement;
 		this.loadButton = loadButton;
@@ -31,13 +37,13 @@ export class FileInputMethod implements InputMethod {
 
 	public async getInput(): Promise<number[] | null> {
 		if (!this.inputElement)
-			throw new Error("Attempted to get input from ManualInputMethod that doesn't currently exist.");
+			throw new Error("Attempted to get input from FileInputMethod that doesn't currently exist.");
 
 		let files = this.inputElement.files;
 
 		if (files == null || files.length < 1)
 			return null;
 
-		return ManualInputMethod.parseNumbers(await files[0].text());
+		return ManualInputMethod.parseNumbers((await files[0].text()).trim());
 	}
 }

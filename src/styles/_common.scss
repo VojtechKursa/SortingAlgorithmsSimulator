@@ -3,6 +3,11 @@
     margin-bottom: $margin;
 }
 
+@mixin margin-horizontal($margin: 1rem) {
+    margin-left: $margin;
+    margin-right: $margin;
+}
+
 .right-align {
     margin-left: auto;
     margin-right: 0;
@@ -18,8 +23,27 @@
     display: none;
 }
 
-.wrong {
+.problem_description {
     color: red;
+    margin-top: 0 !important;
+    padding-top: 2px !important;
+    text-align: right;
+    
+    &:empty {
+        display: none;
+    }
+}
+
+.problem_input {
+    $primary-color: red;
+
+    color: $primary-color;
+
+    input {
+        border: 2px solid $primary-color;
+        
+        color: $primary-color;
+    }
 }
 
 .blur {

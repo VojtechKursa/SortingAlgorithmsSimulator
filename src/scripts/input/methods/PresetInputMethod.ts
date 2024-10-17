@@ -68,6 +68,8 @@ export class PresetInputMethod implements InputMethod {
 
 			newPreset.createForm(this.parametersDiv, this.loadButton);
 
+			this.loadButton.disabled = false;
+
 			this.previousPreset = newPreset;
 		}
 	}

@@ -1,5 +1,5 @@
-import { InputPresetParameter, nullInputErrorMessage } from "./InputPresetParameter";
-import { MandatoryError } from "./MandatoryError";
+import { InputParameter } from "./InputParameter";
+import { NotMandatoryError } from "../../errors/NotMandatoryError";
 
 export enum RoundBehavior {
 	AllowDecimals,
@@ -8,7 +8,7 @@ export enum RoundBehavior {
 	Ceil
 };
 
-export class NumberParameter extends InputPresetParameter {
+export class NumberParameter extends InputParameter {
 	public readonly initialValueNumber: number;
 	public readonly min: number | undefined;
 	public readonly max: number | undefined;
@@ -31,7 +31,7 @@ export class NumberParameter extends InputPresetParameter {
 		this.min = min;
 		this.max = max;
 		this.step = step;
-		this.roundBehavior = roundBehavior == undefined ? RoundBehavior.AllowDecimals : roundBehavior;
+		this.roundBehavior = roundBehavior == undefined ? RoundBehavior.Round : roundBehavior;
 	}
 
 	public override createForm(parametersDiv: HTMLDivElement, loadButton: HTMLButtonElement): void {
@@ -61,7 +61,7 @@ export class NumberParameter extends InputPresetParameter {
 					if (this.input == undefined)
 						return;
 					let value = this.input.valueAsNumber;
-					if (value == undefined)
+					if (value == undefined || Number.isNaN(value))
 						return;
 
 					if (Math.round(value) != value) {
@@ -86,7 +86,7 @@ export class NumberParameter extends InputPresetParameter {
 
 	public getValueNumber(): number | null {
 		if (this.input == undefined)
-			return this.initialValueNumber;
+			return null;
 
 		if (this.input.value == "")
 			return null;
@@ -96,7 +96,7 @@ export class NumberParameter extends InputPresetParameter {
 
 	public getValueNumberMandatory(): number {
 		if (!this.Mandatory)
-			throw new MandatoryError(this.machineName);
+			throw new NotMandatoryError(this.machineName);
 
 		let value = this.getValueNumber();
 

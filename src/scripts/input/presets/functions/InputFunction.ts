@@ -1,10 +1,10 @@
 import { InputPreset } from "../InputPreset";
-import { InputPresetParameter } from "../parameters/InputPresetParameter";
-import { NumberParameter, RoundBehavior } from "../parameters/NumberParameter";
+import { InputParameter } from "../../parameters/InputParameter";
+import { NumberParameter, RoundBehavior } from "../../parameters/NumberParameter";
 
 export abstract class InputFunction implements InputPreset {
 	public readonly name: string;
-	protected parameters: InputPresetParameter[];
+	protected parameters: InputParameter[];
 
 	protected lengthParameter: NumberParameter;
 
