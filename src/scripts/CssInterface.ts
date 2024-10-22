@@ -7,3 +7,5 @@ export const problemInputClass: string = "problem_input";
 export const problemDescriptionDivClass: string = "problem_description";
 
 export const inputWrapperClass: string = "input_wrapper";
+
+export const codeHighlightClass: string = "code-highlight";
