@@ -1,4 +1,4 @@
-export type StepDescriptionElement = HTMLDivElement;
+import { StepDescriptionElement } from "../ElementDefinitions";
 
 export enum StepDescriptionKind {
 	FullStepDescription,

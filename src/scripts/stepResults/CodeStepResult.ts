@@ -1,16 +1,13 @@
 import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
+import { DebuggerElement, VariableWatchElement } from "../ElementDefinitions";
 import { Highlights } from "../Highlights";
 import { StepResult } from "./StepResult";
 
 
 
-export type DebuggerElement = HTMLDivElement;
-export type VariableWatchElement = HTMLDivElement | null;
-
 export class CodeStepResult extends StepResult {
 	public readonly codeHighlights: Highlights;
 	public readonly variables: Map<string, any>;
-	private readonly highlightClass: string = "code-highlight";
 
 	public constructor(text: string, codeHighlights: Highlights, variables: Map<string, any>) {
 		super(text);

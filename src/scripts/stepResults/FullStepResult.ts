@@ -1,11 +1,10 @@
 import { ColorSet } from "../ColorSet"
 import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
-import { CodeStepResult, DebuggerElement, VariableWatchElement } from "./CodeStepResult";
+import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
+import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
 
 
-
-export type VisualizationElement = SVGSVGElement;
 
 export abstract class FullStepResult extends StepResult {
     public readonly final: boolean;

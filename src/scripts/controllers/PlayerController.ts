@@ -1,11 +1,12 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 import { ColorSet } from "../ColorSet";
-import { VisualizationElement, FullStepResult } from "../stepResults/FullStepResult";
-import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepResults/CodeStepResult";
+import { FullStepResult } from "../stepResults/FullStepResult";
+import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
 import { RendererControlElements } from "../controlElements/RendererControlElements";
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
 import { StepDescriptionController } from "./StepDescriptionController";
+import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
 
 export class PlayerController {
     private readonly algorithm: SortingAlgorithm;
