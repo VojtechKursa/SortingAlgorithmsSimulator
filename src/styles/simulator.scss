@@ -4,6 +4,31 @@
 
 :root {
     --code-highlight-color: rgba(255, 255, 0, 0.5);
+    --renderer_highlight1-color: blue;
+    --renderer_highlight2-color: green;
+    --renderer_highlight3-color: red;
+    --renderer_sorted-color: grey;
+    --renderer_order_correct-color: limegreen;
+    --renderer_order_swapped-color: red;
+
+    .renderer_highlight1 {
+        background-color: var(--renderer_highlight1-color) !important;
+    }
+    .renderer_highlight2 {
+        background-color: var(--renderer_highlight2-color) !important;
+    }
+    .renderer_highlight3 {
+        background-color: var(--renderer_highlight3-color) !important;
+    }
+    .renderer_sorted {
+        background-color: var(--renderer_sorted-color) !important;
+    }
+    .renderer_order_correct {
+        background-color: var(--renderer_order_correct-color) !important;
+    }
+    .renderer_order_swapped {
+        background-color: var(--renderer_order_swapped-color) !important;
+    }
 }
 
 select {
@@ -92,10 +117,41 @@ select {
             border-right: $border;
         }
 
-        #canvas {
+        #renderer {
             width: 100%;
-            
             flex-grow: 1;
+
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            --div-max-width: 100%;
+
+            .element {
+                $border-width: 4px;
+
+                flex-grow: 1;
+
+                /*  max-width is taken as width of the whole element, including border,
+                    border can be counted only once, because half the border is inside the element */
+                max-width: calc(var(--div-max-width) + $border-width);
+
+                aspect-ratio: 1;
+
+                text-align: center;
+                align-content: center;
+                
+                border-width: $border-width;
+                border-style: solid;
+                border-color: black;
+                
+                @include common.margin-horizontal(calc($border-width / -2));    // Prevent borders of neighbor elements from adding on each other
+
+                color: black;
+                background-color: white;
+            }
         }
 
         #renderer_step_description {

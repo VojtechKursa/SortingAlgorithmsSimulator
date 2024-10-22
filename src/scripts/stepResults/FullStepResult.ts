@@ -1,4 +1,3 @@
-import { ColorSet } from "../ColorSet"
 import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
 import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
 import { CodeStepResult } from "./CodeStepResult";
@@ -17,14 +16,14 @@ export abstract class FullStepResult extends StepResult {
         this.codeStepResult = codeStepResult;
     }
 
-    public display(visualizationElement: VisualizationElement, colorSet: ColorSet, debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {
+    public display(visualizationElement: VisualizationElement, debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {
         this.codeStepResult.display(debuggerElement, variableWatchElement, stepDescriptionController);
 
-        this.draw(visualizationElement, colorSet);
+        this.draw(visualizationElement);
 
         stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, this.text);
     }
 
-    protected abstract draw(parent: VisualizationElement, colorSet: ColorSet): void;
-    public abstract redraw(parent: VisualizationElement, colorSet: ColorSet): void;
+    protected abstract draw(parent: VisualizationElement): void;
+    public redraw(parent: VisualizationElement): void { }
 }

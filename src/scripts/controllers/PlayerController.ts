@@ -1,5 +1,4 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { ColorSet } from "../ColorSet";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
@@ -25,9 +24,7 @@ export class PlayerController {
 
     private resetButton: HTMLButtonElement;
 
-    public colorSet: ColorSet;
-
-    public constructor(colorSet: ColorSet, algorithm: SortingAlgorithm,
+    public constructor(algorithm: SortingAlgorithm,
         outputElement: VisualizationElement,
         debuggerElement: DebuggerElement,
         variableWatchElement: VariableWatchElement,
@@ -36,7 +33,6 @@ export class PlayerController {
         stepDescriptionController: StepDescriptionController,
         resetButton: HTMLButtonElement
     ) {
-        this.colorSet = colorSet;
         this.algorithm = algorithm;
 
         this.visualizationElement = outputElement;
@@ -75,7 +71,7 @@ export class PlayerController {
 
         if (currentStep instanceof FullStepResult) {
             let step = currentStep;
-            step.display(this.visualizationElement, this.colorSet, this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
+            step.display(this.visualizationElement, this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
         }
         else {
             let step = currentStep as CodeStepResult;

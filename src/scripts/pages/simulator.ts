@@ -1,5 +1,3 @@
-import { ColorSet } from "../ColorSet";
-import { PresetColor } from "../PresetColor";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
@@ -10,14 +8,6 @@ import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 
 
-function findOutputElement(id: string): SVGSVGElement {
-    for (const element of document.getElementsByTagName("svg")) {
-        if (element.id == id)
-            return element;
-    }
-
-    throw new Error("Output element not found");
-}
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
     let playerElementContainer: RendererControlElements;
@@ -48,24 +38,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
-    let output = findOutputElement("canvas");
+    let output = document.getElementById("renderer") as HTMLDivElement;
     let debug_view = document.getElementById("debugger") as HTMLDivElement;
-
-    let colorMap = new Map<PresetColor, string>();
-    colorMap.set(PresetColor.Highlight_1, "blue");
-    colorMap.set(PresetColor.Highlight_2, "green");
-    colorMap.set(PresetColor.Highlight_3, "red");
-    colorMap.set(PresetColor.Sorted, "grey");
-    colorMap.set(PresetColor.ElementOrderCorrect, "limegreen");
-    colorMap.set(PresetColor.ElementOrderSwapped, "red");
-    colorMap.set(PresetColor.CodeHighlight_1, "yellow");
-
-    let colorSet = new ColorSet(colorMap, "white");
 
     let stepDescriptionElement = document.getElementById("renderer_step_description") as HTMLDivElement;
     let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
 
-    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
+    let playerController = new PlayerController(sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
 
     let body = document.getElementsByTagName("body")[0];
     let inputDialog = document.getElementById("dialog_input") as HTMLDialogElement;

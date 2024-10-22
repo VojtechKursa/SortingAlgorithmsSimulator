@@ -1,10 +1,10 @@
 import { StepResult } from "../stepResults/StepResult";
 import { StepResultArray } from "../stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { Highlights } from "../Highlights";
-import { PresetColor } from "../PresetColor";
+import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
+import { CodeHighlight, RendererHighlight } from "../CssInterface";
 
 enum HighlightState {
     Selected,
@@ -23,8 +23,8 @@ export class BubbleSort extends SortingAlgorithm {
         this.swapped = false;
     }
 
-    protected makeFullStepResult(final: boolean, text: string, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: Highlights): StepResult {
-        let highlights: Highlights = new Map<number, PresetColor>();
+    protected makeFullStepResult(final: boolean, text: string, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: RendererHighlights): StepResult {
+        let highlights: RendererHighlights = new Map<number, RendererHighlight>();
 
         if (typeof highlightedLines == "number") {
             highlightedLines = [highlightedLines];
@@ -32,26 +32,26 @@ export class BubbleSort extends SortingAlgorithm {
 
         if (final) {
             for (let i = 0; i < this.current.length; i++) {
-                highlights.set(i, PresetColor.Sorted);
+                highlights.set(i, RendererHighlight.Sorted);
             }
         }
         else {
             if (highlightState == HighlightState.Selected) {
-                highlights.set(this.k, PresetColor.Highlight_1);
-                highlights.set(this.k + 1, PresetColor.Highlight_2);
+                highlights.set(this.k, RendererHighlight.Highlight_1);
+                highlights.set(this.k + 1, RendererHighlight.Highlight_2);
             }
             else if (highlightState == HighlightState.OrderCorrect) {
-                highlights.set(this.k, PresetColor.ElementOrderCorrect);
-                highlights.set(this.k + 1, PresetColor.ElementOrderCorrect);
+                highlights.set(this.k, RendererHighlight.ElementOrderCorrect);
+                highlights.set(this.k + 1, RendererHighlight.ElementOrderCorrect);
             }
             else if (highlightState == HighlightState.OrderSwapped) {
-                highlights.set(this.k, PresetColor.ElementOrderSwapped);
-                highlights.set(this.k + 1, PresetColor.ElementOrderSwapped);
+                highlights.set(this.k, RendererHighlight.ElementOrderSwapped);
+                highlights.set(this.k + 1, RendererHighlight.ElementOrderSwapped);
             }
 
             if (l != undefined) {
                 for (let i = l; i < this.current.length; i++) {
-                    highlights.set(i, PresetColor.Sorted);
+                    highlights.set(i, RendererHighlight.Sorted);
                 }
             }
         }
@@ -72,8 +72,8 @@ export class BubbleSort extends SortingAlgorithm {
         if (typeof highlightedLines == "number")
             highlightedLines = [highlightedLines];
 
-        let highlights = new Map<number, PresetColor>();
-        highlightedLines.forEach(line => highlights.set(line, PresetColor.CodeHighlight_1));
+        let highlights = new Map<number, CodeHighlight>();
+        highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
 
         return new CodeStepResult(text != undefined ? text : "", highlights, variables != undefined ? variables : new Map<string, any>())
     }
@@ -119,7 +119,7 @@ export class BubbleSort extends SortingAlgorithm {
     }
 
     public getInitialStepResult(): FullStepResult {
-        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult("", new Map<number, PresetColor>(), new Map<string, any>()), this.current, null);
+        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult("", new Map<number, CodeHighlight>(), new Map<string, any>()), this.current, null);
     }
 
     public getPseudocode(): string[] {
