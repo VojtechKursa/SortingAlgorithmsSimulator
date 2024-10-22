@@ -10,14 +10,6 @@ import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 
 
-function findOutputElement(id: string): SVGSVGElement {
-    for (const element of document.getElementsByTagName("svg")) {
-        if (element.id == id)
-            return element;
-    }
-
-    throw new Error("Output element not found");
-}
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
     let playerElementContainer: RendererControlElements;
@@ -48,7 +40,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
-    let output = findOutputElement("canvas");
+    let output = document.getElementById("renderer") as HTMLDivElement;
     let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
     let colorMap = new Map<PresetColor, string>();

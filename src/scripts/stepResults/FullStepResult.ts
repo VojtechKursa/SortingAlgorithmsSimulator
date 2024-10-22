@@ -26,5 +26,5 @@ export abstract class FullStepResult extends StepResult {
     }
 
     protected abstract draw(parent: VisualizationElement, colorSet: ColorSet): void;
-    public abstract redraw(parent: VisualizationElement, colorSet: ColorSet): void;
+    public redraw(parent: VisualizationElement, colorSet: ColorSet): void { }
 }

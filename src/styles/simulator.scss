@@ -92,10 +92,31 @@ select {
             border-right: $border;
         }
 
-        #canvas {
+        #renderer {
             width: 100%;
-            
             flex-grow: 1;
+
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            --div-max-width: 100%;
+
+            .element {
+                flex-grow: 1;
+                max-width: var(--div-max-width);
+                aspect-ratio: 1;
+
+                text-align: center;
+                align-content: center;
+
+                border: 2px solid black;
+
+                color: black;
+                background-color: white;
+            }
         }
 
         #renderer_step_description {
