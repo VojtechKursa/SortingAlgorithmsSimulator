@@ -5,6 +5,7 @@ import { CodeStepResult, DebuggerElement, VariableWatchElement } from "../stepRe
 import { StepResultCollection } from "../StepResultCollection";
 import { RendererControlElements } from "../controlElements/RendererControlElements";
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
+import { StepDescriptionController } from "./StepDescriptionController";
 
 export class PlayerController {
     private readonly algorithm: SortingAlgorithm;
@@ -16,6 +17,7 @@ export class PlayerController {
     private readonly visualizationElement: VisualizationElement;
     private readonly debuggerElement: DebuggerElement;
     private readonly variableWatchElement: VariableWatchElement;
+    private readonly stepDescriptionController: StepDescriptionController;
 
     private playerElementContainer: RendererControlElements;
     private debuggerElementContainer: DebuggerControlElements;
@@ -30,6 +32,7 @@ export class PlayerController {
         variableWatchElement: VariableWatchElement,
         playerElementContainer: RendererControlElements,
         debuggerElementContainer: DebuggerControlElements,
+        stepDescriptionController: StepDescriptionController,
         resetButton: HTMLButtonElement
     ) {
         this.colorSet = colorSet;
@@ -38,6 +41,7 @@ export class PlayerController {
         this.visualizationElement = outputElement;
         this.debuggerElement = debuggerElement;
         this.variableWatchElement = variableWatchElement;
+        this.stepDescriptionController = stepDescriptionController;
 
         this.playerElementContainer = playerElementContainer;
         this.debuggerElementContainer = debuggerElementContainer;
@@ -70,11 +74,11 @@ export class PlayerController {
 
         if (currentStep instanceof FullStepResult) {
             let step = currentStep;
-            step.display(this.visualizationElement, this.colorSet, this.debuggerElement, this.variableWatchElement);
+            step.display(this.visualizationElement, this.colorSet, this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
         }
         else {
             let step = currentStep as CodeStepResult;
-            step.display(this.debuggerElement, this.variableWatchElement);
+            step.display(this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
         }
 
         let endStepNumberFull = this.steps.getEndFullStepNumber();

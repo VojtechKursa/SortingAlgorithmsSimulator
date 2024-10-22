@@ -7,6 +7,7 @@ import { RendererControlElements } from "../controlElements/RendererControlEleme
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
 import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
+import { StepDescriptionController } from "../controllers/StepDescriptionController";
 
 
 function findOutputElement(id: string): SVGSVGElement {
@@ -61,7 +62,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let colorSet = new ColorSet(colorMap, "white");
 
-    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, reset);
+    let stepDescriptionElement = document.getElementById("renderer_step_description") as HTMLDivElement;
+    let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
+
+    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
 
     let body = document.getElementsByTagName("body")[0];
     let inputDialog = document.getElementById("dialog_input") as HTMLDialogElement;

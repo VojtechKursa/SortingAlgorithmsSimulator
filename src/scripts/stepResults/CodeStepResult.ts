@@ -1,3 +1,4 @@
+import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
 import { Highlights } from "../Highlights";
 import { StepResult } from "./StepResult";
 
@@ -18,10 +19,12 @@ export class CodeStepResult extends StepResult {
 		this.variables = variables;
 	}
 
-	public display(debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement) {
+	public display(debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {
 		const debuggerLines = debuggerElement.children;
 		debuggerElement.querySelectorAll(`.${this.highlightClass}`).forEach(element => element.classList.remove(this.highlightClass));
 
 		this.codeHighlights.forEach((_, key) => debuggerLines[key].classList.add(this.highlightClass));
+		
+        stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, this.text);
 	}
 }

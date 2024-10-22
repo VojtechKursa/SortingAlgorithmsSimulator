@@ -94,7 +94,20 @@ select {
 
         #canvas {
             width: 100%;
-            height: 100%;
+            
+            flex-grow: 1;
+        }
+
+        #renderer_step_description {
+            height: fit-content;
+            min-height: 1.5em;
+
+            $margin: 0.25em;
+
+            @include common.margin-vertical($margin);
+            @include common.margin-horizontal(calc(-0.5 * var(--bs-gutter-x) + $margin));
+
+            border: 2px solid green;
         }
     }
     
