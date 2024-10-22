@@ -6,11 +6,6 @@ export const nullInputErrorMessage: string = "Attempted to get value from Preset
 export type InputCorrectnessListener = (inputElement: HTMLInputElement, event: Event, parameter: InputParameter) => void;
 
 export class InputParameter {
-	public readonly machineName: string;
-	public readonly readableName: string;
-
-	protected readonly initialValue: string;
-
 	protected listeners: Array<InputCorrectnessListener> = [];
 
 	protected wrapper: HTMLDivElement | undefined;
@@ -20,7 +15,18 @@ export class InputParameter {
 
 	private loadButton: HTMLButtonElement | undefined;
 
-	private mandatory: boolean;
+	private problems: string[] = [];
+	private problemCheckOngoing: boolean = false;
+
+	public constructor(
+		public readonly machineName: string,
+		public readonly readableName: string,
+		public readonly initialValue: string,
+		private mandatory: boolean
+	) {
+		this.listeners.push((input, event, parameter) => this.mandatoryEnsurer(input, event, parameter));
+	}
+
 	public set Mandatory(value: boolean) {
 		this.mandatory = value;
 
@@ -36,18 +42,6 @@ export class InputParameter {
 	}
 	public get Mandatory(): boolean {
 		return this.mandatory;
-	}
-
-	private problems: string[] = [];
-	private problemCheckOngoing: boolean = false;
-
-	public constructor(machineName: string, readableName: string, initialValue: string, mandatory: boolean) {
-		this.machineName = machineName;
-		this.readableName = readableName;
-		this.initialValue = initialValue;
-		this.mandatory = mandatory;
-
-		this.listeners.push((input, event, parameter) => this.mandatoryEnsurer(input, event, parameter));
 	}
 
 	public createForm(parametersDiv: HTMLDivElement, loadButton: HTMLButtonElement): void {

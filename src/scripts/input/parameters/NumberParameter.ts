@@ -10,9 +10,6 @@ export enum RoundBehavior {
 
 export class NumberParameter extends InputParameter {
 	public readonly initialValueNumber: number;
-	public readonly min: number | undefined;
-	public readonly max: number | undefined;
-	public readonly step: number | undefined;
 	public readonly roundBehavior: RoundBehavior;
 
 	public constructor(
@@ -20,17 +17,15 @@ export class NumberParameter extends InputParameter {
 		readableName: string,
 		initialValue: number = 0,
 		mandatory: boolean = true,
-		min: number | undefined = undefined,
-		max: number | undefined = undefined,
-		step: number | undefined = undefined,
+		public readonly min: number | undefined = undefined,
+		public readonly max: number | undefined = undefined,
+		public readonly step: number | undefined = undefined,
 		roundBehavior: RoundBehavior | undefined = undefined
 	) {
 		super(machineName, readableName, initialValue.toString(), mandatory)
 
 		this.initialValueNumber = initialValue;
-		this.min = min;
-		this.max = max;
-		this.step = step;
+
 		this.roundBehavior = roundBehavior == undefined ? RoundBehavior.Round : roundBehavior;
 	}
 

@@ -5,17 +5,15 @@ export class PresetInputMethod implements InputMethod {
 	public readonly name: string = "Preset";
 	public readonly loadButtonName: string = "Load";
 
-	private readonly presets: InputPreset[];
-
 	private select: HTMLSelectElement | undefined;
 	private parametersDiv: HTMLDivElement | undefined;
 	private loadButton: HTMLButtonElement | undefined;
 
 	private previousPreset: InputPreset;
 
-	public constructor(presets: InputPreset[]) {
-		this.presets = presets;
-
+	public constructor(
+		private readonly presets: InputPreset[]
+	) {
 		this.previousPreset = presets[0];
 	}
 

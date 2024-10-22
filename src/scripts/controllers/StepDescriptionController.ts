@@ -6,12 +6,11 @@ export enum StepDescriptionKind {
 };
 
 export class StepDescriptionController {
-	public readonly stepDescriptionElement: StepDescriptionElement;
 	public descriptions: Map<StepDescriptionKind, string> = new Map<StepDescriptionKind, string>();
 
-	public constructor(stepDescriptionElement: StepDescriptionElement) {
-		this.stepDescriptionElement = stepDescriptionElement;
-	}
+	public constructor(
+		public readonly stepDescriptionElement: StepDescriptionElement
+	) { }
 
 	public setDescription(kind: StepDescriptionKind, description: string | null) {
 		if (description == null || description.length == 0)

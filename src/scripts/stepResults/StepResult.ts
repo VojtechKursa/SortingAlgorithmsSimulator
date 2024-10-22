@@ -1,7 +1,3 @@
 export abstract class StepResult {
-    public readonly text: string;
-
-    protected constructor(text: string) {
-        this.text = text;
-    }
+    protected constructor(public readonly text: string) { }
 }

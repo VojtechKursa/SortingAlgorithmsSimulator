@@ -3,14 +3,13 @@ import { InputParameter } from "../../parameters/InputParameter";
 import { NumberParameter, RoundBehavior } from "../../parameters/NumberParameter";
 
 export abstract class InputFunction implements InputPreset {
-	public readonly name: string;
 	protected parameters: InputParameter[];
 
 	protected lengthParameter: NumberParameter;
 
-	protected constructor(name: string) {
-		this.name = name;
-
+	protected constructor(
+		public readonly name: string
+	) {
 		this.lengthParameter = new NumberParameter("length", "Length", 10, true, 0, undefined, 1, RoundBehavior.Round);
 		this.parameters = [this.lengthParameter];
 	}

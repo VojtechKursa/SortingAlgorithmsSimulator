@@ -6,14 +6,12 @@ import { StepResult } from "./StepResult";
 
 
 export abstract class FullStepResult extends StepResult {
-    public readonly final: boolean;
-    public readonly codeStepResult: CodeStepResult;
-
-    protected constructor(final: boolean, text: string, codeStepResult: CodeStepResult) {
+    protected constructor(
+        public readonly final: boolean,
+        text: string,
+        public readonly codeStepResult: CodeStepResult
+    ) {
         super(text);
-
-        this.final = final;
-        this.codeStepResult = codeStepResult;
     }
 
     public display(visualizationElement: VisualizationElement, debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {

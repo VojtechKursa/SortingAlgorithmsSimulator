@@ -9,43 +9,21 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { PlayerController } from "./PlayerController";
 
 export class InputController {
-	public readonly playerController: PlayerController;
-
-	private readonly body: HTMLBodyElement;
-
-	private readonly dialog: HTMLDialogElement;
-	private readonly dialogOpenButton: HTMLButtonElement;
-	private readonly dialog_methodSelector: HTMLSelectElement;
-	private readonly dialog_methodArea: HTMLDivElement;
-	private readonly dialog_okButton: HTMLButtonElement;
-	private readonly dialog_closeButton: HTMLButtonElement;
-
 	private previousMethod: InputMethod;
 
 	public inputMethods: InputMethod[];
 
 	public constructor(
-		playerController: PlayerController,
-		body: HTMLBodyElement,
-		dialog: HTMLDialogElement,
-		dialogOpenButton: HTMLButtonElement,
-		dialog_methodSelector: HTMLSelectElement,
-		dialog_methodArea: HTMLDivElement,
-		dialog_okButton: HTMLButtonElement,
-		dialog_closeButton: HTMLButtonElement,
+		public readonly playerController: PlayerController,
+		private readonly body: HTMLBodyElement,
+		private readonly dialog: HTMLDialogElement,
+		private readonly dialogOpenButton: HTMLButtonElement,
+		private readonly dialog_methodSelector: HTMLSelectElement,
+		private readonly dialog_methodArea: HTMLDivElement,
+		private readonly dialog_okButton: HTMLButtonElement,
+		private readonly dialog_closeButton: HTMLButtonElement,
 		extraPresets?: InputPreset[]
 	) {
-		this.playerController = playerController;
-
-		this.body = body;
-
-		this.dialog = dialog;
-		this.dialogOpenButton = dialogOpenButton;
-		this.dialog_methodSelector = dialog_methodSelector;
-		this.dialog_methodArea = dialog_methodArea;
-		this.dialog_okButton = dialog_okButton;
-		this.dialog_closeButton = dialog_closeButton;
-
 		let inputPresets = InputController.getDefaultPresets();
 
 		if (extraPresets) {

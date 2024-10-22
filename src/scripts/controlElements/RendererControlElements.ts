@@ -1,9 +1,6 @@
 import { ControlElements } from "./ControlElements";
 
 export class RendererControlElements extends ControlElements {
-	public readonly beginningButton: HTMLButtonElement;
-	public readonly endButton: HTMLButtonElement;
-
 	public constructor(
 		backButton: HTMLButtonElement,
 		forwardButton: HTMLButtonElement,
@@ -11,12 +8,9 @@ export class RendererControlElements extends ControlElements {
 		pauseButton: HTMLInputElement,
 		playButton: HTMLInputElement,
 		periodInput: HTMLInputElement,
-		beginningButton: HTMLButtonElement,
-		endButton: HTMLButtonElement
+		public readonly beginningButton: HTMLButtonElement,
+		public readonly endButton: HTMLButtonElement
 	) {
 		super(backButton, forwardButton, stepOutput, pauseButton, playButton, periodInput);
-
-		this.beginningButton = beginningButton;
-		this.endButton = endButton;
 	}
 }

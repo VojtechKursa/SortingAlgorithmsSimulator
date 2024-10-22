@@ -7,14 +7,12 @@ import { StepResult } from "./StepResult";
 
 
 export class CodeStepResult extends StepResult {
-	public readonly codeHighlights: CodeHighlights;
-	public readonly variables: Map<string, any>;
-
-	public constructor(text: string, codeHighlights: CodeHighlights, variables: Map<string, any>) {
+	public constructor(
+		text: string,
+		public readonly codeHighlights: CodeHighlights,
+		public readonly variables: Map<string, any>
+	) {
 		super(text);
-
-		this.codeHighlights = codeHighlights;
-		this.variables = variables;
 	}
 
 	public display(debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {

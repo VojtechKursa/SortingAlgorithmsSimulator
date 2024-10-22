@@ -8,43 +8,21 @@ import { StepDescriptionController } from "./StepDescriptionController";
 import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
 
 export class PlayerController {
-    private readonly algorithm: SortingAlgorithm;
     private steps: StepResultCollection;
 
     private autoPlayTimerId: NodeJS.Timeout | number | null;
     private playingCode: boolean = false;
 
-    private readonly visualizationElement: VisualizationElement;
-    private readonly debuggerElement: DebuggerElement;
-    private readonly variableWatchElement: VariableWatchElement;
-    private readonly stepDescriptionController: StepDescriptionController;
-
-    private playerElementContainer: RendererControlElements;
-    private debuggerElementContainer: DebuggerControlElements;
-
-    private resetButton: HTMLButtonElement;
-
-    public constructor(algorithm: SortingAlgorithm,
-        outputElement: VisualizationElement,
-        debuggerElement: DebuggerElement,
-        variableWatchElement: VariableWatchElement,
-        playerElementContainer: RendererControlElements,
-        debuggerElementContainer: DebuggerControlElements,
-        stepDescriptionController: StepDescriptionController,
-        resetButton: HTMLButtonElement
+    public constructor(
+        private readonly algorithm: SortingAlgorithm,
+        private readonly visualizationElement: VisualizationElement,
+        private readonly debuggerElement: DebuggerElement,
+        private readonly variableWatchElement: VariableWatchElement,
+        private readonly playerElementContainer: RendererControlElements,
+        private readonly debuggerElementContainer: DebuggerControlElements,
+        private readonly stepDescriptionController: StepDescriptionController,
+        private readonly resetButton: HTMLButtonElement
     ) {
-        this.algorithm = algorithm;
-
-        this.visualizationElement = outputElement;
-        this.debuggerElement = debuggerElement;
-        this.variableWatchElement = variableWatchElement;
-        this.stepDescriptionController = stepDescriptionController;
-
-        this.playerElementContainer = playerElementContainer;
-        this.debuggerElementContainer = debuggerElementContainer;
-
-        this.resetButton = resetButton;
-
         this.autoPlayTimerId = null;
 
         this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
