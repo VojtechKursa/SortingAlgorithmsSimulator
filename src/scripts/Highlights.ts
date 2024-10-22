@@ -1,4 +1,5 @@
-import { PresetColor } from "./PresetColor";
+import { CodeHighlight, RendererHighlight } from "./CssInterface";
 
 // Map index -> symbolic color
-export type Highlights = Map<number, PresetColor>;
+export type RendererHighlights = Map<number, RendererHighlight>;
+export type CodeHighlights = Map<number, CodeHighlight>;
