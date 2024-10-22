@@ -1,7 +1,8 @@
 import { ColorSet } from "../ColorSet";
+import { VisualizationElement } from "../ElementDefinitions";
 import { Highlights } from "../Highlights";
 import { CodeStepResult } from "./CodeStepResult";
-import { VisualizationElement, FullStepResult } from "./FullStepResult";
+import { FullStepResult } from "./FullStepResult";
 
 
 

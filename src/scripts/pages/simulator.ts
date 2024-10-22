@@ -1,11 +1,13 @@
 import { ColorSet } from "../ColorSet";
 import { PresetColor } from "../PresetColor";
-import { InputPresetDefinition } from "../InputPresetDefinition";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 import { RendererControlElements } from "../controlElements/RendererControlElements";
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
+import { InputPreset } from "../input/presets/InputPreset";
+import { InputController } from "../controllers/InputController";
+import { StepDescriptionController } from "../controllers/StepDescriptionController";
 
 
 function findOutputElement(id: string): SVGSVGElement {
@@ -17,7 +19,7 @@ function findOutputElement(id: string): SVGSVGElement {
     throw new Error("Output element not found");
 }
 
-export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPresetDefinition): SimulatorPageController {
+export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
     let playerElementContainer: RendererControlElements;
     {
         let back = document.getElementById("step_back") as HTMLButtonElement;
@@ -47,7 +49,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let reset = document.getElementById("button_reset") as HTMLButtonElement;
 
     let output = findOutputElement("canvas");
-    let debug_view = document.getElementById("col_debugger") as HTMLDivElement;
+    let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
     let colorMap = new Map<PresetColor, string>();
     colorMap.set(PresetColor.Highlight_1, "blue");
@@ -60,17 +62,23 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
     let colorSet = new ColorSet(colorMap, "white");
 
-    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, reset);
+    let stepDescriptionElement = document.getElementById("renderer_step_description") as HTMLDivElement;
+    let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
 
+    let playerController = new PlayerController(colorSet, sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
 
+    let body = document.getElementsByTagName("body")[0];
+    let inputDialog = document.getElementById("dialog_input") as HTMLDialogElement;
+    let inputDialogOpenButton = document.getElementById("button_show_dialog_input") as HTMLButtonElement;
+    let inputDialogMethodSelector = document.getElementById("dialog_input-method") as HTMLSelectElement;
+    let inputDialogMethodArea = document.getElementById("dialog_input-method_area") as HTMLDivElement;
+    let inputDialogOkButton = document.getElementById("dialog_input_ok_button") as HTMLButtonElement;
+    let inputDialogCloseButton = document.getElementById("dialog_input_close_button") as HTMLButtonElement;
+
+    let inputController = new InputController(playerController, body, inputDialog, inputDialogOpenButton, inputDialogMethodSelector, inputDialogMethodArea, inputDialogOkButton, inputDialogCloseButton, extraPresets);
+
+    window.addEventListener("load", _ => playerController.redraw());    // ensure the first drawing is correct
     window.addEventListener("resize", _ => playerController.redraw());
-
-
-    let presetSelect = document.getElementById("preset_select") as HTMLSelectElement;
-    let presetSelectButton = document.getElementById("preset_load") as HTMLButtonElement;
-
-    let numbersInput = document.getElementById("numbers_input") as HTMLInputElement;
-    let numbersSet = document.getElementById("numbers_set") as HTMLButtonElement;
 
     let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
 
@@ -92,5 +100,5 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
         debug_view.appendChild(line);
     });
 
-    return new SimulatorPageController(playerController, presetSelect, presetSelectButton, numbersInput, numbersSet, settingsOpenButton, extraPresets);
+    return new SimulatorPageController(playerController, inputController, settingsOpenButton);
 }

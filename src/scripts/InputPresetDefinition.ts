@@ -1,1 +1,0 @@
-export type InputPresetDefinition = Map<string, Array<number> | ((length: number) => number[])>;

@@ -1,10 +1,10 @@
 import { ColorSet } from "../ColorSet"
-import { CodeStepResult, DebuggerElement, VariableWatchElement } from "./CodeStepResult";
+import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
+import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
+import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
 
 
-
-export type VisualizationElement = SVGSVGElement;
 
 export abstract class FullStepResult extends StepResult {
     public readonly final: boolean;
@@ -17,10 +17,12 @@ export abstract class FullStepResult extends StepResult {
         this.codeStepResult = codeStepResult;
     }
 
-    public display(visualizationElement: VisualizationElement, colorSet: ColorSet, debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement) {
-        this.codeStepResult.display(debuggerElement, variableWatchElement);
+    public display(visualizationElement: VisualizationElement, colorSet: ColorSet, debuggerElement: DebuggerElement, variableWatchElement: VariableWatchElement, stepDescriptionController: StepDescriptionController) {
+        this.codeStepResult.display(debuggerElement, variableWatchElement, stepDescriptionController);
 
         this.draw(visualizationElement, colorSet);
+
+        stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, this.text);
     }
 
     protected abstract draw(parent: VisualizationElement, colorSet: ColorSet): void;

@@ -1,7 +1,6 @@
 {
     "recommendations": [
         "ecmel.vscode-html-css",
-        "formulahendry.auto-rename-tag",
         "dbaeumer.vscode-eslint",
         "magnobiet.sass-extension-pack",
         "sibiraj-s.vscode-scss-formatter",
