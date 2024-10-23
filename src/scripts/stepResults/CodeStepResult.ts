@@ -1,5 +1,5 @@
 import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
-import { codeHighlightClass } from "../CssInterface";
+import { CodeHighlight, codeHighlightClass } from "../CssInterface";
 import { CodeHighlights } from "../Highlights";
 import { StepResult } from "./StepResult";
 
@@ -7,8 +7,8 @@ import { StepResult } from "./StepResult";
 
 export class CodeStepResult extends StepResult {
 	public constructor(
-		text: string,
-		public readonly codeHighlights: CodeHighlights,
+		text: string = "",
+		public readonly codeHighlights: CodeHighlights = new Map<number, CodeHighlight>(),
 		public readonly variables: Map<string, any>
 	) {
 		super(text);

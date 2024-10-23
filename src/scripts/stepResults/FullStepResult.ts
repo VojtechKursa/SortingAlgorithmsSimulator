@@ -6,9 +6,9 @@ import { StepResult } from "./StepResult";
 
 export abstract class FullStepResult extends StepResult {
     protected constructor(
-        public readonly final: boolean,
-        text: string,
-        public readonly codeStepResult: CodeStepResult
+        public readonly final: boolean = false,
+        text: string = "",
+        public readonly codeStepResult: CodeStepResult = new CodeStepResult()
     ) {
         super(text);
     }

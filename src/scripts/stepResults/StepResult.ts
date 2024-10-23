@@ -1,3 +1,3 @@
 export abstract class StepResult {
-    protected constructor(public readonly text: string) { }
+    protected constructor(public readonly text: string = "") { }
 }

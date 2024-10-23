@@ -119,7 +119,7 @@ export class BubbleSort extends SortingAlgorithm {
     }
 
     public getInitialStepResult(): FullStepResult {
-        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult("", new Map<number, CodeHighlight>(), new Map<string, any>()), this.current, null);
+        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult(), this.current, null);
     }
 
     public getPseudocode(): string[] {
