@@ -44,7 +44,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
     let stepDescriptionElement = document.getElementById("renderer_step_description") as HTMLDivElement;
     let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
 
-    let playerController = new PlayerController(sortingAlgorithm, output, debug_view, null, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
+    let variableWatchElement = document.getElementById("variable_watch") as HTMLDivElement;
+
+    let playerController = new PlayerController(sortingAlgorithm, output, debug_view, variableWatchElement, playerElementContainer, debuggerElementContainer, stepDescriptionController, reset);
 
     let body = document.getElementsByTagName("body")[0];
     let inputDialog = document.getElementById("dialog_input") as HTMLDialogElement;

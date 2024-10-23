@@ -1,5 +1,3 @@
-import { StepDescriptionElement } from "../ElementDefinitions";
-
 export enum StepDescriptionKind {
 	FullStepDescription,
 	CodeStepDescription
@@ -9,7 +7,7 @@ export class StepDescriptionController {
 	public descriptions: Map<StepDescriptionKind, string> = new Map<StepDescriptionKind, string>();
 
 	public constructor(
-		public readonly stepDescriptionElement: StepDescriptionElement
+		public readonly stepDescriptionElement: HTMLDivElement
 	) { }
 
 	public setDescription(kind: StepDescriptionKind, description: string | null) {
