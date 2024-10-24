@@ -5,7 +5,6 @@ import { StepResultCollection } from "../StepResultCollection";
 import { RendererControlElements } from "../controlElements/RendererControlElements";
 import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
 import { StepDescriptionController } from "./StepDescriptionController";
-import { DebuggerElement, VariableWatchElement, VisualizationElement } from "../ElementDefinitions";
 
 export class PlayerController {
     private steps: StepResultCollection;
@@ -15,9 +14,9 @@ export class PlayerController {
 
     public constructor(
         private readonly algorithm: SortingAlgorithm,
-        private readonly visualizationElement: VisualizationElement,
-        private readonly debuggerElement: DebuggerElement,
-        private readonly variableWatchElement: VariableWatchElement,
+        private readonly visualizationElement: HTMLDivElement,
+        private readonly debuggerElement: HTMLDivElement,
+        private readonly variableWatchElement: HTMLDivElement,
         private readonly playerElementContainer: RendererControlElements,
         private readonly debuggerElementContainer: DebuggerControlElements,
         private readonly stepDescriptionController: StepDescriptionController,

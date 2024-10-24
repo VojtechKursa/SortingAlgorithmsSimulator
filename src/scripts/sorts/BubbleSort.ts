@@ -5,6 +5,7 @@ import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { CodeHighlight, RendererHighlight } from "../CssInterface";
+import { Variable } from "../Variable";
 
 enum HighlightState {
     Selected,
@@ -68,14 +69,14 @@ export class BubbleSort extends SortingAlgorithm {
         return new StepResultArray(final, text, this.makeCodeStepResult(highlightedLines), this.current, highlights);
     }
 
-    protected makeCodeStepResult(highlightedLines: number[] | number, variables: Map<string, any> | undefined = undefined, text: string | undefined = undefined): CodeStepResult {
+    protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
         if (typeof highlightedLines == "number")
             highlightedLines = [highlightedLines];
 
         let highlights = new Map<number, CodeHighlight>();
         highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
 
-        return new CodeStepResult(text != undefined ? text : "", highlights, variables != undefined ? variables : new Map<string, any>())
+        return new CodeStepResult(text != undefined ? text : "", highlights, [new Variable("k", this.k, true), new Variable("swapped", this.swapped)])
     }
 
     protected * stepForwardInternal(): Generator<StepResult> {
@@ -119,7 +120,7 @@ export class BubbleSort extends SortingAlgorithm {
     }
 
     public getInitialStepResult(): FullStepResult {
-        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult("", new Map<number, CodeHighlight>(), new Map<string, any>()), this.current, null);
+        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult(), this.current, null);
     }
 
     public getPseudocode(): string[] {

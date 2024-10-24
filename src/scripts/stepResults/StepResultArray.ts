@@ -1,5 +1,4 @@
 import { CssVariables, rendererElementClass, RendererHighlightCssHelper } from "../CssInterface";
-import { VisualizationElement } from "../ElementDefinitions";
 import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "./CodeStepResult";
 import { FullStepResult } from "./FullStepResult";
@@ -17,7 +16,7 @@ export class StepResultArray extends FullStepResult {
         this.highlights = highlights;
     }
 
-    public draw(parent: VisualizationElement): void {
+    public draw(parent: HTMLDivElement): void {
         parent.innerText = "";
 
         parent.style.setProperty(CssVariables.RendererDivMaxWidth, `${(100 / this.array.length).toString()}%`);
