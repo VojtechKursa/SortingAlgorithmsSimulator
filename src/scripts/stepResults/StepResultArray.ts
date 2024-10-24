@@ -1,4 +1,4 @@
-import { CssVariables, rendererElementClass, RendererHighlightCssHelper } from "../CssInterface";
+import { CssVariables, firstClass, lastClass, RendererClasses, RendererHighlightCssHelper } from "../CssInterface";
 import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "./CodeStepResult";
 import { FullStepResult } from "./FullStepResult";
@@ -17,13 +17,19 @@ export class StepResultArray extends FullStepResult {
     }
 
     public draw(parent: HTMLDivElement): void {
-        parent.innerText = "";
+        parent.querySelectorAll(`.${RendererClasses.elementClass}`).forEach(div => parent.removeChild(div));
 
-        parent.style.setProperty(CssVariables.RendererDivMaxWidth, `${(100 / this.array.length).toString()}%`);
+        let borderWidth = Number.parseFloat(getComputedStyle(parent).getPropertyValue(CssVariables.RendererElementBorderWidth));
+        parent.style.setProperty(CssVariables.RendererDivMaxWidth, `${((parent.clientWidth - borderWidth) / this.array.length).toString()}px`);
 
         for (let i = 0; i < this.array.length; i++) {
             let div = document.createElement("div");
-            div.classList.add(rendererElementClass);
+            div.classList.add(RendererClasses.elementClass);
+
+            if(i == 0)
+                div.classList.add(firstClass);
+            if(i == this.array.length - 1)
+                div.classList.add(lastClass);
 
             let highlight = this.highlights?.get(i);
             if (highlight != undefined)
