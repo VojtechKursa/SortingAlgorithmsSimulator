@@ -215,8 +215,22 @@ select {
                 @include common.margin-horizontal();
 
                 #variable_watch {
-                    display: grid;
-                    grid-template-columns: auto auto;
+                    thead {
+                        background-color: green;
+                    }
+
+                    td {
+                        border: 2px solid black;
+                    }
+
+                    #variable_watch_body {
+
+                        .variable_watch-row {
+                            &:nth-child(odd) {
+                                background-color: grey;
+                            }
+                        }
+                    }
                 }
             }
         }
