@@ -1,4 +1,5 @@
 import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
+import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
 import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
 
@@ -13,14 +14,13 @@ export abstract class FullStepResult extends StepResult {
         super(text);
     }
 
-    public display(visualizationElement: HTMLDivElement, debuggerElement: HTMLDivElement, variableWatchElement: HTMLDivElement, stepDescriptionController: StepDescriptionController) {
-        this.codeStepResult.display(debuggerElement, variableWatchElement, stepDescriptionController);
+    public display(outputElements: SimulatorOutputElements): void {
+        outputElements.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, this.text);
 
-        this.draw(visualizationElement);
+        this.codeStepResult.display(outputElements);
 
-        stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, this.text);
+        this.draw(outputElements.renderer);
     }
 
     protected abstract draw(parent: HTMLDivElement): void;
-    public redraw(parent: HTMLDivElement): void { }
 }

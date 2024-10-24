@@ -40,10 +40,14 @@ export class RendererHighlightCssHelper {
 	}
 }
 
-export const rendererElementClass: string = "element";
+export class RendererClasses {
+	public static readonly elementClass: string = "renderer-array_item";
+	public static readonly variableClass: string = "renderer-variable";
+}
 
 export const enum CssVariables {
 	RendererDivMaxWidth = "--div-max-width",
+	RendererElementBorderWidth = "--element-border-width",
 }
 
 export class VariableWatchClasses {
@@ -51,3 +55,6 @@ export class VariableWatchClasses {
 	public static readonly nameColumn = "variable_watch-var_name";
 	public static readonly valueColumn = "variable_watch-var_value";
 }
+
+export const firstClass: string = "first";
+export const lastClass: string = "last";

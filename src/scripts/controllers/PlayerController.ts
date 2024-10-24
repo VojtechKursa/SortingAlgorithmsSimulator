@@ -1,10 +1,8 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { StepResultCollection } from "../StepResultCollection";
-import { RendererControlElements } from "../controlElements/RendererControlElements";
-import { DebuggerControlElements } from "../controlElements/DebuggerControlElements";
-import { StepDescriptionController } from "./StepDescriptionController";
+import { RendererControlElements } from "../htmlElementCollections/RendererControlElements";
+import { DebuggerControlElements } from "../htmlElementCollections/DebuggerControlElements";
+import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
 
 export class PlayerController {
     private steps: StepResultCollection;
@@ -14,12 +12,9 @@ export class PlayerController {
 
     public constructor(
         private readonly algorithm: SortingAlgorithm,
-        private readonly visualizationElement: HTMLDivElement,
-        private readonly debuggerElement: HTMLDivElement,
-        private readonly variableWatchElement: HTMLDivElement,
-        private readonly playerElementContainer: RendererControlElements,
-        private readonly debuggerElementContainer: DebuggerControlElements,
-        private readonly stepDescriptionController: StepDescriptionController,
+        private readonly outputElements: SimulatorOutputElements,
+        private readonly playerControls: RendererControlElements,
+        private readonly debuggerControls: DebuggerControlElements,
         private readonly resetButton: HTMLButtonElement
     ) {
         this.autoPlayTimerId = null;
@@ -28,17 +23,17 @@ export class PlayerController {
 
         this.reset();
 
-        this.playerElementContainer.backButton.addEventListener("click", _ => this.backward());
-        this.playerElementContainer.forwardButton.addEventListener("click", _ => this.forward());
-        this.playerElementContainer.beginningButton.addEventListener("click", _ => this.toBeginning());
-        this.playerElementContainer.endButton.addEventListener("click", _ => this.toEnd());
-        this.playerElementContainer.playButton.addEventListener("click", _ => this.play());
-        this.playerElementContainer.pauseButton.addEventListener("click", _ => this.pause());
+        this.playerControls.backButton.addEventListener("click", _ => this.backward());
+        this.playerControls.forwardButton.addEventListener("click", _ => this.forward());
+        this.playerControls.beginningButton.addEventListener("click", _ => this.toBeginning());
+        this.playerControls.endButton.addEventListener("click", _ => this.toEnd());
+        this.playerControls.playButton.addEventListener("click", _ => this.play());
+        this.playerControls.pauseButton.addEventListener("click", _ => this.pause());
 
-        this.debuggerElementContainer.backButton.addEventListener("click", _ => this.backwardCode());
-        this.debuggerElementContainer.forwardButton.addEventListener("click", _ => this.forwardCode());
-        this.debuggerElementContainer.playButton.addEventListener("click", _ => this.playCode());
-        this.debuggerElementContainer.pauseButton.addEventListener("click", _ => this.pauseCode());
+        this.debuggerControls.backButton.addEventListener("click", _ => this.backwardCode());
+        this.debuggerControls.forwardButton.addEventListener("click", _ => this.forwardCode());
+        this.debuggerControls.playButton.addEventListener("click", _ => this.playCode());
+        this.debuggerControls.pauseButton.addEventListener("click", _ => this.pauseCode());
 
         this.resetButton.addEventListener("click", _ => this.reset());
     }
@@ -46,20 +41,13 @@ export class PlayerController {
     public redraw(): void {
         let currentStep = this.steps.getCurrentStep();
 
-        if (currentStep instanceof FullStepResult) {
-            let step = currentStep;
-            step.display(this.visualizationElement, this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
-        }
-        else {
-            let step = currentStep as CodeStepResult;
-            step.display(this.debuggerElement, this.variableWatchElement, this.stepDescriptionController);
-        }
+        currentStep.display(this.outputElements);
 
         let endStepNumberFull = this.steps.getEndFullStepNumber();
-        this.playerElementContainer.stepOutput.value = `${this.steps.getCurrentFullStepNumber()} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
+        this.playerControls.stepOutput.value = `${this.steps.getCurrentFullStepNumber()} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
 
         let endStepNumber = this.steps.getEndStepNumber();
-        this.debuggerElementContainer.stepOutput.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
+        this.debuggerControls.stepOutput.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
     }
 
     public forward(): void {
@@ -140,12 +128,12 @@ export class PlayerController {
         let currentStep = this.steps.getCurrentStepNumber();
 
         if (currentStep == endStep) {
-            if (!this.playerElementContainer.forwardButton.disabled) {
-                this.playerElementContainer.forwardButton.disabled = true;
-                this.playerElementContainer.playButton.disabled = true;
-                this.playerElementContainer.endButton.disabled = true;
+            if (!this.playerControls.forwardButton.disabled) {
+                this.playerControls.forwardButton.disabled = true;
+                this.playerControls.playButton.disabled = true;
+                this.playerControls.endButton.disabled = true;
 
-                this.debuggerElementContainer.forwardButton.disabled = true;
+                this.debuggerControls.forwardButton.disabled = true;
             }
 
             if (this.autoPlayTimerId != null) {
@@ -157,27 +145,27 @@ export class PlayerController {
                 }
             }
         }
-        else if (this.playerElementContainer.forwardButton.disabled) {
-            this.playerElementContainer.forwardButton.disabled = false;
-            this.playerElementContainer.playButton.disabled = false;
-            this.playerElementContainer.endButton.disabled = false;
+        else if (this.playerControls.forwardButton.disabled) {
+            this.playerControls.forwardButton.disabled = false;
+            this.playerControls.playButton.disabled = false;
+            this.playerControls.endButton.disabled = false;
 
-            this.debuggerElementContainer.forwardButton.disabled = false;
+            this.debuggerControls.forwardButton.disabled = false;
         }
 
         if (currentStep <= 0) {
-            if (!this.playerElementContainer.backButton.disabled) {
-                this.playerElementContainer.backButton.disabled = true;
-                this.playerElementContainer.beginningButton.disabled = true;
+            if (!this.playerControls.backButton.disabled) {
+                this.playerControls.backButton.disabled = true;
+                this.playerControls.beginningButton.disabled = true;
 
-                this.debuggerElementContainer.backButton.disabled = true;
+                this.debuggerControls.backButton.disabled = true;
             }
         }
-        else if (this.playerElementContainer.backButton.disabled) {
-            this.playerElementContainer.backButton.disabled = false;
-            this.playerElementContainer.beginningButton.disabled = false;
+        else if (this.playerControls.backButton.disabled) {
+            this.playerControls.backButton.disabled = false;
+            this.playerControls.beginningButton.disabled = false;
 
-            this.debuggerElementContainer.backButton.disabled = false;
+            this.debuggerControls.backButton.disabled = false;
         }
     }
 
@@ -196,45 +184,45 @@ export class PlayerController {
     private updatePlayControls(starting: boolean, playingCode: boolean): void {
         if (starting) {
             if (playingCode) {
-                this.playerElementContainer.pauseButton.disabled = true;
-                this.playerElementContainer.playButton.disabled = true;
+                this.playerControls.pauseButton.disabled = true;
+                this.playerControls.playButton.disabled = true;
 
-                this.debuggerElementContainer.periodInput.disabled = true;
+                this.debuggerControls.periodInput.disabled = true;
 
-                if (!this.debuggerElementContainer.playButton.checked) {
-                    this.debuggerElementContainer.playButton.checked = true;
+                if (!this.debuggerControls.playButton.checked) {
+                    this.debuggerControls.playButton.checked = true;
                 }
             }
             else {
-                this.debuggerElementContainer.pauseButton.disabled = true;
-                this.debuggerElementContainer.playButton.disabled = true;
+                this.debuggerControls.pauseButton.disabled = true;
+                this.debuggerControls.playButton.disabled = true;
 
-                this.playerElementContainer.periodInput.disabled = true;
+                this.playerControls.periodInput.disabled = true;
 
-                if (!this.playerElementContainer.playButton.checked) {
-                    this.playerElementContainer.playButton.checked = true;
+                if (!this.playerControls.playButton.checked) {
+                    this.playerControls.playButton.checked = true;
                 }
             }
         }
         else {
             if (playingCode) {
-                this.playerElementContainer.pauseButton.disabled = false;
-                this.playerElementContainer.playButton.disabled = false;
+                this.playerControls.pauseButton.disabled = false;
+                this.playerControls.playButton.disabled = false;
 
-                this.debuggerElementContainer.periodInput.disabled = false;
+                this.debuggerControls.periodInput.disabled = false;
 
-                if (!this.debuggerElementContainer.pauseButton.checked) {
-                    this.debuggerElementContainer.pauseButton.checked = true;
+                if (!this.debuggerControls.pauseButton.checked) {
+                    this.debuggerControls.pauseButton.checked = true;
                 }
             }
             else {
-                this.debuggerElementContainer.pauseButton.disabled = false;
-                this.debuggerElementContainer.playButton.disabled = false;
+                this.debuggerControls.pauseButton.disabled = false;
+                this.debuggerControls.playButton.disabled = false;
 
-                this.playerElementContainer.periodInput.disabled = false;
+                this.playerControls.periodInput.disabled = false;
 
-                if (!this.playerElementContainer.pauseButton.checked) {
-                    this.playerElementContainer.pauseButton.checked = true;
+                if (!this.playerControls.pauseButton.checked) {
+                    this.playerControls.pauseButton.checked = true;
                 }
             }
         }
@@ -247,7 +235,7 @@ export class PlayerController {
 
     public play(): void {
         if (this.autoPlayTimerId == null) {
-            let intervalMs = this.getPlayInterval(this.playerElementContainer.periodInput);
+            let intervalMs = this.getPlayInterval(this.playerControls.periodInput);
 
             this.updatePlayControls(true, false);
 
@@ -268,7 +256,7 @@ export class PlayerController {
 
     public playCode(): void {
         if (this.autoPlayTimerId == null) {
-            let intervalMs = this.getPlayInterval(this.debuggerElementContainer.periodInput);
+            let intervalMs = this.getPlayInterval(this.debuggerControls.periodInput);
 
             this.updatePlayControls(true, true);
 
