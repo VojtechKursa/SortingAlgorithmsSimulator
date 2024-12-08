@@ -129,17 +129,19 @@ select {
                 --div-max-width: 100%;
                 --element-border-width: 4px;
 
-                .renderer-array_item {
+                .array_item {
                     grid-row: 2;
+
+                    position: relative;
+                    
+                    text-align: center;
+                    align-content: center;
 
                     /*  max-width is taken as width of the whole element, including border,
                         border can be counted only once, because half the border is inside the element */
                     max-width: calc(var(--div-max-width) + var(--element-border-width));
 
                     aspect-ratio: 1;
-
-                    text-align: center;
-                    align-content: center;
                     
                     border-width: var(--element-border-width);
                     border-style: solid;
@@ -157,9 +159,19 @@ select {
 
                     color: black;
                     background-color: white;
+
+                    .index {
+                        position: absolute;
+
+                        top: 100%;
+                        left: 100%;
+                        transform: translate(-150%, -100%);
+
+                        font-size: 0.75em;
+                    }
                 }
 
-                .renderer-variable {
+                .variable {
                     grid-row: 1;
                 }
             }
