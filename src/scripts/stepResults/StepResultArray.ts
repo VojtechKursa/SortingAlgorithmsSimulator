@@ -28,15 +28,15 @@ export class StepResultArray extends FullStepResult {
             const div = document.createElement("div");
             div.classList.add(RendererClasses.elementClass);
 
-            if(i == 0)
+            if (i == 0)
                 div.classList.add(firstClass);
-            if(i == this.array.length - 1)
+            if (i == this.array.length - 1)
                 div.classList.add(lastClass);
 
             let highlight = this.highlights?.get(i);
             if (highlight != undefined)
                 div.classList.add(RendererHighlightCssHelper.getCssClass(highlight));
-            
+
             const valueElement = document.createElement("div");
             valueElement.classList.add(RendererClasses.elementValueClass);
             valueElement.textContent = number.value.toString();
