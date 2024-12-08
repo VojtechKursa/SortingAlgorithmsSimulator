@@ -1,15 +1,16 @@
 import { CssVariables, firstClass, lastClass, RendererClasses, RendererHighlightCssHelper } from "../CssInterface";
 import { RendererHighlights } from "../Highlights";
+import { IndexedNumber } from "../IndexedNumber";
 import { CodeStepResult } from "./CodeStepResult";
 import { FullStepResult } from "./FullStepResult";
 
 
 
 export class StepResultArray extends FullStepResult {
-    public readonly array: number[];
+    public readonly array: IndexedNumber[];
     public readonly highlights: RendererHighlights | null;
 
-    public constructor(final: boolean, text: string, codeStepResult: CodeStepResult, array: number[], highlights: RendererHighlights | null) {
+    public constructor(final: boolean, text: string, codeStepResult: CodeStepResult, array: IndexedNumber[], highlights: RendererHighlights | null) {
         super(final, text, codeStepResult);
 
         this.array = array.slice();
@@ -23,7 +24,8 @@ export class StepResultArray extends FullStepResult {
         parent.style.setProperty(CssVariables.RendererDivMaxWidth, `${((parent.clientWidth - borderWidth) / this.array.length).toString()}px`);
 
         for (let i = 0; i < this.array.length; i++) {
-            let div = document.createElement("div");
+            const number = this.array[i];
+            const div = document.createElement("div");
             div.classList.add(RendererClasses.elementClass);
 
             if(i == 0)
@@ -34,8 +36,19 @@ export class StepResultArray extends FullStepResult {
             let highlight = this.highlights?.get(i);
             if (highlight != undefined)
                 div.classList.add(RendererHighlightCssHelper.getCssClass(highlight));
+            
+            const valueElement = document.createElement("div");
+            valueElement.classList.add(RendererClasses.elementValueClass);
+            valueElement.textContent = number.value.toString();
+            div.appendChild(valueElement);
 
-            div.textContent = this.array[i].toString();
+            if (number.index != null) {
+                const indexElement = document.createElement("div");
+                indexElement.classList.add(RendererClasses.elementIndexClass);
+                indexElement.textContent = number.index.toString();
+
+                div.appendChild(indexElement);
+            }
 
             parent.appendChild(div);
         }

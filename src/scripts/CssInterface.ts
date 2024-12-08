@@ -41,8 +41,10 @@ export class RendererHighlightCssHelper {
 }
 
 export class RendererClasses {
-	public static readonly elementClass: string = "renderer-array_item";
-	public static readonly variableClass: string = "renderer-variable";
+	public static readonly elementClass: string = "array_item";
+	public static readonly elementValueClass: string = "value";
+	public static readonly elementIndexClass: string = "index";
+	public static readonly variableClass: string = "variable";
 }
 
 export const enum CssVariables {
