@@ -3,6 +3,7 @@ import { StepResultCollection } from "../StepResultCollection";
 import { RendererControlElements } from "../htmlElementCollections/RendererControlElements";
 import { DebuggerControlElements } from "../htmlElementCollections/DebuggerControlElements";
 import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
+import { StepKind } from "../stepResults/StepKind";
 
 export class PlayerController {
     private steps: StepResultCollection;
@@ -43,15 +44,20 @@ export class PlayerController {
 
         currentStep.display(this.outputElements);
 
-        let endStepNumberFull = this.steps.getEndFullStepNumber();
-        this.playerControls.stepOutput.value = `${this.steps.getCurrentFullStepNumber()} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
+        let currentFullStepIndexes = this.steps.getCurrentStepNumber(StepKind.Full, false);
 
-        let endStepNumber = this.steps.getEndStepNumber();
-        this.debuggerControls.stepOutput.value = `${this.steps.getCurrentStepNumber()} / ${endStepNumber == null ? "?" : endStepNumber}`;
+        let endStepNumberFull = this.steps.getEndStepNumber(StepKind.Full);
+        this.playerControls.stepOutput.value = `${currentFullStepIndexes[0]} / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
+
+        let endStepNumberSub = this.steps.getEndStepNumber(StepKind.Sub);
+        let currentStepNumberSub = currentFullStepIndexes[1];
+
+        let endStepNumberCode = this.steps.getEndStepNumber(StepKind.Code);
+        this.debuggerControls.stepOutput.value = `${this.steps.getCurrentStepNumber(StepKind.Code)} / ${endStepNumberCode == null ? "?" : endStepNumberCode}`;
     }
 
     public forward(): void {
-        if (this.steps.forwardFull())
+        if (this.steps.forward(StepKind.Full))
             this.redraw();
         else {
             if (!this.algorithm.isCompleted()) {
@@ -68,7 +74,7 @@ export class PlayerController {
     }
 
     public backward(): void {
-        if (this.steps.backwardFull())
+        if (this.steps.backward(StepKind.Full))
             this.redraw();
 
         this.updateStepControls();
@@ -101,7 +107,7 @@ export class PlayerController {
     }
 
     public forwardCode(): void {
-        if (this.steps.forward())
+        if (this.steps.forward(StepKind.Code))
             this.redraw();
         else {
             if (!this.algorithm.isCompleted()) {
@@ -117,7 +123,7 @@ export class PlayerController {
     }
 
     public backwardCode(): void {
-        if (this.steps.backward())
+        if (this.steps.backward(StepKind.Code))
             this.redraw();
 
         this.updateStepControls();
