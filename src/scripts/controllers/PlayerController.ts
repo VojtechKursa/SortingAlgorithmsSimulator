@@ -61,10 +61,10 @@ export class PlayerController {
             this.redraw();
         else {
             if (!this.algorithm.isCompleted()) {
-                let result = this.algorithm.stepForwardFull();
+                let result = this.algorithm.stepForward(StepKind.Full);
 
-                result[1].forEach(codeStepResult => this.steps.add(codeStepResult));
-                this.steps.addAndAdvance(result[0]);
+                result.forEach(stepResult => this.steps.add(stepResult));
+                this.steps.goToLastKnownStep();
 
                 this.redraw();
             }

@@ -276,6 +276,10 @@ export class StepResultCollection {
 		}
 	}
 
+	public goToLastKnownStep(): void {
+		this.pointer = this.steps.length - 1;
+	}
+
 	public getLastKnownStepNumber(): number;
 	public getLastKnownStepNumber(kind: StepKind.Code | StepKind.Full): number;
 	public getLastKnownStepNumber(kind: StepKind.Sub, fullStep?: number): number;
