@@ -1,5 +1,5 @@
 import { FullStepResult } from "./stepResults/FullStepResult";
-import { StepKind } from "./stepResults/StepKind";
+import { StepKind, StepKindHelper } from "./stepResults/StepKind";
 import { StepResult } from "./stepResults/StepResult";
 
 export class StepResultCollection {
@@ -21,8 +21,7 @@ export class StepResultCollection {
 		this.addAndAdvance(initialStep);
 
 		if (initialStep instanceof FullStepResult) {
-			let fullStep = initialStep as FullStepResult;
-			this.previousFullWasLastSubstep = fullStep.isLastSubstep;
+			this.previousFullWasLastSubstep = initialStep.isLastSubstep;
 		}
 	}
 
@@ -30,19 +29,17 @@ export class StepResultCollection {
 		this.steps.push(stepResult);
 
 		if (stepResult instanceof FullStepResult) {
-			let fullStepResult = stepResult as FullStepResult;
-
 			if (this.previousFullWasLastSubstep)
 				this.fullStepIndexes.push([this.steps.length - 1]);
 			else
 				this.fullStepIndexes[this.fullStepIndexes.length - 1].push(this.steps.length - 1);
 
-			if (fullStepResult.final) {
+			if (stepResult.final) {
 				this.endStep = this.steps.length - 1;
 				this.endFullStep = this.fullStepIndexes.length - 1;
 			}
 
-			this.previousFullWasLastSubstep = fullStepResult.isLastSubstep;
+			this.previousFullWasLastSubstep = stepResult.isLastSubstep;
 		}
 	}
 
@@ -298,13 +295,6 @@ export class StepResultCollection {
 	public getStepKind(stepIndex: number = this.pointer): StepKind {
 		const currentStep = this.steps[stepIndex];
 
-		if (currentStep instanceof FullStepResult) {
-			if (currentStep.isLastSubstep)
-				return StepKind.Full;
-			else
-				return StepKind.Sub;
-		} else {
-			return StepKind.Code;
-		}
+		return StepKindHelper.getStepKind(currentStep);
 	}
 }
