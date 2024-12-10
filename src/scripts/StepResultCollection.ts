@@ -14,12 +14,13 @@ export class StepResultCollection {
 	public constructor(initialStep: StepResult) {
 		this.steps = new Array<StepResult>();
 		this.fullStepIndexes = new Array<Array<number>>();
-		this.pointer = -1;
+		this.pointer = 0;
 
 		this.endStep = this.endFullStep = null;
 
-		this.addAndAdvance(initialStep);
-
+		this.fullStepIndexes.push([0]);
+		this.steps.push(initialStep);
+		
 		if (initialStep instanceof FullStepResult) {
 			this.previousFullWasLastSubstep = initialStep.isLastSubstep;
 		}
