@@ -62,8 +62,9 @@ export class StepResultCollection {
 			case StepKind.Full:
 				let currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
 				let subStepIndexes: number[] | undefined;
+				let currentStepKind = this.getStepKind();
 
-				if (this.getStepKind() == StepKind.Full) {
+				if (currentStepKind == StepKind.Full) {
 					if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
 						subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
 					}
@@ -79,11 +80,19 @@ export class StepResultCollection {
 				if (kind == StepKind.Full) {
 					targetIndex = subStepIndexes[subStepIndexes.length - 1];
 				} else {
-					if (currentFullStepIndexes[1] + 1 < subStepIndexes.length)
-						targetIndex = subStepIndexes[currentFullStepIndexes[1] + 1]
-					else if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
-						subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
-						targetIndex = subStepIndexes[0];
+					if (currentStepKind == StepKind.Full) {
+						if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
+							subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
+							targetIndex = subStepIndexes[0];
+						}
+					}
+					else {
+						if (currentFullStepIndexes[1] + 1 < subStepIndexes.length)
+							targetIndex = subStepIndexes[currentFullStepIndexes[1] + 1]
+						else if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
+							subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
+							targetIndex = subStepIndexes[0];
+						}
 					}
 				}
 
