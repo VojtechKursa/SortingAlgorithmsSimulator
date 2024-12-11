@@ -12,6 +12,11 @@ module.exports = {
             description: "Description of Optimized Bubble sort here."
         },
         {
+            name: "Selection sort",
+            nameMachine: "selectionSort",
+            description: "Description of Selection sort here."
+        },
+        {
             name: "Insertion sort",
             nameMachine: "insertionSort",
             description: "Description of Insertion sort here."
