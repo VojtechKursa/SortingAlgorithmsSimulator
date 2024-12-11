@@ -1,14 +1,7 @@
-import { ControlElements } from "./ControlElements";
-
-export class DebuggerControlElements extends ControlElements {
+export class DebuggerControlElements {
 	public constructor(
-		backButton: HTMLButtonElement,
-		forwardButton: HTMLButtonElement,
-		stepOutput: HTMLOutputElement,
-		pauseButton: HTMLInputElement,
-		playButton: HTMLInputElement,
-		periodInput: HTMLInputElement
-	) {
-		super(backButton, forwardButton, stepOutput, pauseButton, playButton, periodInput);
-	}
+		public readonly backCodeStepButton: HTMLButtonElement,
+		public readonly forwardCodeStepButton: HTMLButtonElement,
+		public readonly stepOutput: HTMLOutputElement
+	) { }
 }

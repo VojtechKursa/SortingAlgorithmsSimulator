@@ -31,28 +31,33 @@
                 </div>
             </div>
 
+            <div class="row continuous_control">
+                <div class="period_container">
+                    <span>Interval:</span>
+                    <input id="player_control_period" type="number" value="1" min="0.5" step="0.5">
+                    <span>s</span>
+                </div>
+                <div id="player_control" class="btn-group" role="group">
+                    <input id="player_control_pause" name="player_control_play" value="0" type="radio" class="btn-check" checked>
+                    <label for="player_control_pause" class="btn btn-outline-warning"><i class="bi bi-pause-fill"></i></label>
+
+                    <input id="player_control_play" name="player_control_play" value="1" type="radio" class="btn-check">
+                    <label for="player_control_play" class="btn btn-outline-success"><i class="bi bi-play-fill"></i></label>
+                </div>
+                <div id="continuous_control-kind-wrapper" class="radio_buttons_wrapper"></div>
+            </div>
+
             <div id="row_main" class="row">
                 <div id="col_renderer" class="col-lg">
                     <div class="control_module">
                         <div id="stepping" class="btn-group" role="group">
                             <button id="step_beginning" type="button" class="btn btn-primary"><i class="bi bi-skip-backward-fill"></i></button>
                             <button id="step_back" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
+                            <button id="step_back_sub" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
                             <output id="step_id" type="number" class="btn btn-secondary disabled">0</output>
+                            <button id="step_next_sub" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
                             <button id="step_next" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
                             <button id="step_end" type="button" class="btn btn-primary"><i class="bi bi-skip-forward-fill"></i></button>
-                        </div>
-                        <div class="continuous_control">
-                            <div class="period_container">
-                                <input id="player_control_period" type="number" value="1" min="0.5" step="0.5">
-                                <span>s</span>
-                            </div>
-                            <div id="player_control" class="btn-group" role="group">
-                                <input id="player_control_pause" name="player_control_play" value="0" type="radio" class="btn-check" checked>
-                                <label for="player_control_pause" class="btn btn-outline-warning"><i class="bi bi-pause-fill"></i></label>
-
-                                <input id="player_control_play" name="player_control_play" value="1" type="radio" class="btn-check">
-                                <label for="player_control_play" class="btn btn-outline-success"><i class="bi bi-play-fill"></i></label>
-                            </div>
                         </div>
                     </div>
                     <div id="renderer_wrapper">
@@ -66,20 +71,6 @@
                             <button id="step_code_back" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
                             <output id="step_code_id" type="number" class="btn btn-secondary disabled">0</output>
                             <button id="step_code_next" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
-                        </div>
-                        <div class="continuous_control">
-                            <div class="period_container">
-                                <input id="player_control_code_period" type="number" value="1" min="0.5" step="0.5">
-                                <span>s</span>
-                            </div>
-
-                            <div id="player_control_code" class="btn-group" role="group">
-                                <input id="player_control_code_pause" name="player_control_code_play" value="0" type="radio" class="btn-check" checked>
-                                <label for="player_control_code_pause" class="btn btn-outline-warning"><i class="bi bi-pause-fill"></i></label>
-    
-                                <input id="player_control_code_play" name="player_control_code_play" value="1" type="radio" class="btn-check">
-                                <label for="player_control_code_play" class="btn btn-outline-success"><i class="bi bi-play-fill"></i></label>
-                            </div>
                         </div>
                     </div>
                     <div id="debugger_row">

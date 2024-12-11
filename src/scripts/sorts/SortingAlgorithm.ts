@@ -1,6 +1,7 @@
 import { IndexedNumber } from "../IndexedNumber";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
+import { StepKind, StepKindHelper } from "../stepResults/StepKind";
 import { StepResult } from "../stepResults/StepResult";
 
 class TemporaryIndexedNumber {
@@ -85,38 +86,33 @@ export abstract class SortingAlgorithm {
         return this.finalStepResult != null;
     }
 
-    public stepForwardFull(): [StepResult, CodeStepResult[]] {
+    public stepForward(): StepResult;
+    public stepForward(kind: StepKind.Code): StepResult;
+    public stepForward(kind: StepKind.Sub | StepKind.Full): StepResult[];
+    public stepForward(kind: StepKind = StepKind.Code): StepResult | StepResult[] {
         if (this.finalStepResult != null)
-            return [this.finalStepResult, []];
+            return kind == StepKind.Code ? this.finalStepResult : [this.finalStepResult];
 
-        let codeResults = new Array<CodeStepResult>();
-        let stepResult: FullStepResult | null = null;
+        let targetIndex = StepKindHelper.getHierarchicalIndex(kind);
+        let results = new Array<StepResult>();
+        let lastResult: StepResult;
 
         do {
-            let result = this.stepForward();
+            lastResult = this.generator.next().value as StepResult;
+            results.push(lastResult);
+        } while (StepKindHelper.getHierarchicalIndex(lastResult) < targetIndex);
+        
+        if (lastResult instanceof FullStepResult && lastResult.final)
+            this.finalStepResult = lastResult as FullStepResult;
 
-            if (result instanceof FullStepResult)
-                stepResult = result as FullStepResult;
-            else
-                codeResults.push(result as CodeStepResult);
-        } while (stepResult == null);
+        if (kind == StepKind.Code) {
+            if (results.length > 1)
+                throw new Error("Code step returned more than 1 StepResult");
 
-        if (stepResult.final)
-            this.finalStepResult = stepResult;
-
-        return [stepResult, codeResults];
-    }
-
-    public stepForward(): StepResult {
-        if (this.finalStepResult != null)
-            return this.finalStepResult;
-
-        let result = this.generator.next().value as StepResult;
-
-        if (result instanceof FullStepResult && result.final)
-            this.finalStepResult = result as FullStepResult;
-
-        return result;
+            return lastResult;
+        }
+        
+        return results;
     }
 
     protected swapCurrent(indexA: number, indexB: number): void {

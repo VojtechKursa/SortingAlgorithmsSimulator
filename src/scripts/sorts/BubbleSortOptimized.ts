@@ -25,11 +25,11 @@ export class BubbleSortOptimized extends BubbleSort {
                     next_l = this.k + 1;
                 }
 
-                yield this.makeFullStepResult(false, "", undefined, [], this.l);
+                yield this.makeFullStepResult(false, "", true, undefined, [], this.l);
             }
         }
 
-        yield this.makeFullStepResult(true, "", undefined, []);
+        yield this.makeFullStepResult(true, "", true, undefined, []);
     }
 
     protected resetInternal(): void {

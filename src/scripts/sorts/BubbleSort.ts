@@ -24,7 +24,7 @@ export class BubbleSort extends SortingAlgorithm {
         this.swapped = false;
     }
 
-    protected makeFullStepResult(final: boolean, text: string, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: RendererHighlights): StepResult {
+    protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: RendererHighlights): StepResult {
         let highlights: RendererHighlights = new Map<number, RendererHighlight>();
 
         if (typeof highlightedLines == "number") {
@@ -66,7 +66,7 @@ export class BubbleSort extends SortingAlgorithm {
             }
         }
 
-        return new StepResultArray(final, text, this.makeCodeStepResult(highlightedLines), this.current, highlights);
+        return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines), this.current, highlights);
     }
 
     protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
@@ -90,18 +90,18 @@ export class BubbleSort extends SortingAlgorithm {
             yield this.makeCodeStepResult(4);
 
             for (this.k = 0; this.k < this.current.length - 1; this.k++) {
-                yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}`, HighlightState.Selected, 5)
+                yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}`, false, HighlightState.Selected, 5)
 
                 if (this.current[this.k] > this.current[this.k + 1]) {
                     this.swapCurrent(this.k, this.k + 1);
                     this.swapped = true;
 
-                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger, elements will be swapped.`, HighlightState.OrderSwapped, [6, 7]);
+                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger, elements will be swapped.`, true, HighlightState.OrderSwapped, [6, 7]);
 
                     yield this.makeCodeStepResult(8);
                 }
                 else {
-                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, HighlightState.OrderCorrect, 8);
+                    yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, true, HighlightState.OrderCorrect, 8);
                 }
 
                 yield this.makeCodeStepResult(4);
@@ -111,7 +111,7 @@ export class BubbleSort extends SortingAlgorithm {
             yield this.makeCodeStepResult(10);
         } while (this.swapped)
 
-        yield this.makeFullStepResult(true, "Array is sorted.", undefined, [this.getPseudocode().length - 1]);
+        yield this.makeFullStepResult(true, "Array is sorted.", true, undefined, [this.getPseudocode().length - 1]);
     }
 
     protected resetInternal(): void {
@@ -120,7 +120,7 @@ export class BubbleSort extends SortingAlgorithm {
     }
 
     public getInitialStepResult(): FullStepResult {
-        return new StepResultArray(this.current.length <= 1, "", new CodeStepResult(), this.current, null);
+        return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult(), this.current, null);
     }
 
     public getPseudocode(): string[] {

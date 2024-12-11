@@ -1,16 +1,11 @@
-import { ControlElements } from "./ControlElements";
-
-export class RendererControlElements extends ControlElements {
+export class RendererControlElements {
 	public constructor(
-		backButton: HTMLButtonElement,
-		forwardButton: HTMLButtonElement,
-		stepOutput: HTMLOutputElement,
-		pauseButton: HTMLInputElement,
-		playButton: HTMLInputElement,
-		periodInput: HTMLInputElement,
+		public readonly backFullStepButton: HTMLButtonElement,
+		public readonly forwardFullStepButton: HTMLButtonElement,
+		public readonly backSubStepButton: HTMLButtonElement,
+		public readonly forwardSubStepButton: HTMLButtonElement,
 		public readonly beginningButton: HTMLButtonElement,
-		public readonly endButton: HTMLButtonElement
-	) {
-		super(backButton, forwardButton, stepOutput, pauseButton, playButton, periodInput);
-	}
+		public readonly endButton: HTMLButtonElement,
+		public readonly stepOutput: HTMLDivElement
+	) { }
 }
