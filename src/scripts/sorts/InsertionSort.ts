@@ -79,6 +79,7 @@ export class InsertionSort extends SortingAlgorithm {
 
 	protected * stepForwardInternal(): Generator<StepResult> {
 		let xIndexed: IndexedNumber;
+		let enteredOuterWhile = false;
 
 		this.i = 1;
 		yield this.makeCodeStepResult(1);
@@ -87,6 +88,8 @@ export class InsertionSort extends SortingAlgorithm {
 			yield this.makeCodeStepResult(2);
 
 		while (this.i < this.current.length) {
+			enteredOuterWhile = true;
+
 			yield this.makeCodeStepResult(2);
 
 			xIndexed = this.current[this.i];
@@ -99,10 +102,10 @@ export class InsertionSort extends SortingAlgorithm {
 			if (!(this.j > 0 && this.current[this.j - 1].value > this.x))
 				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
 
-			let enteredWhile = false;
+			let enteredInnerWhile = false;
 
 			while (this.j > 0 && this.current[this.j - 1].value > this.x) {
-				enteredWhile = true;
+				enteredInnerWhile = true;
 
 				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
 
@@ -114,7 +117,7 @@ export class InsertionSort extends SortingAlgorithm {
 			}
 
 			if (this.j > 0) {
-				if (enteredWhile)
+				if (enteredInnerWhile)
 					yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
 				
 				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, true, HighlightState.OrderCorrect, 8);
@@ -131,7 +134,9 @@ export class InsertionSort extends SortingAlgorithm {
 			yield this.makeCodeStepResult(10);
 		}
 
-		yield this.makeCodeStepResult(2);
+		if (enteredOuterWhile)
+			yield this.makeCodeStepResult(2);
+
 		yield this.makeCodeStepResult(11);
 
 		yield this.makeCodeStepResult(12);
