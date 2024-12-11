@@ -112,42 +112,46 @@ export class PlayerController {
         let endStep = this.steps.getEndStepNumber();
         let currentStep = this.steps.getCurrentStepNumber();
 
-        if (currentStep == endStep) {
-            this.playerControls.forwardFullStepButton.disabled = true;
-            this.playerControls.forwardSubStepButton.disabled = true;
-            this.playerControls.endButton.disabled = true;
+        if (this.autoPlayTimerId != null || this.playingKind != null) {
+            this.disableAllDirectStepControls(true);
 
-            this.debuggerControls.forwardCodeStepButton.disabled = true;
-
-            if (this.autoPlayTimerId != null || this.playingKind != null) {
+            if (currentStep == endStep)
                 this.pause();
+        }
+        else {
+            if (currentStep == endStep) {
+                this.playerControls.forwardFullStepButton.disabled = true;
+                this.playerControls.forwardSubStepButton.disabled = true;
+                this.playerControls.endButton.disabled = true;
+
+                this.debuggerControls.forwardCodeStepButton.disabled = true;
+
+                this.continuousControls.playButton.disabled = true;
+            }
+            else if (this.playerControls.forwardFullStepButton.disabled) {
+                this.playerControls.forwardFullStepButton.disabled = false;
+                this.playerControls.forwardSubStepButton.disabled = false;
+                this.playerControls.endButton.disabled = false;
+
+                this.debuggerControls.forwardCodeStepButton.disabled = false;
+
+                this.continuousControls.playButton.disabled = false;
             }
 
-            this.continuousControls.playButton.disabled = true;
-        }
-        else if (this.playerControls.forwardFullStepButton.disabled) {
-            this.playerControls.forwardFullStepButton.disabled = false;
-            this.playerControls.forwardSubStepButton.disabled = false;
-            this.playerControls.endButton.disabled = false;
+            if (currentStep <= 0) {
+                this.playerControls.backFullStepButton.disabled = true;
+                this.playerControls.backSubStepButton.disabled = true;
+                this.playerControls.beginningButton.disabled = true;
 
-            this.debuggerControls.forwardCodeStepButton.disabled = false;
+                this.debuggerControls.backCodeStepButton.disabled = true;
+            }
+            else if (this.playerControls.backFullStepButton.disabled) {
+                this.playerControls.backFullStepButton.disabled = false;
+                this.playerControls.backSubStepButton.disabled = false;
+                this.playerControls.beginningButton.disabled = false;
 
-            this.continuousControls.playButton.disabled = false;
-        }
-
-        if (currentStep <= 0) {
-            this.playerControls.backFullStepButton.disabled = true;
-            this.playerControls.backSubStepButton.disabled = true;
-            this.playerControls.beginningButton.disabled = true;
-
-            this.debuggerControls.backCodeStepButton.disabled = true;
-        }
-        else if (this.playerControls.backFullStepButton.disabled) {
-            this.playerControls.backFullStepButton.disabled = false;
-            this.playerControls.backSubStepButton.disabled = false;
-            this.playerControls.beginningButton.disabled = false;
-
-            this.debuggerControls.backCodeStepButton.disabled = false;
+                this.debuggerControls.backCodeStepButton.disabled = false;
+            }
         }
     }
 
@@ -182,8 +186,6 @@ export class PlayerController {
                 intervalMs = this.continuousControls.getTimerIntervalMs();
 
             this.playingKind = kind;
-
-            this.disableAllDirectStepControls(true);
 
             this.forward(kind);
 
