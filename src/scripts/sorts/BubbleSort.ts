@@ -6,12 +6,7 @@ import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { CodeHighlight, RendererHighlight } from "../CssInterface";
 import { Variable } from "../Variable";
-
-enum HighlightState {
-    Selected,
-    OrderCorrect,
-    OrderSwapped
-};
+import { HighlightState } from "../HighlightState";
 
 export class BubbleSort extends SortingAlgorithm {
     protected k: number;
