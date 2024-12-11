@@ -53,18 +53,30 @@ select {
     > * {
         min-width: max-content;
     }
+}
 
-    .continuous_control {
-        @extend .right-align;
+.continuous_control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        display: flex;
+    margin-bottom: 1em;
 
-        .period_container {
-            margin-right: 16px;
+    & > * {
+        width: fit-content;
+    }
 
-            input {
-                width: 3em;
-            }
+    .period_container {
+        margin-right: 16px;
+
+        input {
+            width: 3em;
+        }
+    }
+
+    .radio_buttons_wrapper {
+        input[type=radio] {
+            margin-left: 2em;
         }
     }
 }

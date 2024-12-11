@@ -7,6 +7,7 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
+import { ContinuousControlElements } from "../htmlElementCollections/ContinuousControlElements";
 
 
 
@@ -18,15 +19,14 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
         let playerElementContainer: RendererControlElements;
         {
             let back = document.getElementById("step_back") as HTMLButtonElement;
-            let step = document.getElementById("step_id") as HTMLOutputElement;
+            let backSub = document.getElementById("step_back_sub") as HTMLButtonElement;
+            let step = document.getElementById("step_id") as HTMLDivElement;
+            let nextSub = document.getElementById("step_next_sub") as HTMLButtonElement;
             let next = document.getElementById("step_next") as HTMLButtonElement;
-            let pause = document.getElementById("player_control_pause") as HTMLInputElement;
-            let play = document.getElementById("player_control_play") as HTMLInputElement;
-            let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
             let beginning = document.getElementById("step_beginning") as HTMLButtonElement;
             let end = document.getElementById("step_end") as HTMLButtonElement;
 
-            playerElementContainer = new RendererControlElements(back, next, step, pause, play, periodInput, beginning, end);
+            playerElementContainer = new RendererControlElements(back, next, backSub, nextSub, beginning, end, step);
         }
 
         let debuggerElementContainer: DebuggerControlElements;
@@ -34,11 +34,18 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
             let backCode = document.getElementById("step_code_back") as HTMLButtonElement;
             let stepCode = document.getElementById("step_code_id") as HTMLOutputElement;
             let nextCode = document.getElementById("step_code_next") as HTMLButtonElement;
-            let pauseCode = document.getElementById("player_control_code_pause") as HTMLInputElement;
-            let playCode = document.getElementById("player_control_code_play") as HTMLInputElement;
-            let periodInputCode = document.getElementById("player_control_code_period") as HTMLInputElement;
 
-            debuggerElementContainer = new DebuggerControlElements(backCode, nextCode, stepCode, pauseCode, playCode, periodInputCode);
+            debuggerElementContainer = new DebuggerControlElements(backCode, nextCode, stepCode);
+        }
+
+        let continuousControlElements: ContinuousControlElements;
+        {
+            let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
+            let pauseButton = document.getElementById("player_control_pause") as HTMLInputElement;
+            let playButton = document.getElementById("player_control_play") as HTMLInputElement;
+            let radioWrapper = document.getElementById("continuous_control-kind-wrapper") as HTMLDivElement;
+
+            continuousControlElements = new ContinuousControlElements(periodInput, pauseButton, playButton, radioWrapper);
         }
 
         let reset = document.getElementById("button_reset") as HTMLButtonElement;
@@ -52,7 +59,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
         let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
 
-        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, reset);
+        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, reset);
     }
 
     let inputController: InputController;
