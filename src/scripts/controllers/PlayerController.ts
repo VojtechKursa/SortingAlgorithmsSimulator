@@ -163,38 +163,27 @@ export class PlayerController {
         this.debuggerControls.backCodeStepButton.disabled = disabled;
     }
 
-    private updatePlayControls(): void {
-        let starting = this.playingKind != null;
-
-        if (starting) {
-            this.disableAllDirectStepControls(true);
-
-            if (!this.continuousControls.playButton.checked)
-                this.continuousControls.playButton.checked = true;
-        } else {
-            this.disableAllDirectStepControls(false);
-
-            if (!this.continuousControls.pauseButton.checked)
-                this.continuousControls.pauseButton.checked = true;
-        }
-    }
-
     private playHandler(start: boolean, kind: StepKind, intervalMs: number): void {
         if (start) {
-            this.play(kind, intervalMs);
+            this.play(kind, intervalMs, true);
         } else {
-            this.pause();
+            this.pause(true);
         }
     }
 
-    public play(kind: StepKind, intervalMs?: number): void {
+    public play(kind: StepKind, intervalMs?: number, triggeredByHandler: boolean = false): void {
+        if (!triggeredByHandler) {
+            this.continuousControls.play();
+            return;
+        }
+
         if (this.autoPlayTimerId == null) {
             if (intervalMs == undefined)
                 intervalMs = this.continuousControls.getTimerIntervalMs();
 
             this.playingKind = kind;
 
-            this.updatePlayControls();
+            this.disableAllDirectStepControls(true);
 
             this.forward(kind);
 
@@ -202,13 +191,21 @@ export class PlayerController {
         }
     }
 
-    public pause(): void {
+    public pause(triggeredByHandler: boolean = false): void {
+        if (!triggeredByHandler) {
+            this.continuousControls.pause();
+            return;
+        }
+
         if (this.autoPlayTimerId != null) {
             clearInterval(this.autoPlayTimerId);
             this.autoPlayTimerId = null;
             this.playingKind = null;
 
-            this.updatePlayControls();
+            this.disableAllDirectStepControls(false);
+
+            // update step controls after enabling all of them
+            this.updateStepControls();
         }
     }
 

@@ -37,23 +37,50 @@ export class ContinuousControlElements {
 
 		this.playing = false;
 
-		pauseButton.addEventListener("click", _ => {
-			if (this.playing) {
-				this.handlers.forEach(handler => handler(false, this.getStepKind(), this.getTimerIntervalMs()));
-				this.setActiveElementDisabledState(false);
-				this.playing = false;
-			}
-		});
-		playButton.addEventListener("click", _ => {
-			if (!this.playing) {
-				this.handlers.forEach(handler => handler(true, this.getStepKind(), this.getTimerIntervalMs()));
-				this.setActiveElementDisabledState(true);
-				this.playing = true;
-			}
-		})
+		pauseButton.addEventListener("click", _ => this.pause());
+		playButton.addEventListener("click", _ => this.play());
 	}
 
-	private setActiveElementDisabledState(disabled: boolean) {
+	public play(kind?: StepKind, intervalMs?: number): boolean {
+		if (this.playing)
+			return false;
+
+		if (kind == undefined)
+			kind = this.getStepKind();
+
+		if (intervalMs == undefined)
+			intervalMs = this.getTimerIntervalMs();
+
+		this.playing = true;
+		this.updateActiveElementDisabledState(true);
+
+		if (!this.playButton.checked)
+			this.playButton.checked = true;
+
+		this.handlers.forEach(handler => handler(true, kind, intervalMs))
+
+		return true;
+	}
+
+	public pause(): boolean {
+		if (!this.playing)
+			return false;
+
+		this.playing = false;
+		this.updateActiveElementDisabledState(false);
+
+		if (!this.pauseButton.checked)
+			this.pauseButton.checked = true;
+
+		this.handlers.forEach(handler => handler(false, this.getStepKind(), this.getTimerIntervalMs()));
+
+		return true;
+	}
+
+	private updateActiveElementDisabledState(disabled?: boolean) {
+		if (disabled == undefined)
+			disabled = this.playing;
+
 		this.periodInput.disabled = disabled;
 		(this.radioButtonWrapper.querySelectorAll("input[type=radio]") as NodeListOf<HTMLInputElement>).forEach(radio => radio.disabled = disabled);
 	}
@@ -61,13 +88,13 @@ export class ContinuousControlElements {
 	public getTimerIntervalMs(): number {
 		let value = this.periodInput.valueAsNumber;
 
-        if (value <= 0 || Number.isNaN(value)) {
-            value = Number.parseFloat(this.periodInput.min);
+		if (value <= 0 || Number.isNaN(value)) {
+			value = Number.parseFloat(this.periodInput.min);
 
-            this.periodInput.valueAsNumber = value;
-        }
+			this.periodInput.valueAsNumber = value;
+		}
 
-        return value * 1000;
+		return value * 1000;
 	}
 
 	public getStepKind(): StepKind {
@@ -90,7 +117,7 @@ export class ContinuousControlElements {
 
 	public unregisterHandler(handler: ContinuousControlEventHandler): void {
 		let index: number;
-		
+
 		do {
 			index = this.handlers.findIndex(val => val == handler);
 
