@@ -1,4 +1,5 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
+import { ColorSet } from "../ColorSet";
 import { StepResultCollection } from "../StepResultCollection";
 import { RendererControlElements } from "../htmlElementCollections/RendererControlElements";
 import { DebuggerControlElements } from "../htmlElementCollections/DebuggerControlElements";
@@ -18,6 +19,7 @@ export class PlayerController {
         private readonly playerControls: RendererControlElements,
         private readonly debuggerControls: DebuggerControlElements,
         private readonly continuousControls: ContinuousControlElements,
+        private readonly colorSet: ColorSet,
         private readonly resetButton: HTMLButtonElement
     ) {
         this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
@@ -42,7 +44,7 @@ export class PlayerController {
     public redraw(): void {
         let currentStep = this.steps.getCurrentStep();
 
-        currentStep.display(this.outputElements);
+        currentStep.display(this.outputElements, this.colorSet);
 
         let currentFullStepIndexes = this.steps.getCurrentStepNumber(StepKind.Full, false);
 

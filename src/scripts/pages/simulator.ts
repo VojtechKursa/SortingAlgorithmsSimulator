@@ -1,3 +1,4 @@
+import { ColorSet } from "../ColorSet";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
@@ -8,6 +9,7 @@ import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
 import { ContinuousControlElements } from "../htmlElementCollections/ContinuousControlElements";
+import { RendererHighlight } from "../Highlights";
 
 
 
@@ -48,9 +50,19 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
             continuousControlElements = new ContinuousControlElements(periodInput, pauseButton, playButton, radioWrapper);
         }
 
-        let reset = document.getElementById("button_reset") as HTMLButtonElement;
+        let output = ((document.getElementById("canvas") as any) as SVGSVGElement);
+        let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
-        let output = document.getElementById("renderer") as HTMLDivElement;
+        let reset = document.getElementById("button_reset") as HTMLButtonElement;
+        let colorMap = new Map<RendererHighlight, string>();
+        colorMap.set(RendererHighlight.Highlight_1, "blue");
+        colorMap.set(RendererHighlight.Highlight_2, "green");
+        colorMap.set(RendererHighlight.Highlight_3, "red");
+        colorMap.set(RendererHighlight.Sorted, "grey");
+        colorMap.set(RendererHighlight.ElementOrderCorrect, "limegreen");
+        colorMap.set(RendererHighlight.ElementOrderSwapped, "red");
+
+        let colorSet = new ColorSet(colorMap, "white");
 
         let stepDescriptionElement = document.getElementById("step_description") as HTMLDivElement;
         let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
@@ -59,7 +71,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
         let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
 
-        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, reset);
+        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, colorSet, reset);
     }
 
     let inputController: InputController;

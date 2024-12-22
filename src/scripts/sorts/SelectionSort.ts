@@ -1,10 +1,9 @@
 import { StepResult } from "../stepResults/StepResult";
 import { StepResultArray } from "../stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight } from "../CssInterface";
+import { CodeHighlight, RendererHighlight, RendererHighlights } from "../Highlights";
 import { Variable } from "../Variable";
 import { HighlightState } from "../HighlightState";
 
@@ -101,7 +100,7 @@ export class SelectionSort extends SortingAlgorithm {
 			highlightedLines = [highlightedLines];
 
 		let highlights = new Map<number, CodeHighlight>();
-		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
+		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.ActiveLine));
 
 		let variables = new Array<Variable>();
 		if (this.i != null)

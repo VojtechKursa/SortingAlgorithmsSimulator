@@ -4,7 +4,7 @@ import { SortingAlgorithm } from "./SortingAlgorithm";
 import { RendererHighlights } from "../Highlights";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight } from "../CssInterface";
+import { CodeHighlight, RendererHighlight } from "../Highlights";
 import { Variable } from "../Variable";
 import { HighlightState } from "../HighlightState";
 
@@ -69,7 +69,7 @@ export class BubbleSort extends SortingAlgorithm {
             highlightedLines = [highlightedLines];
 
         let highlights = new Map<number, CodeHighlight>();
-        highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
+        highlightedLines.forEach(line => highlights.set(line, CodeHighlight.ActiveLine));
 
         return new CodeStepResult(text != undefined ? text : "", highlights, [new Variable("k", this.k, true), new Variable("swapped", this.swapped)])
     }
@@ -115,7 +115,7 @@ export class BubbleSort extends SortingAlgorithm {
     }
 
     public getInitialStepResult(): FullStepResult {
-        return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult(), this.current, null);
+        return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult("", new Map<number, CodeHighlight>(), new Array<Variable>()), this.current, null);
     }
 
     public getPseudocode(): string[] {

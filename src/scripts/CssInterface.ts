@@ -10,36 +10,6 @@ export const inputWrapperClass: string = "input_wrapper";
 
 export const codeHighlightClass: string = "code-highlight";
 
-export const enum RendererHighlight {
-	Highlight_1,
-	Highlight_2,
-	Highlight_3,
-	Sorted,
-	ElementOrderCorrect,
-	ElementOrderSwapped,
-}
-
-export const enum CodeHighlight {
-	CodeHighlight_1,
-}
-
-export class RendererHighlightCssHelper {
-	public static getCssClass(highlight: RendererHighlight): string {
-		switch (highlight) {
-			case RendererHighlight.Highlight_1: return "renderer_highlight1";
-			case RendererHighlight.Highlight_2: return "renderer_highlight2";
-			case RendererHighlight.Highlight_3: return "renderer_highlight3";
-			case RendererHighlight.Sorted: return "renderer_sorted";
-			case RendererHighlight.ElementOrderCorrect: return "renderer_order_correct";
-			case RendererHighlight.ElementOrderSwapped: return "renderer_order_swapped";
-		}
-	}
-
-	public static getCssColorVariable(highlight: RendererHighlight): string {
-		return `--${RendererHighlightCssHelper.getCssClass(highlight)}-color`;
-	}
-}
-
 export class RendererClasses {
 	public static readonly elementClass: string = "array_item";
 	public static readonly elementValueClass: string = "value";
