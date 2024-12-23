@@ -240,4 +240,14 @@ export class PlayerController {
 
 		this.reset();
 	}
+
+	public setDarkMode(darkMode: boolean): void {
+		const originalColorSet = this.renderer.colorSet;
+		const newColorSet = darkMode ? this.colors.darkColors : this.colors.lightColors;
+
+		if (originalColorSet != newColorSet) {
+			this.renderer.colorSet = newColorSet;
+			this.redraw();
+		}
+	}
 }

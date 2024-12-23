@@ -12,6 +12,7 @@ import { ContinuousControlElements } from "../data/collections/htmlElementCollec
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
+import { DarkModeHandler } from "../controllers/DarkModeHandler";
 
 
 
@@ -86,8 +87,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 	let simulatorPageController: SimulatorPageController;
 	{
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
+		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton);
+		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, new DarkModeHandler(darkModeButton));
 	}
 
 	window.addEventListener("load", _ => playerController.draw());    // ensure the first drawing is correct
