@@ -59,7 +59,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 				rect.setAttribute("width", boxSizeStr);
 				rect.setAttribute("stroke", "black");
 				rect.setAttribute("stroke-width", `${borderWidth}px`);
-				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : undefined));
+				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background));
 				rect.classList.add(RendererClasses.elementClass);
 
 				const text = document.createElementNS("http://www.w3.org/2000/svg", "text");

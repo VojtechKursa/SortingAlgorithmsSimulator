@@ -1,4 +1,9 @@
 export const enum SymbolicColor {
+	Simulator_Background = "simulator-background",
+	Simulator_Foreground = "simulator-foreground",
+	Element_Background = "element-background",
+	Element_Foreground = "element-foreground",
+	Element_Border = "element-border",
 	Element_Sorted = "element-sorted",
 	Element_OrderCorrect = "element-order_correct",
 	Element_OrderIncorrect = "element-order_incorrect",

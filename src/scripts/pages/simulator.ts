@@ -11,6 +11,7 @@ import { SimulatorOutputElements } from "../data/collections/htmlElementCollecti
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
+import { PageColors } from "../visualization/colors/PageColors";
 
 
 
@@ -55,15 +56,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
 		let reset = document.getElementById("button_reset") as HTMLButtonElement;
-		let colorMap = new Map<SymbolicColor, string>();
-		colorMap.set(SymbolicColor.Element_Highlight_1, "blue");
-		colorMap.set(SymbolicColor.Element_Highlight_2, "green");
-		colorMap.set(SymbolicColor.Element_Highlight_3, "red");
-		colorMap.set(SymbolicColor.Element_Sorted, "grey");
-		colorMap.set(SymbolicColor.Element_OrderCorrect, "limegreen");
-		colorMap.set(SymbolicColor.Element_OrderIncorrect, "red");
-
-		let colorSet = new ColorSet(colorMap, "white");
+		let colors = PageColors.load();
 
 		let stepDescriptionElement = document.getElementById("step_description") as HTMLDivElement;
 		let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
@@ -72,9 +65,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
 
-		let renderer = new SvgRenderingVisitor(colorSet, simulatorOutputElements);
+		let renderer = new SvgRenderingVisitor(colors.darkColors, simulatorOutputElements);
 
-		playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, renderer, reset);
+		playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, renderer, colors, reset);
 	}
 
 	let inputController: InputController;
