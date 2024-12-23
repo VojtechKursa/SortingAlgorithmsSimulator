@@ -3,8 +3,9 @@ import { SimulatorOutputElements } from "../../data/collections/htmlElementColle
 import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
-import { ColorSet } from "../ColorSet";
-import { codeHighlightClass, RendererClasses, VariableWatchClasses } from "../CssInterface";
+import { ColorSet } from "../colors/ColorSet";
+import { RendererClasses, VariableWatchClasses } from "../CssInterface";
+import { SymbolicColor, SymbolicColorHelper } from "../colors/SymbolicColor";
 import { RenderingVisitor } from "./RenderingVisitor";
 
 class Rectangle {
@@ -121,11 +122,12 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
 		const debuggerElement = this.output.debuggerElement;
+		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
 
 		const debuggerLines = debuggerElement.children;
-		debuggerElement.querySelectorAll(`.${codeHighlightClass}`).forEach(element => element.classList.remove(codeHighlightClass));
+		debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
 
-		step.codeHighlights.forEach((_, key) => debuggerLines[key].classList.add(codeHighlightClass));
+		step.SymbolicColors.forEach((_, key) => debuggerLines[key].classList.add(highlightClass));
 	}
 
 	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult) {

@@ -23,6 +23,12 @@ class IndexingData {
 
 
 
+export enum HighlightState {
+	Selected,
+	OrderCorrect,
+	OrderSwapped
+};
+
 export abstract class SortingAlgorithm {
 	private input: Array<IndexedNumber>;
 	protected current: Array<IndexedNumber>;

@@ -3,7 +3,7 @@
 
 
 :root {
-	--code-highlight-color: rgba(255, 255, 0, 0.5);
+	--color-code-line_active: rgba(255, 255, 0, 0.5);
 }
 
 select {
@@ -162,8 +162,8 @@ select {
 					}
 				}
 		
-				.code-highlight {
-					background-color: var(--code-highlight-color);
+				.code-line_active {
+					background-color: var(--color-code-line_active);
 				}
 			}
 

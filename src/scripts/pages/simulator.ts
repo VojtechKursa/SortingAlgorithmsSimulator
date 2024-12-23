@@ -1,4 +1,4 @@
-import { ColorSet } from "../visualization/ColorSet";
+import { ColorSet } from "../visualization/colors/ColorSet";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
@@ -9,7 +9,7 @@ import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
-import { RendererHighlight } from "../visualization/Highlights";
+import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 
 
@@ -55,13 +55,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let debug_view = document.getElementById("debugger") as HTMLDivElement;
 
 		let reset = document.getElementById("button_reset") as HTMLButtonElement;
-		let colorMap = new Map<RendererHighlight, string>();
-		colorMap.set(RendererHighlight.Highlight_1, "blue");
-		colorMap.set(RendererHighlight.Highlight_2, "green");
-		colorMap.set(RendererHighlight.Highlight_3, "red");
-		colorMap.set(RendererHighlight.Sorted, "grey");
-		colorMap.set(RendererHighlight.ElementOrderCorrect, "limegreen");
-		colorMap.set(RendererHighlight.ElementOrderSwapped, "red");
+		let colorMap = new Map<SymbolicColor, string>();
+		colorMap.set(SymbolicColor.Element_Highlight_1, "blue");
+		colorMap.set(SymbolicColor.Element_Highlight_2, "green");
+		colorMap.set(SymbolicColor.Element_Highlight_3, "red");
+		colorMap.set(SymbolicColor.Element_Sorted, "grey");
+		colorMap.set(SymbolicColor.Element_OrderCorrect, "limegreen");
+		colorMap.set(SymbolicColor.Element_OrderIncorrect, "red");
 
 		let colorSet = new ColorSet(colorMap, "white");
 

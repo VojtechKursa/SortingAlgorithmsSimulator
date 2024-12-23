@@ -1,6 +1,6 @@
 import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { ColorSet } from "../ColorSet";
+import { ColorSet } from "../colors/ColorSet";
 
 export interface RenderingVisitor {
 	colorSet: ColorSet;
