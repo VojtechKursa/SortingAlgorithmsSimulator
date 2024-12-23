@@ -31,7 +31,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 		if (step instanceof StepResultArray) {
 			const parent = this.output.renderer;
-			parent.querySelectorAll(`.${RendererClasses.elementClass},.${RendererClasses.elementValueClass}`)
+			parent.querySelectorAll(`.${RendererClasses.elementClass},.${RendererClasses.elementValueClass},.${RendererClasses.elementIndexClass}`)
 				.forEach(element => element.remove());
 
 			this.arrayElementLocations.splice(0, this.arrayElementLocations.length);
@@ -45,12 +45,13 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			let boxSizeStr = boxSize.toString();
 
 			for (let i = 0; i < step.array.length; i++) {
-				const rectX = leftOffset + i * boxSize;
-				
-				this.arrayElementLocations.push(new Rectangle(rectX, y, boxSize, boxSize));
+				const item = step.array[i];
+
+				const box = new Rectangle(leftOffset + i * boxSize, y, boxSize, boxSize);
+				this.arrayElementLocations.push(box);
 
 				const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-				rect.setAttribute("x", rectX.toString());
+				rect.setAttribute("x", box.x.toString());
 				rect.setAttribute("y", y.toString());
 				rect.setAttribute("height", boxSizeStr);
 				rect.setAttribute("width", boxSizeStr);
@@ -65,11 +66,27 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 				text.setAttribute("color", "black");
 				text.setAttribute("alignment-baseline", "central");
 				text.setAttribute("text-anchor", "middle");
-				text.textContent = step.array[i].value.toString();
+				text.textContent = item.value.toString();
 				text.classList.add(RendererClasses.elementValueClass);
 
 				parent.appendChild(rect);
 				parent.appendChild(text);
+
+				if (item.index != null) {
+					const rightMargin = 4;
+					const bottomMargin = 4;
+
+					const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
+					index.setAttribute("x", (box.x + box.width - rightMargin).toString());
+					index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
+					index.setAttribute("color", "black");
+					index.setAttribute("alignment-baseline", "bottom");
+					index.setAttribute("text-anchor", "end");
+					index.textContent = item.index.toString();
+					index.classList.add(RendererClasses.elementIndexClass);
+
+					parent.appendChild(index);
+				}
 			}
 		}
 		else
