@@ -11,13 +11,3 @@ export const enum SymbolicColor {
 	Variable_3 = "variable-3",
 	Variable_4 = "variable-4",
 }
-
-export class SymbolicColorHelper {
-	public static getCssClass(color: SymbolicColor): string {
-		return color;
-	}
-
-	public static getCssColorVar(color: SymbolicColor): string {
-		return `--color-${color}`;
-	}
-}

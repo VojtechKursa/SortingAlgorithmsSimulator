@@ -5,7 +5,8 @@ import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
 import { ColorSet } from "../colors/ColorSet";
 import { RendererClasses, VariableWatchClasses } from "../CssInterface";
-import { SymbolicColor, SymbolicColorHelper } from "../colors/SymbolicColor";
+import { SymbolicColor } from "../colors/SymbolicColor";
+import { SymbolicColorHelper } from "../colors/SymbolicColorHelper";
 import { RenderingVisitor } from "./RenderingVisitor";
 
 class Rectangle {
