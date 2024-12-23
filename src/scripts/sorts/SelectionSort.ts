@@ -1,11 +1,11 @@
-import { StepResult } from "../stepResults/StepResult";
-import { StepResultArray } from "../stepResults/StepResultArray";
+import { StepResult } from "../data/stepResults/StepResult";
+import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight, RendererHighlights } from "../Highlights";
-import { Variable } from "../Variable";
-import { HighlightState } from "../HighlightState";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { CodeHighlight, RendererHighlight, RendererHighlights } from "../visualization/Highlights";
+import { Variable } from "../data/Variable";
+import { HighlightState } from "../visualization/HighlightState";
 
 export class SelectionSort extends SortingAlgorithm {
 	protected i?: number;

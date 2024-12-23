@@ -1,11 +1,11 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { ColorSet } from "../ColorSet";
-import { StepResultCollection } from "../StepResultCollection";
-import { RendererControlElements } from "../htmlElementCollections/RendererControlElements";
-import { DebuggerControlElements } from "../htmlElementCollections/DebuggerControlElements";
-import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
-import { StepKind } from "../stepResults/StepKind";
-import { ContinuousControlElements } from "../htmlElementCollections/ContinuousControlElements";
+import { ColorSet } from "../visualization/ColorSet";
+import { StepResultCollection } from "../data/collections/StepResultCollection";
+import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
+import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
+import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
+import { StepKind } from "../data/stepResults/StepKind";
+import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 
 export class PlayerController {
     private steps: StepResultCollection;

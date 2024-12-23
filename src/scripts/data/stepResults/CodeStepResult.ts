@@ -1,7 +1,7 @@
-import { StepDescriptionKind } from "../controllers/StepDescriptionController";
-import { CodeHighlights, CodeHighlight } from "../Highlights";
-import { codeHighlightClass, RendererClasses, VariableWatchClasses } from "../CssInterface";
-import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
+import { StepDescriptionKind } from "../../controllers/StepDescriptionController";
+import { CodeHighlights, CodeHighlight } from "../../visualization/Highlights";
+import { codeHighlightClass, VariableWatchClasses } from "../../visualization/CssInterface";
+import { SimulatorOutputElements } from "../collections/htmlElementCollections/SimulatorOutputElements";
 import { Variable } from "../Variable";
 import { StepResult } from "./StepResult";
 
@@ -52,11 +52,11 @@ export class CodeStepResult extends StepResult {
 	}
 
 	protected drawVariables(variableRenderer: SVGSVGElement) {
-		variableRenderer.querySelectorAll(`.${RendererClasses.variableClass}`).forEach(child => variableRenderer.removeChild(child));
+		//variableRenderer.querySelectorAll(`.${RendererClasses.variableClass}`).forEach(child => variableRenderer.removeChild(child));
 
 		this.variables.filter(variable => variable.draw).forEach(variable => {
 			let div = document.createElement("div");
-			div.classList.add(RendererClasses.variableClass);
+			//div.classList.add(RendererClasses.variableClass);
 			div.style.gridColumn = variable.value + 1;
 			div.textContent = variable.name;
 

@@ -1,6 +1,6 @@
-import { ColorSet } from "../ColorSet"
-import { StepDescriptionController, StepDescriptionKind } from "../controllers/StepDescriptionController";
-import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
+import { ColorSet } from "../../visualization/ColorSet"
+import { StepDescriptionController, StepDescriptionKind } from "../../controllers/StepDescriptionController";
+import { SimulatorOutputElements } from "../collections/htmlElementCollections/SimulatorOutputElements";
 import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
 

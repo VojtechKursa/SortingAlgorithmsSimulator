@@ -1,12 +1,12 @@
-import { StepResult } from "../stepResults/StepResult";
-import { StepResultArray } from "../stepResults/StepResultArray";
+import { StepResult } from "../data/stepResults/StepResult";
+import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { RendererHighlights } from "../Highlights";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight } from "../Highlights";
-import { Variable } from "../Variable";
-import { HighlightState } from "../HighlightState";
+import { RendererHighlights } from "../visualization/Highlights";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { CodeHighlight, RendererHighlight } from "../visualization/Highlights";
+import { Variable } from "../data/Variable";
+import { HighlightState } from "../visualization/HighlightState";
 
 export class BubbleSort extends SortingAlgorithm {
     protected k: number;

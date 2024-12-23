@@ -1,5 +1,5 @@
-import { ColorSet } from "../ColorSet";
-import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
+import { ColorSet } from "../../visualization/ColorSet";
+import { SimulatorOutputElements } from "../collections/htmlElementCollections/SimulatorOutputElements";
 
 export abstract class StepResult {
     protected constructor(public readonly text: string = "") { }

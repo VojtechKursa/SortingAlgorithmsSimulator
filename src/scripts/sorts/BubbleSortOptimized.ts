@@ -1,4 +1,4 @@
-import { StepResult } from "../stepResults/StepResult";
+import { StepResult } from "../data/stepResults/StepResult";
 import { BubbleSort } from "./BubbleSort";
 
 export class BubbleSortOptimized extends BubbleSort {

@@ -1,6 +1,6 @@
-import { FullStepResult } from "./stepResults/FullStepResult";
-import { StepKind, StepKindHelper } from "./stepResults/StepKind";
-import { StepResult } from "./stepResults/StepResult";
+import { FullStepResult } from "../stepResults/FullStepResult";
+import { StepKind, StepKindHelper } from "../stepResults/StepKind";
+import { StepResult } from "../stepResults/StepResult";
 
 export class StepResultCollection {
 	private readonly steps: Array<StepResult>;

@@ -1,8 +1,8 @@
-import { IndexedNumber } from "../IndexedNumber";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { StepKind, StepKindHelper } from "../stepResults/StepKind";
-import { StepResult } from "../stepResults/StepResult";
+import { IndexedNumber } from "../data/IndexedNumber";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
+import { StepResult } from "../data/stepResults/StepResult";
 
 class TemporaryIndexedNumber {
     public constructor(

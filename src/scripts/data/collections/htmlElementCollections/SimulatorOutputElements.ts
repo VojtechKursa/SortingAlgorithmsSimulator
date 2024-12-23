@@ -1,4 +1,4 @@
-import { StepDescriptionController } from "../controllers/StepDescriptionController";
+import { StepDescriptionController } from "../../../controllers/StepDescriptionController";
 
 export class SimulatorOutputElements {
 	public constructor(

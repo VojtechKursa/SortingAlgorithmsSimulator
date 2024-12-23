@@ -1,8 +1,8 @@
-import { ColorSet } from "../ColorSet";
+import { ColorSet } from "../../visualization/ColorSet";
 import { IndexedNumber } from "../IndexedNumber";
 import { CodeStepResult } from "./CodeStepResult";
 import { FullStepResult } from "./FullStepResult";
-import { RendererHighlights } from "../Highlights";
+import { RendererHighlights } from "../../visualization/Highlights";
 
 
 

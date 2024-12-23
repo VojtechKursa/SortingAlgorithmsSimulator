@@ -1,15 +1,15 @@
-import { ColorSet } from "../ColorSet";
+import { ColorSet } from "../visualization/ColorSet";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { RendererControlElements } from "../htmlElementCollections/RendererControlElements";
-import { DebuggerControlElements } from "../htmlElementCollections/DebuggerControlElements";
+import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
+import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
-import { SimulatorOutputElements } from "../htmlElementCollections/SimulatorOutputElements";
-import { ContinuousControlElements } from "../htmlElementCollections/ContinuousControlElements";
-import { RendererHighlight } from "../Highlights";
+import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
+import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
+import { RendererHighlight } from "../visualization/Highlights";
 
 
 
