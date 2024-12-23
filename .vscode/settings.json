@@ -1,7 +1,18 @@
 {
     "svg.preview.background": "editor",
     "cSpell.words": [
+        "codepaths",
+        "dotenv",
+        "eslintcache",
+        "jscoverage",
+        "jspm",
         "limegreen",
-        "topbar"
+        "Microbundle",
+        "Nuxt",
+        "pids",
+        "stylelintcache",
+        "topbar",
+        "vuepress",
+        "wscript"
     ]
 }
