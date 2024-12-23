@@ -9,12 +9,15 @@ import { RenderingVisitor } from "./RenderingVisitor";
 
 export class SvgRenderingVisitor implements RenderingVisitor {
 	public constructor(
-		public colorSet: ColorSet
+		public colorSet: ColorSet,
+		public readonly output: SimulatorOutputElements
 	) { }
 
-	public handleFullStepDraw(step: FullStepResult, output: SimulatorOutputElements): void {
+	public handleFullStepDraw(step: FullStepResult): void {
+		this.output.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
+
 		if (step instanceof StepResultArray) {
-			const parent = output.renderer;
+			const parent = this.output.renderer;
 
 			let borderWidth = 2;
 
@@ -33,32 +36,40 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		}
 		else
 			throw new Error("Renderer not written for this step result.");
+
+		step.codeStepResult.display(this);
 	}
 
-	public handleFullStepRedraw(step: FullStepResult, output: SimulatorOutputElements): void {
-		this.handleFullStepDraw(step, output);
+	public handleFullStepRedraw(step: FullStepResult): void {
+		this.handleFullStepDraw(step);
+
+        step.codeStepResult.redraw(this);
 	}
 
-	public handleCodeStepDraw(step: CodeStepResult, output: SimulatorOutputElements): void {
-		this.codeStep_handleDebuggerHighlights(step, output.debuggerElement);
-		this.codeStep_handleVariableWatchUpdate(step, output.variableWatch);
-		this.codeStep_drawVariables(step, output.renderer);
+	public handleCodeStepDraw(step: CodeStepResult): void {
+		this.codeStep_handleDebuggerHighlights(step);
+		this.codeStep_handleVariableWatchUpdate(step);
+		this.codeStep_drawVariables(step);
 
-		output.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
+		this.output.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
 	}
 
-	public handleCodeStepRedraw(step: CodeStepResult, output: SimulatorOutputElements): void {
-		this.handleCodeStepDraw(step, output);
+	public handleCodeStepRedraw(step: CodeStepResult): void {
+		this.handleCodeStepDraw(step);
 	}
 
-	protected codeStep_handleDebuggerHighlights(step: CodeStepResult, debuggerElement: HTMLDivElement): void {
+	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
+		const debuggerElement = this.output.debuggerElement;
+
 		const debuggerLines = debuggerElement.children;
 		debuggerElement.querySelectorAll(`.${codeHighlightClass}`).forEach(element => element.classList.remove(codeHighlightClass));
 
 		step.codeHighlights.forEach((_, key) => debuggerLines[key].classList.add(codeHighlightClass));
 	}
 
-	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult, variableWatchElement: HTMLDivElement) {
+	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult) {
+		const variableWatchElement = this.output.variableWatch;
+
 		variableWatchElement.innerText = "";
 
 		step.variables.forEach(variable => {
@@ -78,7 +89,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		});
 	}
 
-	protected codeStep_drawVariables(step: CodeStepResult, variableRenderer: SVGSVGElement) {
+	protected codeStep_drawVariables(step: CodeStepResult) {
+		const variableRenderer = this.output.renderer;
 		//variableRenderer.querySelectorAll(`.${RendererClasses.variableClass}`).forEach(child => variableRenderer.removeChild(child));
 
 		step.variables.filter(variable => variable.draw).forEach(variable => {

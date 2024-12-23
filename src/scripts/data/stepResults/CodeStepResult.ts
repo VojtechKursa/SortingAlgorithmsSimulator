@@ -1,7 +1,6 @@
 import { StepDescriptionKind } from "../../controllers/StepDescriptionController";
 import { CodeHighlights, CodeHighlight } from "../../visualization/Highlights";
 import { codeHighlightClass, VariableWatchClasses } from "../../visualization/CssInterface";
-import { SimulatorOutputElements } from "../collections/htmlElementCollections/SimulatorOutputElements";
 import { Variable } from "../Variable";
 import { StepResult } from "./StepResult";
 import { RenderingVisitor } from "../../visualization/rendering/RenderingVisitor";
@@ -17,11 +16,11 @@ export class CodeStepResult extends StepResult {
 		super(text);
 	}
 
-	public display(outputElements: SimulatorOutputElements, renderer: RenderingVisitor): void {
-		renderer.handleCodeStepDraw(this, outputElements);
+	public display(renderer: RenderingVisitor): void {
+		renderer.handleCodeStepDraw(this);
 	}
 
-	public redraw(outputElements: SimulatorOutputElements, renderer: RenderingVisitor): void {
-		renderer.handleCodeStepRedraw(this, outputElements);
+	public redraw(renderer: RenderingVisitor): void {
+		renderer.handleCodeStepRedraw(this);
 	}
 }

@@ -44,7 +44,7 @@ export class PlayerController {
     public draw(): void {
         let currentStep = this.steps.getCurrentStep();
 
-        currentStep.display(this.outputElements, this.renderer);
+        currentStep.display(this.renderer);
 
         let currentFullStepIndexes = this.steps.getCurrentStepNumber(StepKind.Full, false);
 
@@ -59,7 +59,7 @@ export class PlayerController {
     public redraw(): void {
         let currentStep = this.steps.getCurrentStep();
 
-        currentStep.redraw(this.outputElements, this.renderer);
+        currentStep.redraw(this.renderer);
     }
 
     public forward(kind: StepKind): void {

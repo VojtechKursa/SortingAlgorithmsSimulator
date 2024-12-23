@@ -72,7 +72,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
         let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
 
-        let renderer = new SvgRenderingVisitor(colorSet);
+        let renderer = new SvgRenderingVisitor(colorSet, simulatorOutputElements);
 
         playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, renderer, reset);
     }
