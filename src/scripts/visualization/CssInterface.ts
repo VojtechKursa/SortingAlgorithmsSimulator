@@ -15,3 +15,10 @@ export class VariableWatchClasses {
 	public static readonly nameColumn = "variable_watch-var_name";
 	public static readonly valueColumn = "variable_watch-var_value";
 }
+
+export class RendererClasses {
+	public static readonly elementClass: string = "array_item";
+	public static readonly elementValueClass: string = "value";
+	public static readonly elementIndexClass: string = "index";
+	public static readonly variableClass: string = "variable";
+}

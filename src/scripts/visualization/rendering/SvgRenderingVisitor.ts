@@ -4,7 +4,7 @@ import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
 import { ColorSet } from "../ColorSet";
-import { codeHighlightClass, VariableWatchClasses } from "../CssInterface";
+import { codeHighlightClass, RendererClasses, VariableWatchClasses } from "../CssInterface";
 import { RenderingVisitor } from "./RenderingVisitor";
 
 class Rectangle {
@@ -31,6 +31,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 		if (step instanceof StepResultArray) {
 			const parent = this.output.renderer;
+			parent.querySelectorAll(`.${RendererClasses.elementClass},.${RendererClasses.elementValueClass}`)
+				.forEach(element => element.remove());
 
 			this.arrayElementLocations.splice(0, this.arrayElementLocations.length);
 
@@ -40,18 +42,35 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			let y = (parent.clientHeight - boxSize) / 2;
 			let leftOffset = (parent.clientWidth - step.array.length * boxSize) / 2;
 
-			let resultBuilder = new Array<string>();
+			let boxSizeStr = boxSize.toString();
 
 			for (let i = 0; i < step.array.length; i++) {
 				const rectX = leftOffset + i * boxSize;
 				
 				this.arrayElementLocations.push(new Rectangle(rectX, y, boxSize, boxSize));
 
-				resultBuilder.push(`<rect x="${rectX}" y="${y}" width="${boxSize}" height="${boxSize}" stroke="black" stroke-width="${borderWidth}px" fill="${this.colorSet.get(step.highlights != null ? step.highlights.get(i) : undefined)}" />`);
-				resultBuilder.push(`<text x="${leftOffset + (i + 0.5) * boxSize}" y="${y + (boxSize / 2)}" color="black" alignment-baseline="central" text-anchor="middle">${step.array[i].value}</text>`)
-			}
+				const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+				rect.setAttribute("x", rectX.toString());
+				rect.setAttribute("y", y.toString());
+				rect.setAttribute("height", boxSizeStr);
+				rect.setAttribute("width", boxSizeStr);
+				rect.setAttribute("stroke", "black");
+				rect.setAttribute("stroke-width", `${borderWidth}px`);
+				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : undefined));
+				rect.classList.add(RendererClasses.elementClass);
 
-			parent.innerHTML = resultBuilder.join("\n");
+				const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+				text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
+				text.setAttribute("y", (y + (boxSize / 2)).toString());
+				text.setAttribute("color", "black");
+				text.setAttribute("alignment-baseline", "central");
+				text.setAttribute("text-anchor", "middle");
+				text.textContent = step.array[i].value.toString();
+				text.classList.add(RendererClasses.elementValueClass);
+
+				parent.appendChild(rect);
+				parent.appendChild(text);
+			}
 		}
 		else
 			throw new Error("Renderer not written for this step result.");
@@ -116,18 +135,17 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	protected codeStep_drawVariables(step: CodeStepResult) {
 		const variableRenderer = this.output.renderer;
-		const variableClass = "variable";
 		const textSize = 16;
 		const margin = textSize / 2;
 
-		variableRenderer.querySelectorAll(`.${variableClass}`).forEach(child => variableRenderer.removeChild(child));
+		variableRenderer.querySelectorAll(`.${RendererClasses.variableClass}`).forEach(child => variableRenderer.removeChild(child));
 
 		step.variables.filter(variable => variable.draw).forEach(variable => {
 			const elementLocation = this.arrayElementLocations[variable.value];
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 			text.textContent = variable.name;
-			text.classList.add(variableClass);
+			text.classList.add(RendererClasses.variableClass);
 			text.setAttribute("x", (elementLocation.x + (elementLocation.width / 2)).toString());
 			text.setAttribute("y", (elementLocation.y - margin).toString());
 			text.setAttribute("font-size", `${textSize}px`);
