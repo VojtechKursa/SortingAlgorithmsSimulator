@@ -41,7 +41,7 @@ export class PlayerController {
         this.continuousControls.registerHandler((start, kind, interval) => this.playHandler(start, kind, interval));
     }
 
-    public redraw(): void {
+    public draw(): void {
         let currentStep = this.steps.getCurrentStep();
 
         currentStep.display(this.outputElements, this.renderer);
@@ -56,9 +56,15 @@ export class PlayerController {
         this.debuggerControls.stepOutput.value = `${this.steps.getCurrentStepNumber(StepKind.Code)} / ${endStepNumberCode == null ? "?" : endStepNumberCode}`;
     }
 
+    public redraw(): void {
+        let currentStep = this.steps.getCurrentStep();
+
+        currentStep.redraw(this.outputElements, this.renderer);
+    }
+
     public forward(kind: StepKind): void {
         if (this.steps.forward(kind))
-            this.redraw();
+            this.draw();
         else {
             if (!this.algorithm.isCompleted()) {
                 if (kind == StepKind.Code)
@@ -70,7 +76,7 @@ export class PlayerController {
                     this.steps.goToLastKnownStep();
                 }
 
-                this.redraw();
+                this.draw();
             }
         }
 
@@ -79,7 +85,7 @@ export class PlayerController {
 
     public backward(kind: StepKind): void {
         if (this.steps.backward(kind))
-            this.redraw();
+            this.draw();
 
         this.updateStepControls();
     }
@@ -87,7 +93,7 @@ export class PlayerController {
     public toBeginning(): void {
         this.steps.goToStep(0);
 
-        this.redraw();
+        this.draw();
         this.updateStepControls();
     }
 
@@ -106,7 +112,7 @@ export class PlayerController {
             this.steps.goToStep(this.steps.getLastKnownStepNumber());
         }
 
-        this.redraw();
+        this.draw();
         this.updateStepControls();
     }
 
@@ -222,7 +228,7 @@ export class PlayerController {
 
         this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
 
-        this.redraw();
+        this.draw();
 
         this.updateStepControls();
     }
