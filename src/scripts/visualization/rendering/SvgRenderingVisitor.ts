@@ -64,7 +64,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 				text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
 				text.setAttribute("y", (y + (boxSize / 2)).toString());
 				text.setAttribute("color", "black");
-				text.setAttribute("alignment-baseline", "central");
+				text.setAttribute("dominant-baseline", "central");
 				text.setAttribute("text-anchor", "middle");
 				text.textContent = item.value.toString();
 				text.classList.add(RendererClasses.elementValueClass);
@@ -80,7 +80,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 					index.setAttribute("x", (box.x + box.width - rightMargin).toString());
 					index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
 					index.setAttribute("color", "black");
-					index.setAttribute("alignment-baseline", "bottom");
+					index.setAttribute("dominant-baseline", "text-bottom");
 					index.setAttribute("text-anchor", "end");
 					index.textContent = item.index.toString();
 					index.classList.add(RendererClasses.elementIndexClass);
