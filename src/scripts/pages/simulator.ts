@@ -10,6 +10,7 @@ import { StepDescriptionController } from "../controllers/StepDescriptionControl
 import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 import { RendererHighlight } from "../visualization/Highlights";
+import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 
 
 
@@ -71,7 +72,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
         let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
 
-        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, colorSet, reset);
+        let renderer = new SvgRenderingVisitor(colorSet);
+
+        playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, renderer, reset);
     }
 
     let inputController: InputController;

@@ -1,11 +1,11 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { ColorSet } from "../visualization/ColorSet";
 import { StepResultCollection } from "../data/collections/StepResultCollection";
 import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
 import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
+import { RenderingVisitor } from "../visualization/rendering/RenderingVisitor";
 
 export class PlayerController {
     private steps: StepResultCollection;
@@ -19,7 +19,7 @@ export class PlayerController {
         private readonly playerControls: RendererControlElements,
         private readonly debuggerControls: DebuggerControlElements,
         private readonly continuousControls: ContinuousControlElements,
-        private readonly colorSet: ColorSet,
+        private readonly renderer: RenderingVisitor,
         private readonly resetButton: HTMLButtonElement
     ) {
         this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
@@ -44,7 +44,7 @@ export class PlayerController {
     public redraw(): void {
         let currentStep = this.steps.getCurrentStep();
 
-        currentStep.display(this.outputElements, this.colorSet);
+        currentStep.display(this.outputElements, this.renderer);
 
         let currentFullStepIndexes = this.steps.getCurrentStepNumber(StepKind.Full, false);
 

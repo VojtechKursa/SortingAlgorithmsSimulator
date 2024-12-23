@@ -3,6 +3,7 @@ import { StepDescriptionController, StepDescriptionKind } from "../../controller
 import { SimulatorOutputElements } from "../collections/htmlElementCollections/SimulatorOutputElements";
 import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
+import { RenderingVisitor } from "../../visualization/rendering/RenderingVisitor";
 
 
 
@@ -16,14 +17,17 @@ export abstract class FullStepResult extends StepResult {
         super(text);
     }
 
-    public display(outputElements: SimulatorOutputElements, colorSet: ColorSet): void {
+    public display(outputElements: SimulatorOutputElements, renderer: RenderingVisitor): void {
         outputElements.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, this.text);
 
-        this.codeStepResult.display(outputElements);
+        renderer.handleFullStepDraw(this, outputElements);
 
-        this.draw(outputElements.renderer, colorSet);
+        this.codeStepResult.display(outputElements, renderer);
     }
 
-    protected abstract draw(parent: SVGSVGElement, colorSet: ColorSet): void;
-    public abstract redraw(parent: SVGSVGElement, colorSet: ColorSet): void;
+    public redraw(outputElements: SimulatorOutputElements, renderer: RenderingVisitor): void {
+        renderer.handleFullStepRedraw(this, outputElements);
+
+        this.codeStepResult.redraw(outputElements, renderer);
+    }
 }
