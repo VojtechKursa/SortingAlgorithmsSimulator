@@ -14,6 +14,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 	) { }
 
 	public handleFullStepDraw(step: FullStepResult): void {
+		this.codeStep_preFull(step.codeStepResult);
+
 		this.output.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
 
 		if (step instanceof StepResultArray) {
@@ -37,25 +39,31 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		else
 			throw new Error("Renderer not written for this step result.");
 
-		step.codeStepResult.display(this);
+		this.codeStep_postFull(step.codeStepResult);
 	}
 
 	public handleFullStepRedraw(step: FullStepResult): void {
 		this.handleFullStepDraw(step);
-
-		step.codeStepResult.redraw(this);
 	}
 
 	public handleCodeStepDraw(step: CodeStepResult): void {
-		this.codeStep_handleDebuggerHighlights(step);
-		this.codeStep_handleVariableWatchUpdate(step);
-		this.codeStep_drawVariables(step);
-
-		this.output.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
+		this.codeStep_preFull(step);
+		this.codeStep_postFull(step);
 	}
 
 	public handleCodeStepRedraw(step: CodeStepResult): void {
-		this.handleCodeStepDraw(step);
+		this.codeStep_drawVariables(step);
+	}
+
+	protected codeStep_preFull(step: CodeStepResult): void {
+		this.output.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
+
+		this.codeStep_handleVariableWatchUpdate(step);
+		this.codeStep_handleDebuggerHighlights(step);
+	}
+
+	protected codeStep_postFull(step: CodeStepResult): void {
+		this.codeStep_drawVariables(step);
 	}
 
 	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
