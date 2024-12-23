@@ -118,7 +118,7 @@ export class InsertionSort extends SortingAlgorithm {
 			if (this.j > 0) {
 				if (enteredInnerWhile)
 					yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
-				
+
 				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, true, HighlightState.OrderCorrect, 8);
 			}
 			else {

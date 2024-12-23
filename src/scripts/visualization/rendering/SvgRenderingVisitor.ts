@@ -24,14 +24,14 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			let boxSize = Math.min((parent.clientWidth / step.array.length) - borderWidth, parent.clientHeight - borderWidth);
 			let y = (parent.clientHeight - boxSize) / 2;
 			let leftOffset = (parent.clientWidth - step.array.length * boxSize) / 2;
-	
+
 			let resultBuilder = new Array<string>();
-	
+
 			for (let i = 0; i < step.array.length; i++) {
 				resultBuilder.push(`<rect x="${leftOffset + i * boxSize}" y="${y}" width="${boxSize}" height="${boxSize}" stroke="black" stroke-width="${borderWidth}px" fill="${this.colorSet.get(step.highlights != null ? step.highlights.get(i) : undefined)}" />`);
 				resultBuilder.push(`<text x="${leftOffset + (i + 0.5) * boxSize}" y="${y + (boxSize / 2)}" color="black" alignment-baseline="central" text-anchor="middle">${step.array[i].value}</text>`)
 			}
-	
+
 			parent.innerHTML = resultBuilder.join("\n");
 		}
 		else
@@ -43,7 +43,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 	public handleFullStepRedraw(step: FullStepResult): void {
 		this.handleFullStepDraw(step);
 
-        step.codeStepResult.redraw(this);
+		step.codeStepResult.redraw(this);
 	}
 
 	public handleCodeStepDraw(step: CodeStepResult): void {

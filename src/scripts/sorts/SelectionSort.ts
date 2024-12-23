@@ -170,7 +170,7 @@ export class SelectionSort extends SortingAlgorithm {
 
 		if (enteredOuterWhile)
 			yield this.makeCodeStepResult(2);
-		
+
 		yield this.makeCodeStepResult(13);
 		yield this.makeFullStepResult(true, "Array sorted", true, false, undefined, 14);
 	}
