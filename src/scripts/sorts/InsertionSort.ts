@@ -1,13 +1,12 @@
-import { StepResult } from "../stepResults/StepResult";
-import { StepResultArray } from "../stepResults/StepResultArray";
+import { StepResult } from "../data/stepResults/StepResult";
+import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { RendererHighlights } from "../Highlights";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight } from "../CssInterface";
-import { Variable } from "../Variable";
-import { IndexedNumber } from "../IndexedNumber";
-import { HighlightState } from "../HighlightState";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { CodeHighlight, RendererHighlight, RendererHighlights } from "../visualization/Highlights";
+import { Variable } from "../data/Variable";
+import { IndexedNumber } from "../data/IndexedNumber";
+import { HighlightState } from "../visualization/HighlightState";
 
 export class InsertionSort extends SortingAlgorithm {
 	protected i?: number;
@@ -64,7 +63,7 @@ export class InsertionSort extends SortingAlgorithm {
 			highlightedLines = [highlightedLines];
 
 		let highlights = new Map<number, CodeHighlight>();
-		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
+		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.ActiveLine));
 
 		let variables = new Array<Variable>();
 		if (this.i != null)
@@ -119,7 +118,7 @@ export class InsertionSort extends SortingAlgorithm {
 			if (this.j > 0) {
 				if (enteredInnerWhile)
 					yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
-				
+
 				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, true, HighlightState.OrderCorrect, 8);
 			}
 			else {

@@ -1,4 +1,4 @@
-import { StepKind, StepKindHelper } from "../stepResults/StepKind";
+import { StepKind, StepKindHelper } from "../../stepResults/StepKind";
 
 export type ContinuousControlEventHandler = (start: boolean, stepKind: StepKind, interval: number) => void;
 

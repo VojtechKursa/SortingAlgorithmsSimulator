@@ -1,6 +1,6 @@
-import { FullStepResult } from "./stepResults/FullStepResult";
-import { StepKind, StepKindHelper } from "./stepResults/StepKind";
-import { StepResult } from "./stepResults/StepResult";
+import { FullStepResult } from "../stepResults/FullStepResult";
+import { StepKind, StepKindHelper } from "../stepResults/StepKind";
+import { StepResult } from "../stepResults/StepResult";
 
 export class StepResultCollection {
 	private readonly steps: Array<StepResult>;
@@ -20,7 +20,7 @@ export class StepResultCollection {
 
 		this.fullStepIndexes.push([0]);
 		this.steps.push(initialStep);
-		
+
 		if (initialStep instanceof FullStepResult) {
 			this.previousFullWasLastSubstep = initialStep.isLastSubstep;
 		}
@@ -57,7 +57,7 @@ export class StepResultCollection {
 					return true;
 				}
 				return false;
-			
+
 			case StepKind.Sub:
 			case StepKind.Full:
 				let currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
@@ -118,12 +118,12 @@ export class StepResultCollection {
 					return true;
 				}
 				return false;
-			
+
 			case StepKind.Sub:
 				currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
 				let targetIndex: number | undefined;
 
-				if (currentFullStepIndexes[1] > 0) {						
+				if (currentFullStepIndexes[1] > 0) {
 					let subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0]];
 					targetIndex = subStepIndexes[currentFullStepIndexes[1] - 1];
 				} else if (currentFullStepIndexes[0] - 1 >= 0) {
@@ -136,7 +136,7 @@ export class StepResultCollection {
 
 				this.pointer = targetIndex;
 				return true;
-			
+
 			case StepKind.Full:
 				currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
 
@@ -160,7 +160,7 @@ export class StepResultCollection {
 		switch (kind) {
 			case StepKind.Code:
 				return this.pointer;
-			
+
 			case StepKind.Sub:
 			case StepKind.Full:
 				let stepIndexes = this.binarySearchFullStepIndex();
@@ -207,7 +207,7 @@ export class StepResultCollection {
 			if (subSteps[i] <= targetStep)
 				return i;
 		}
-		
+
 		throw new Error("Invalid substeps array for specified target step");
 	}
 
@@ -254,7 +254,7 @@ export class StepResultCollection {
 					return true;
 				}
 				return false;
-			
+
 			case StepKind.Sub:
 				if (subStep == undefined)
 					throw new Error("goToStep called with SubStep step kind, but no sub-step index was given");
@@ -270,12 +270,12 @@ export class StepResultCollection {
 					}
 				}
 				return false;
-			
+
 			case StepKind.Full:
 				if (step > -1 && step < this.fullStepIndexes.length) {
 					let subStepIndexes = this.fullStepIndexes[step];
 					let targetIndex = subStepIndexes[subStepIndexes.length - 1];
-					
+
 					if (this.getStepKind(targetIndex) == StepKind.Full) {
 						this.pointer = targetIndex;
 						return true;

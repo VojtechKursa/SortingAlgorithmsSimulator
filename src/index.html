@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Sorting algorithms simulator</title>
+		<title>Sorting algorithms simulator</title>
 
-        <script src="./scripts/pages/index.ts" defer="defer"></script>
+		<script src="./scripts/pages/index.ts" defer="defer"></script>
 
-        <link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-        <link href="./styles/index.scss" rel="stylesheet">
-    </head>
-    <body data-bs-theme="dark">
-        <div id="topbar" class="container-fluid">
+		<link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+		<link href="./styles/index.scss" rel="stylesheet">
+	</head>
+	<body data-bs-theme="dark">
+		<div id="topbar" class="container-fluid">
 			<a class="navbar-brand" href="#">Sorting algorithms simulator</a>
 		</div>
 
-        <div id="card_container" class="container-fluid">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
-                {{#each algorithms}}
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">{{name}}</h5>
-                            <p class="card-text">{{description}}</p>
-                        </div>
-                        <div class="card-footer">
-                            <a href="./{{nameMachine}}.html" class="btn btn-primary">Try</a>
-                        </div>
-                    </div>
-                </div>
-                {{/each}}
-            </div>
-        </div>
+		<div id="card_container" class="container-fluid">
+			<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
+				{{#each algorithms}}
+				<div class="col">
+					<div class="card h-100">
+						<div class="card-body">
+							<h5 class="card-title">{{name}}</h5>
+							<p class="card-text">{{description}}</p>
+						</div>
+						<div class="card-footer">
+							<a href="./{{nameMachine}}.html" class="btn btn-primary">Try</a>
+						</div>
+					</div>
+				</div>
+				{{/each}}
+			</div>
+		</div>
 
 
 
-        <script src="bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
+		<script src="bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	</body>
 </html>

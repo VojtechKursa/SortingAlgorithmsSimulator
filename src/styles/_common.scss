@@ -1,70 +1,70 @@
 @mixin margin-vertical($margin: 1rem) {
-    margin-top: $margin;
-    margin-bottom: $margin;
+	margin-top: $margin;
+	margin-bottom: $margin;
 }
 
 @mixin margin-horizontal($margin: 1rem) {
-    margin-left: $margin;
-    margin-right: $margin;
+	margin-left: $margin;
+	margin-right: $margin;
 }
 
 .right-align {
-    margin-left: auto;
-    margin-right: 0;
+	margin-left: auto;
+	margin-right: 0;
 }
 
 
 
 .block {
-    display: block;
+	display: block;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 .problem_description {
-    color: red;
-    margin-top: 0 !important;
-    padding-top: 2px !important;
-    text-align: right;
-    
-    &:empty {
-        display: none;
-    }
+	color: red;
+	margin-top: 0 !important;
+	padding-top: 2px !important;
+	text-align: right;
+	
+	&:empty {
+		display: none;
+	}
 }
 
 .problem_input {
-    $primary-color: red;
+	$primary-color: red;
 
-    color: $primary-color;
+	color: $primary-color;
 
-    input {
-        border: 2px solid $primary-color;
-        
-        color: $primary-color;
-    }
+	input {
+		border: 2px solid $primary-color;
+		
+		color: $primary-color;
+	}
 }
 
 .blur {
-    filter: blur(4px);
+	filter: blur(4px);
 }
 
 #topbar {
-    background-color: #222222;
-    color: white;
-    font-size: 24px;
-    padding: 8px 12px;
+	background-color: #222222;
+	color: white;
+	font-size: 24px;
+	padding: 8px 12px;
 }
 
 .btn-group {
-    min-width: max-content;
+	min-width: max-content;
 }
 
 .container-fluid {
-    min-width: min-content;
+	min-width: min-content;
 }
 
 .breadcrumb {
-    @include margin-vertical(0.5rem);
+	@include margin-vertical(0.5rem);
 }

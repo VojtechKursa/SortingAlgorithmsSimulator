@@ -59,7 +59,7 @@ export class StepKindHelper {
 	public static fromString(text: string | null | undefined): StepKind | undefined {
 		if (text == null || text == undefined)
 			return undefined;
-		
+
 		for (const keyPair of this.map) {
 			if (keyPair[1].machineName == text)
 				return keyPair[0];
@@ -70,7 +70,7 @@ export class StepKindHelper {
 
 	public static toString(kind: StepKind): StepKindDescription {
 		let result = this.map.get(kind);
-		
+
 		if (result == undefined)
 			throw new Error("StepKind without toString implementation");
 

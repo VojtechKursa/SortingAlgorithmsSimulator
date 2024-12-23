@@ -3,345 +3,266 @@
 
 
 :root {
-    --code-highlight-color: rgba(255, 255, 0, 0.5);
-    --renderer_highlight1-color: blue;
-    --renderer_highlight2-color: green;
-    --renderer_highlight3-color: red;
-    --renderer_sorted-color: grey;
-    --renderer_order_correct-color: limegreen;
-    --renderer_order_swapped-color: red;
-
-    .renderer_highlight1 {
-        background-color: var(--renderer_highlight1-color) !important;
-    }
-    .renderer_highlight2 {
-        background-color: var(--renderer_highlight2-color) !important;
-    }
-    .renderer_highlight3 {
-        background-color: var(--renderer_highlight3-color) !important;
-    }
-    .renderer_sorted {
-        background-color: var(--renderer_sorted-color) !important;
-    }
-    .renderer_order_correct {
-        background-color: var(--renderer_order_correct-color) !important;
-    }
-    .renderer_order_swapped {
-        background-color: var(--renderer_order_swapped-color) !important;
-    }
+	--code-highlight-color: rgba(255, 255, 0, 0.5);
 }
 
 select {
-    margin-top: 4px;
+	margin-top: 4px;
 }
 
 .btn-group output {
-    text-align: center;
-    align-content: center;
+	text-align: center;
+	align-content: center;
 }
 
 .control_module {
-    @include common.margin-vertical();
+	@include common.margin-vertical();
 
-    display: flex;
-    width: 100%;
+	display: flex;
+	width: 100%;
 
-    * {
-        min-height: 100%;
-    }
-    
-    > * {
-        min-width: max-content;
-    }
+	* {
+		min-height: 100%;
+	}
+	
+	> * {
+		min-width: max-content;
+	}
 }
 
 .continuous_control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
-    margin-bottom: 1em;
+	margin-bottom: 1em;
 
-    & > * {
-        width: fit-content;
-    }
+	& > * {
+		width: fit-content;
+	}
 
-    .period_container {
-        margin-right: 16px;
+	.period_container {
+		margin-right: 16px;
 
-        input {
-            width: 3em;
-        }
-    }
+		input {
+			width: 3em;
+		}
+	}
 
-    .radio_buttons_wrapper {
-        input[type=radio] {
-            margin-left: 2em;
-        }
-    }
+	.radio_buttons_wrapper {
+		input[type=radio] {
+			margin-left: 2em;
+		}
+	}
 }
 
 .input_parameter_module {
-    .input_wrapper {
-        display: flex;
+	.input_wrapper {
+		display: flex;
 
-        label {
-            width: 100px;
-    
-            margin-right: 1em;
-        }
-    
-        input {
-            flex-grow: 1;
-        }
-    }
+		label {
+			width: 100px;
+	
+			margin-right: 1em;
+		}
+	
+		input {
+			flex-grow: 1;
+		}
+	}
 }
 
 
 #navbar {
-    display: flex;
+	display: flex;
 
-    @include common.margin-vertical(8px);
-    
-    #settings_button_wrapper {
-        width: fit-content;
-        
-        @extend .right-align;
-    }
+	@include common.margin-vertical(8px);
+	
+	#settings_button_wrapper {
+		width: fit-content;
+		
+		@extend .right-align;
+	}
 }
 
 #row_main {
-    $border: 2px solid black;
-    
-    border: $border;
-    text-align: center;
+	$border: 2px solid black;
+	
+	border: $border;
+	text-align: center;
 
 
-    #col_renderer {
-        display: flex;
-        flex-flow: column;
+	#col_renderer {
+		display: flex;
+		flex-flow: column;
 
-        @media (max-width: 991px) {
-            height: fit-content;
-            border-bottom: $border;
-        }
-        @media (min-width: 992px) {
-            border-right: $border;
-        }
+		@media (max-width: 991px) {
+			height: fit-content;
+			border-bottom: $border;
+		}
+		@media (min-width: 992px) {
+			border-right: $border;
+		}
 
-        #renderer_wrapper {
-            width: 100%;
-            flex-grow: 1;
+		#canvas {
+			width: 100%;
+			
+			flex-grow: 1;
+		}
 
-            align-content: center;
+		#step_description {
+			height: fit-content;
+			min-height: 1.5em;
 
-            #renderer {
-                display: grid;
+			$margin: 0.25em;
 
-                --div-max-width: 100%;
-                --element-border-width: 4px;
+			@include common.margin-vertical($margin);
+			@include common.margin-horizontal(calc(-0.5 * var(--bs-gutter-x) + $margin));
 
-                .array_item {
-                    grid-row: 2;
+			border: 2px solid green;
+		}
+	}
+	
+	#col_debugger {
+		max-width: fit-content;
+		
+		#debugger_row {
+			display: flex;
+			flex-direction: row;
 
-                    position: relative;
-                    
-                    text-align: center;
-                    align-content: center;
+			#debugger {
+				background-color: black;
+				color: white;
 
-                    /*  max-width is taken as width of the whole element, including border,
-                        border can be counted only once, because half the border is inside the element */
-                    max-width: calc(var(--div-max-width) + var(--element-border-width));
+				text-align: left;
+				align-content: center;
 
-                    aspect-ratio: 1;
-                    
-                    border-width: var(--element-border-width);
-                    border-style: solid;
-                    border-color: black;
-                    
-                    @include common.margin-horizontal(calc(var(--element-border-width) / -2));    // Prevent borders of neighbor elements from adding on each other
+				.code-line {
+					display: grid;
+					grid-template-columns: 3em auto;
+		
+					font-family: monospace;
+		
+					.code-header {
+						grid-column: 1;
+		
+						background-color: grey;
+		
+						text-align: right;
+						padding-right: 0.5em;
+		
+						user-select: none;  /* Make the text un-selectable */
+					}
+		
+					.code-text {
+						grid-column: 2;
+		
+						padding-left: 0.5em;
+						white-space: pre;
+					}
+				}
+		
+				.code-highlight {
+					background-color: var(--code-highlight-color);
+				}
+			}
 
-                    &.first {
-                        margin-left: 0;
-                    }
+			#variable_watch_wrapper {
+				@include common.margin-horizontal();
 
-                    &.last {
-                        margin-right: 0;
-                    }
+				#variable_watch {
+					thead {
+						background-color: green;
+					}
 
-                    color: black;
-                    background-color: white;
+					td {
+						border: 2px solid black;
+					}
 
-                    .index {
-                        position: absolute;
+					#variable_watch_body {
 
-                        top: 100%;
-                        left: 100%;
-                        transform: translate(-150%, -100%);
-
-                        font-size: 0.75em;
-                    }
-                }
-
-                .variable {
-                    grid-row: 1;
-                }
-            }
-        }
-
-        #step_description {
-            height: fit-content;
-            min-height: 1.5em;
-
-            $margin: 0.25em;
-
-            @include common.margin-vertical($margin);
-            @include common.margin-horizontal(calc(-0.5 * var(--bs-gutter-x) + $margin));
-
-            border: 2px solid green;
-        }
-    }
-    
-    #col_debugger {
-        max-width: fit-content;
-        
-        #debugger_row {
-            display: flex;
-            flex-direction: row;
-
-            #debugger {
-                background-color: black;
-                color: white;
-
-                text-align: left;
-                align-content: center;
-
-                .code-line {
-                    display: grid;
-                    grid-template-columns: 3em auto;
-        
-                    font-family: monospace;
-        
-                    .code-header {
-                        grid-column: 1;
-        
-                        background-color: grey;
-        
-                        text-align: right;
-                        padding-right: 0.5em;
-        
-                        user-select: none;  /* Make the text un-selectable */
-                    }
-        
-                    .code-text {
-                        grid-column: 2;
-        
-                        padding-left: 0.5em;
-                        white-space: pre;
-                    }
-                }
-        
-                .code-highlight {
-                    background-color: var(--code-highlight-color);
-                }
-            }
-
-            #variable_watch_wrapper {
-                @include common.margin-horizontal();
-
-                #variable_watch {
-                    thead {
-                        background-color: green;
-                    }
-
-                    td {
-                        border: 2px solid black;
-                    }
-
-                    #variable_watch_body {
-
-                        .variable_watch-row {
-                            &:nth-child(odd) {
-                                background-color: grey;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+						.variable_watch-row {
+							&:nth-child(odd) {
+								background-color: grey;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 #row_simulator_controls {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 
-    margin-top: 1em;
+	margin-top: 1em;
 
-    min-width: fit-content;
+	min-width: fit-content;
 
-    button {
-        @include common.margin-horizontal(1em);
+	button {
+		@include common.margin-horizontal(1em);
 
-        width: 100%;
-        max-width: 250px;
-        min-width: fit-content;
+		width: 100%;
+		max-width: 250px;
+		min-width: fit-content;
 
-        height: 50px;
+		height: 50px;
 
-        &:first-child {
-            margin-left: 0;
-        }
+		&:first-child {
+			margin-left: 0;
+		}
 
-        &:last-child {
-            margin-right: 0;
-        }
-    }
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }
 
 #dialog_input {
-    #dialog_input-method_area {
-        @include common.margin-vertical(2em);
+	#dialog_input-method_area {
+		@include common.margin-vertical(2em);
 
-        label {
-            width: 100px;
+		label {
+			width: 100px;
 
-            margin-right: 1em;
-        }
+			margin-right: 1em;
+		}
 
-        > div {
-            margin-top: 1em;
+		> div {
+			margin-top: 1em;
 
-            &:first-child {
-                margin-top: 0;
-            }
+			&:first-child {
+				margin-top: 0;
+			}
 
-            div {
-                margin-top: 0.5em;
+			div {
+				margin-top: 0.5em;
 
-                &:first-child {
-                    margin-top: 0;
-                }
-            }
-        }
-    }
+				&:first-child {
+					margin-top: 0;
+				}
+			}
+		}
+	}
 }
 
 .dialog_buttons {
-    display: flex;
-    flex-flow: row;
+	display: flex;
+	flex-flow: row;
 
-    button {
-        width: 100%;
+	button {
+		width: 100%;
 
-        @include common.margin-horizontal(0.5em);
-        
-        &:first-child {
-            margin-left: 0;
-        }
+		@include common.margin-horizontal(0.5em);
+		
+		&:first-child {
+			margin-left: 0;
+		}
 
-        &:last-child {
-            margin-right: 0;
-        }
-    }
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }

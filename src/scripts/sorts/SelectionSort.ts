@@ -1,12 +1,11 @@
-import { StepResult } from "../stepResults/StepResult";
-import { StepResultArray } from "../stepResults/StepResultArray";
+import { StepResult } from "../data/stepResults/StepResult";
+import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { SortingAlgorithm } from "./SortingAlgorithm";
-import { RendererHighlights } from "../Highlights";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight } from "../CssInterface";
-import { Variable } from "../Variable";
-import { HighlightState } from "../HighlightState";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { CodeHighlight, RendererHighlight, RendererHighlights } from "../visualization/Highlights";
+import { Variable } from "../data/Variable";
+import { HighlightState } from "../visualization/HighlightState";
 
 export class SelectionSort extends SortingAlgorithm {
 	protected i?: number;
@@ -101,7 +100,7 @@ export class SelectionSort extends SortingAlgorithm {
 			highlightedLines = [highlightedLines];
 
 		let highlights = new Map<number, CodeHighlight>();
-		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.CodeHighlight_1));
+		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.ActiveLine));
 
 		let variables = new Array<Variable>();
 		if (this.i != null)
@@ -171,7 +170,7 @@ export class SelectionSort extends SortingAlgorithm {
 
 		if (enteredOuterWhile)
 			yield this.makeCodeStepResult(2);
-		
+
 		yield this.makeCodeStepResult(13);
 		yield this.makeFullStepResult(true, "Array sorted", true, false, undefined, 14);
 	}
