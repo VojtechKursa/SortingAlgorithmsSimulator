@@ -1,20 +1,21 @@
+import Color from "colorjs.io";
 import { SymbolicColor } from "../colors/SymbolicColor";
 
 export class ColorSet {
-	private map: Map<SymbolicColor, string>;
-	private defaultValue: string;
+	private map: Map<SymbolicColor, Color>;
 
-	public constructor(map: Iterable<readonly [SymbolicColor, string]>, defaultValue: string) {
-		this.map = new Map<SymbolicColor, string>();
+	public constructor(
+		map: Iterable<readonly [SymbolicColor, Color]>,
+		private readonly defaultValue: Color
+	) {
+		this.map = new Map<SymbolicColor, Color>();
 
 		for (const item of map) {
 			this.map.set(item[0], item[1]);
 		}
-
-		this.defaultValue = defaultValue;
 	}
 
-	public get(color: SymbolicColor | undefined): string {
+	public get(color: SymbolicColor | undefined): Color {
 		if (color == undefined)
 			return this.defaultValue;
 
@@ -28,19 +29,33 @@ export class ColorSet {
 		}
 	}
 
-	public set(color: SymbolicColor, value: string): void {
+	public set(color: SymbolicColor, value: Color): void {
 		this.map.set(color, value);
 	}
 
 	public static fromJSON(source: string): ColorSet;
-	public static fromJSON(source: any): ColorSet;
-	public static fromJSON(source: any): ColorSet {
-		if (typeof source == "string") {
-			let obj = JSON.parse(source);
-			return new ColorSet(obj.data, obj.defaultValue);
+	public static fromJSON(source: object): ColorSet;
+	public static fromJSON(source: Array<[SymbolicColor, string]>, defaultValue: Color): ColorSet;
+	public static fromJSON(source: any, defaultValue?: Color): ColorSet {
+		let parsed = typeof source === "string" ? JSON.parse(source) : source;
+
+		if (parsed instanceof Array) {
+			if (defaultValue != undefined)
+				return new ColorSet(parsed, defaultValue);
+			else
+				throw new Error("Default value not defined with Array-type source when parsing ColorSet");
+		}
+		else if (typeof parsed === "object") {
+			let data = parsed.data;
+			let defaultValue = parsed.defaultValue;
+
+			if (data instanceof Array && typeof defaultValue === "string")
+				return new ColorSet(data.map(value => [value[0], new Color(value[1])]), new Color(defaultValue));
+			else
+				throw new Error("Attempted to parse invalid ColorSet object");
 		}
 		else {
-			return new ColorSet(source.data, source.defaultValue);
+			throw new Error("Attempted to parse ColorSet from unsupported format");
 		}
 	}
 
@@ -50,60 +65,64 @@ export class ColorSet {
 
 	public toSerializableObject() {
 		return {
-			data: this.toArray(),
-			defaultValue: this.defaultValue
+			data: this.toSerializableArray(),
+			defaultValue: this.defaultValue.toString()
 		};
 	}
 
-	public toArray(): Array<[SymbolicColor, string]> {
-		const resultBuilder = new Array<[SymbolicColor, string]>();
+	public toArray(): Array<[SymbolicColor, Color]> {
+		const result = new Array<[SymbolicColor, Color]>();
 
 		for (const item of this.map) {
-			resultBuilder.push(item);
+			result.push(item);
 		}
 
-		return resultBuilder;
+		return result;
+	}
+
+	public toSerializableArray(): Array<[SymbolicColor, string]> {
+		return this.toArray().map(value => [value[0], value[1].toString()]);
 	}
 
 	public static getDefaultLight(): ColorSet {
 		return new ColorSet([
-			[SymbolicColor.Simulator_Background, "transparent"],
-			[SymbolicColor.Simulator_Foreground, "black"],
-			[SymbolicColor.Element_Background, "white"],
-			[SymbolicColor.Element_Foreground, "black"],
-			[SymbolicColor.Element_Border, "black"],
-			[SymbolicColor.Element_Sorted, "grey"],
-			[SymbolicColor.Element_OrderCorrect, "limegreen"],
-			[SymbolicColor.Element_OrderIncorrect, "crimson"],
-			[SymbolicColor.Element_Highlight_1, "blue"],
-			[SymbolicColor.Element_Highlight_2, "green"],
-			[SymbolicColor.Element_Highlight_3, "red"],
-			[SymbolicColor.Code_ActiveLine, "#ffff007f"],
-			[SymbolicColor.Variable_1, "blue"],
-			[SymbolicColor.Variable_2, "green"],
-			[SymbolicColor.Variable_3, "red"],
-			[SymbolicColor.Variable_4, "cyan"],
-		], "white");
+			[SymbolicColor.Simulator_Background, new Color("transparent")],
+			[SymbolicColor.Simulator_Foreground, new Color("black")],
+			[SymbolicColor.Element_Background, new Color("white")],
+			[SymbolicColor.Element_Foreground, new Color("black")],
+			[SymbolicColor.Element_Border, new Color("black")],
+			[SymbolicColor.Element_Sorted, new Color("grey")],
+			[SymbolicColor.Element_OrderCorrect, new Color("limegreen")],
+			[SymbolicColor.Element_OrderIncorrect, new Color("crimson")],
+			[SymbolicColor.Element_Highlight_1, new Color("blue")],
+			[SymbolicColor.Element_Highlight_2, new Color("green")],
+			[SymbolicColor.Element_Highlight_3, new Color("red")],
+			[SymbolicColor.Code_ActiveLine, new Color("rgba(255, 255, 0, 0.5)")],
+			[SymbolicColor.Variable_1, new Color("blue")],
+			[SymbolicColor.Variable_2, new Color("green")],
+			[SymbolicColor.Variable_3, new Color("red")],
+			[SymbolicColor.Variable_4, new Color("cyan")],
+		], new Color("white"));
 	}
 
 	public static getDefaultDark(): ColorSet {
 		return new ColorSet([
-			[SymbolicColor.Simulator_Background, "transparent"],
-			[SymbolicColor.Simulator_Foreground, "black"],
-			[SymbolicColor.Element_Background, "white"],
-			[SymbolicColor.Element_Foreground, "black"],
-			[SymbolicColor.Element_Border, "black"],
-			[SymbolicColor.Element_Sorted, "grey"],
-			[SymbolicColor.Element_OrderCorrect, "limegreen"],
-			[SymbolicColor.Element_OrderIncorrect, "crimson"],
-			[SymbolicColor.Element_Highlight_1, "blue"],
-			[SymbolicColor.Element_Highlight_2, "green"],
-			[SymbolicColor.Element_Highlight_3, "red"],
-			[SymbolicColor.Code_ActiveLine, "#ffff007f"],
-			[SymbolicColor.Variable_1, "blue"],
-			[SymbolicColor.Variable_2, "green"],
-			[SymbolicColor.Variable_3, "red"],
-			[SymbolicColor.Variable_4, "cyan"],
-		], "white");
+			[SymbolicColor.Simulator_Background, new Color("transparent")],
+			[SymbolicColor.Simulator_Foreground, new Color("black")],
+			[SymbolicColor.Element_Background, new Color("white")],
+			[SymbolicColor.Element_Foreground, new Color("black")],
+			[SymbolicColor.Element_Border, new Color("black")],
+			[SymbolicColor.Element_Sorted, new Color("grey")],
+			[SymbolicColor.Element_OrderCorrect, new Color("limegreen")],
+			[SymbolicColor.Element_OrderIncorrect, new Color("crimson")],
+			[SymbolicColor.Element_Highlight_1, new Color("blue")],
+			[SymbolicColor.Element_Highlight_2, new Color("green")],
+			[SymbolicColor.Element_Highlight_3, new Color("red")],
+			[SymbolicColor.Code_ActiveLine, new Color("rgba(255, 255, 0, 0.5)")],
+			[SymbolicColor.Variable_1, new Color("blue")],
+			[SymbolicColor.Variable_2, new Color("green")],
+			[SymbolicColor.Variable_3, new Color("red")],
+			[SymbolicColor.Variable_4, new Color("cyan")],
+		], new Color("white"));
 	}
 }

@@ -57,15 +57,15 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 				rect.setAttribute("y", y.toString());
 				rect.setAttribute("height", boxSizeStr);
 				rect.setAttribute("width", boxSizeStr);
-				rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border));
+				rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
 				rect.setAttribute("stroke-width", `${borderWidth}px`);
-				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background));
+				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background).toString());
 				rect.classList.add(RendererClasses.elementClass);
 
 				const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 				text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
 				text.setAttribute("y", (y + (boxSize / 2)).toString());
-				text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground));
+				text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
 				text.setAttribute("dominant-baseline", "central");
 				text.setAttribute("text-anchor", "middle");
 				text.textContent = item.value.toString();
@@ -81,7 +81,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 					const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
 					index.setAttribute("x", (box.x + box.width - rightMargin).toString());
 					index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
-					index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground));
+					index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
 					index.setAttribute("dominant-baseline", "text-bottom");
 					index.setAttribute("text-anchor", "end");
 					index.textContent = item.index.toString();
@@ -171,7 +171,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			text.setAttribute("font-size", `${textSize}px`);
 			text.setAttribute("text-anchor", "middle");
 			text.setAttribute("alignment-baseline", "bottom");
-			text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground));
+			text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
 
 			variableRenderer.appendChild(text);
 		});
