@@ -16,7 +16,6 @@
   "author": "Vojtěch Kursa",
   "license": "MIT",
   "devDependencies": {
-    "@types/color": "^4.2.0",
     "css-loader": "^6.8.1",
     "handlebars": "^4.7.8",
     "html-bundler-webpack-plugin": "^2.14.4",
