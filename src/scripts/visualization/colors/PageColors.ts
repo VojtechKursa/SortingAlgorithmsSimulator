@@ -3,6 +3,10 @@ import { ColorSet } from "./ColorSet";
 export class PageColors {
 	private static readonly storageKey = "colors";
 
+	public get currentColorSet(): ColorSet {
+		return document.body.getAttribute("data-bs-theme") === "dark" ? this.darkColors : this.lightColors;
+	}
+
 	public constructor(
 		public readonly lightColors: ColorSet,
 		public readonly darkColors: ColorSet

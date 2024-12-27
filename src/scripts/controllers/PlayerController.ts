@@ -21,7 +21,7 @@ export class PlayerController {
 		private readonly debuggerControls: DebuggerControlElements,
 		private readonly continuousControls: ContinuousControlElements,
 		private readonly renderer: RenderingVisitor,
-		private readonly colors: PageColors,
+		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
 	) {
 		this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());

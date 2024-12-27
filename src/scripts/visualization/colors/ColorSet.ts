@@ -1,7 +1,8 @@
 import Color from "colorjs.io";
 import { SymbolicColor } from "../colors/SymbolicColor";
+import { SymbolicColorHelper } from "./SymbolicColorHelper";
 
-export class ColorSet {
+export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 	private map: Map<SymbolicColor, Color>;
 
 	public constructor(
@@ -31,6 +32,14 @@ export class ColorSet {
 
 	public set(color: SymbolicColor, value: Color): void {
 		this.map.set(color, value);
+	}
+
+	public applyCSS() {
+		const root = document.documentElement;
+
+		for (const pair of this.map) {
+			root.style.setProperty(SymbolicColorHelper.getCssColorVar(pair[0]), pair[1].toString());
+		}
 	}
 
 	public static fromJSON(source: string): ColorSet;
@@ -124,5 +133,9 @@ export class ColorSet {
 			[SymbolicColor.Variable_3, new Color("red")],
 			[SymbolicColor.Variable_4, new Color("cyan")],
 		], new Color("white"));
+	}
+
+	[Symbol.iterator](): MapIterator<[SymbolicColor, Color]> {
+		return this.map.entries();
 	}
 }
