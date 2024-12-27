@@ -18,3 +18,22 @@ export const enum SymbolicColor {
 	Variable_3 = "variable-3",
 	Variable_4 = "variable-4",
 }
+
+export const symbolicColors = [
+	SymbolicColor.Simulator_Background,
+	SymbolicColor.Simulator_Foreground,
+	SymbolicColor.Element_Background,
+	SymbolicColor.Element_Foreground,
+	SymbolicColor.Element_Border,
+	SymbolicColor.Element_Sorted,
+	SymbolicColor.Element_OrderCorrect,
+	SymbolicColor.Element_OrderIncorrect,
+	SymbolicColor.Element_Highlight_1,
+	SymbolicColor.Element_Highlight_2,
+	SymbolicColor.Element_Highlight_3,
+	SymbolicColor.Code_ActiveLine,
+	SymbolicColor.Variable_1,
+	SymbolicColor.Variable_2,
+	SymbolicColor.Variable_3,
+	SymbolicColor.Variable_4
+];

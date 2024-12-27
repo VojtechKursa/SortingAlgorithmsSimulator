@@ -9,6 +9,7 @@ import { CallStackController } from "./CallStackController";
 import { DarkModeHandler } from "./DarkModeHandler";
 import { InputController } from "./InputController";
 import { PlayerController } from "./PlayerController";
+import { SettingsController } from "./SettingsController";
 
 /**
  * Controller class for managing the simulator page.
@@ -103,6 +104,10 @@ export class SimulatorPageController {
 				event.preventDefault();
 				this.playerController.performAction(action);
 			}
+		});
+
+		settingsOpenButton.addEventListener("click", _ => {
+			new SettingsController(playerController.colors).open();
 		});
 
 		this.resizeHandler();
