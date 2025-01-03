@@ -9,7 +9,7 @@ import { SymbolicColor } from "../../visualization/colors/SymbolicColor";
 export class CodeStepResult extends StepResult {
 	public constructor(
 		text: string = "",
-		public readonly SymbolicColors: Highlights = new Map<number, SymbolicColor>(),
+		public readonly symbolicColors: Highlights = new Map<number, SymbolicColor>(),
 		public readonly variables: Variable[] = []
 	) {
 		super(text);

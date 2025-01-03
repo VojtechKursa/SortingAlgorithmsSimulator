@@ -141,7 +141,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		const debuggerLines = debuggerElement.children;
 		debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
 
-		step.SymbolicColors.forEach((_, key) => debuggerLines[key].classList.add(highlightClass));
+		step.symbolicColors.forEach((_, key) => debuggerLines[key].classList.add(highlightClass));
 	}
 
 	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult) {
