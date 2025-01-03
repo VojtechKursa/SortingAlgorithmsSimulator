@@ -67,11 +67,11 @@ export class InsertionSort extends SortingAlgorithm {
 
 		let variables = new Array<Variable>();
 		if (this.i != null)
-			variables.push(new Variable("i", this.i, !final));
+			variables.push(new Variable("i", this.i, final ? undefined : SymbolicColor.Variable_1));
 		if (this.x != null)
-			variables.push(new Variable("x", this.x, false));
+			variables.push(new Variable("x", this.x, undefined));
 		if (this.j != null)
-			variables.push(new Variable("j", this.j, !final));
+			variables.push(new Variable("j", this.j, final ? undefined : SymbolicColor.Variable_2));
 
 		return new CodeStepResult(text != undefined ? text : "", highlights, variables);
 	}

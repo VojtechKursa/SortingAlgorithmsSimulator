@@ -68,8 +68,8 @@ export class SelectionSort extends SortingAlgorithm {
 			else {
 				if (this.j != undefined) {
 					if (highlightState == HighlightState.Selected && this.min != undefined) {
-						highlights.set(this.min, SymbolicColor.Element_Highlight_1);
-						highlights.set(this.j, SymbolicColor.Element_Highlight_2);
+						highlights.set(this.j, SymbolicColor.Element_Highlight_1);
+						highlights.set(this.min, SymbolicColor.Element_Highlight_2);
 					}
 					else if (highlightState == HighlightState.OrderCorrect && this.min != undefined) {
 						highlights.set(this.min, SymbolicColor.Element_OrderCorrect);
@@ -104,11 +104,11 @@ export class SelectionSort extends SortingAlgorithm {
 
 		let variables = new Array<Variable>();
 		if (this.i != null)
-			variables.push(new Variable("i", this.i, !final));
+			variables.push(new Variable("i", this.i, final ? undefined : SymbolicColor.Variable_3));
 		if (this.min != null)
-			variables.push(new Variable("min", this.min, !final));
+			variables.push(new Variable("min", this.min, final ? undefined : SymbolicColor.Variable_2));
 		if (this.j != null)
-			variables.push(new Variable("j", this.j, !final));
+			variables.push(new Variable("j", this.j, final ? undefined : SymbolicColor.Variable_1));
 
 		return new CodeStepResult(text != undefined ? text : "", highlights, variables);
 	}

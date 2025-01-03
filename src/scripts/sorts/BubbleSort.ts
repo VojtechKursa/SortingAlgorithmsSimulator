@@ -70,7 +70,7 @@ export class BubbleSort extends SortingAlgorithm {
 		let highlights = new Map<number, SymbolicColor>();
 		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
 
-		return new CodeStepResult(text != undefined ? text : "", highlights, [new Variable("k", this.k, true), new Variable("swapped", this.swapped)])
+		return new CodeStepResult(text != undefined ? text : "", highlights, [new Variable("k", this.k, SymbolicColor.Variable_1), new Variable("swapped", this.swapped)])
 	}
 
 	protected * stepForwardInternal(): Generator<StepResult> {
