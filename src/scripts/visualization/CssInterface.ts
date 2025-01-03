@@ -18,5 +18,7 @@ export class RendererClasses {
 	public static readonly elementClass: string = "array_item";
 	public static readonly elementValueClass: string = "value";
 	public static readonly elementIndexClass: string = "index";
-	public static readonly variableClass: string = "variable";
+	public static readonly variableWrapperClass: string = "variable-wrapper";
+	public static readonly variableTextClass: string = "variable-text";
+	public static readonly variablePointerClass: string = "variable-pointer";
 }
