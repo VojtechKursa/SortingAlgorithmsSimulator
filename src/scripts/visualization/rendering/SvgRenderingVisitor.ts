@@ -181,14 +181,16 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		const chevronWidth = this.boxSize;
 		const chevronHeight = this.boxSize / 2;
 
+		const variablesAboveElements = new Array<number>(this.arrayElementLocations.length);
 
 		step.variables.filter(variable => variable.color != undefined).forEach(variable => {
 			if (variable.value >= this.arrayElementLocations.length)
 				return;
 
 			const elementLocation = this.arrayElementLocations[variable.value];
+			const variableOrder = variablesAboveElements[variable.value] ?? 0;
 
-			const chevronTop = elementLocation.y - chevronMargin - chevronHeight;
+			const chevronTop = elementLocation.y - chevronMargin - chevronHeight - (variableOrder * (chevronMargin + chevronHeight + (textMargin * 2) + textSize));
 
 			const points = new Array<Point2D>();
 			points.push(new Point2D(elementLocation.x, chevronTop));
@@ -214,6 +216,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 			variableRenderer.appendChild(chevron);
 			variableRenderer.appendChild(text);
+
+			variablesAboveElements[variable.value] = variableOrder + 1;
 		});
 	}
 }
