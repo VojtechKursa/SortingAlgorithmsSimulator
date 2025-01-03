@@ -1,12 +1,12 @@
 import { StepResult } from "../data/stepResults/StepResult";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { SortingAlgorithm } from "./SortingAlgorithm";
+import { HighlightState, SortingAlgorithm } from "./SortingAlgorithm";
 import { CodeStepResult } from "../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../data/stepResults/FullStepResult";
-import { CodeHighlight, RendererHighlight, RendererHighlights } from "../visualization/Highlights";
 import { Variable } from "../data/Variable";
 import { IndexedNumber } from "../data/IndexedNumber";
-import { HighlightState } from "../visualization/HighlightState";
+import { Highlights } from "../visualization/Highlights";
+import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 
 export class InsertionSort extends SortingAlgorithm {
 	protected i?: number;
@@ -17,8 +17,8 @@ export class InsertionSort extends SortingAlgorithm {
 		super(input);
 	}
 
-	protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, additionalHighlights?: RendererHighlights): StepResult {
-		let highlights: RendererHighlights = new Map<number, RendererHighlight>();
+	protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, additionalHighlights?: Highlights): StepResult {
+		let highlights: Highlights = new Map<number, SymbolicColor>();
 
 		if (typeof highlightedLines == "number") {
 			highlightedLines = [highlightedLines];
@@ -26,22 +26,22 @@ export class InsertionSort extends SortingAlgorithm {
 
 		if (final) {
 			for (let i = 0; i < this.current.length; i++) {
-				highlights.set(i, RendererHighlight.Sorted);
+				highlights.set(i, SymbolicColor.Element_Sorted);
 			}
 		}
 		else {
 			if (this.j != undefined) {
 				if (highlightState == HighlightState.Selected) {
-					highlights.set(this.j - 1, RendererHighlight.Highlight_1);
-					highlights.set(this.j, RendererHighlight.Highlight_2);
+					highlights.set(this.j - 1, SymbolicColor.Element_Highlight_1);
+					highlights.set(this.j, SymbolicColor.Element_Highlight_2);
 				}
 				else if (highlightState == HighlightState.OrderCorrect) {
-					highlights.set(this.j - 1, RendererHighlight.ElementOrderCorrect);
-					highlights.set(this.j, RendererHighlight.ElementOrderCorrect);
+					highlights.set(this.j - 1, SymbolicColor.Element_OrderCorrect);
+					highlights.set(this.j, SymbolicColor.Element_OrderCorrect);
 				}
 				else if (highlightState == HighlightState.OrderSwapped) {
-					highlights.set(this.j - 1, RendererHighlight.ElementOrderSwapped);
-					highlights.set(this.j, RendererHighlight.ElementOrderSwapped);
+					highlights.set(this.j - 1, SymbolicColor.Element_OrderIncorrect);
+					highlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
 				}
 			}
 		}
@@ -62,8 +62,8 @@ export class InsertionSort extends SortingAlgorithm {
 		if (typeof highlightedLines == "number")
 			highlightedLines = [highlightedLines];
 
-		let highlights = new Map<number, CodeHighlight>();
-		highlightedLines.forEach(line => highlights.set(line, CodeHighlight.ActiveLine));
+		let highlights = new Map<number, SymbolicColor>();
+		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
 
 		let variables = new Array<Variable>();
 		if (this.i != null)

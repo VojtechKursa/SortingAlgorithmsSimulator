@@ -8,8 +8,6 @@ export const problemDescriptionDivClass: string = "problem_description";
 
 export const inputWrapperClass: string = "input_wrapper";
 
-export const codeHighlightClass: string = "code-highlight";
-
 export class VariableWatchClasses {
 	public static readonly row = "variable_watch-row";
 	public static readonly nameColumn = "variable_watch-var_name";

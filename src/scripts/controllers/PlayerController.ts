@@ -6,6 +6,7 @@ import { SimulatorOutputElements } from "../data/collections/htmlElementCollecti
 import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 import { RenderingVisitor } from "../visualization/rendering/RenderingVisitor";
+import { PageColors } from "../visualization/colors/PageColors";
 
 export class PlayerController {
 	private steps: StepResultCollection;
@@ -20,6 +21,7 @@ export class PlayerController {
 		private readonly debuggerControls: DebuggerControlElements,
 		private readonly continuousControls: ContinuousControlElements,
 		private readonly renderer: RenderingVisitor,
+		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
 	) {
 		this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
@@ -237,5 +239,15 @@ export class PlayerController {
 		this.algorithm.setInput(input);
 
 		this.reset();
+	}
+
+	public setDarkMode(darkMode: boolean): void {
+		const originalColorSet = this.renderer.colorSet;
+		const newColorSet = darkMode ? this.colors.darkColors : this.colors.lightColors;
+
+		if (originalColorSet != newColorSet) {
+			this.renderer.colorSet = newColorSet;
+			this.redraw();
+		}
 	}
 }

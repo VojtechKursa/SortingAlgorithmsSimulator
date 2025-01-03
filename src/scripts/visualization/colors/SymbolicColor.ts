@@ -1,0 +1,18 @@
+export const enum SymbolicColor {
+	Simulator_Background = "simulator-background",
+	Simulator_Foreground = "simulator-foreground",
+	Element_Background = "element-background",
+	Element_Foreground = "element-foreground",
+	Element_Border = "element-border",
+	Element_Sorted = "element-sorted",
+	Element_OrderCorrect = "element-order_correct",
+	Element_OrderIncorrect = "element-order_incorrect",
+	Element_Highlight_1 = "element-highlight_1",
+	Element_Highlight_2 = "element-highlight_2",
+	Element_Highlight_3 = "element-highlight_3",
+	Code_ActiveLine = "code-line_active",
+	Variable_1 = "variable-1",
+	Variable_2 = "variable-2",
+	Variable_3 = "variable-3",
+	Variable_4 = "variable-4",
+}

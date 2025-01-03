@@ -3,8 +3,10 @@ import { SimulatorOutputElements } from "../../data/collections/htmlElementColle
 import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
-import { ColorSet } from "../ColorSet";
-import { codeHighlightClass, RendererClasses, VariableWatchClasses } from "../CssInterface";
+import { ColorSet } from "../colors/ColorSet";
+import { RendererClasses, VariableWatchClasses } from "../CssInterface";
+import { SymbolicColor } from "../colors/SymbolicColor";
+import { SymbolicColorHelper } from "../colors/SymbolicColorHelper";
 import { RenderingVisitor } from "./RenderingVisitor";
 
 class Rectangle {
@@ -55,15 +57,15 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 				rect.setAttribute("y", y.toString());
 				rect.setAttribute("height", boxSizeStr);
 				rect.setAttribute("width", boxSizeStr);
-				rect.setAttribute("stroke", "black");
+				rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
 				rect.setAttribute("stroke-width", `${borderWidth}px`);
-				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : undefined));
+				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background).toString());
 				rect.classList.add(RendererClasses.elementClass);
 
 				const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 				text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
 				text.setAttribute("y", (y + (boxSize / 2)).toString());
-				text.setAttribute("color", "black");
+				text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
 				text.setAttribute("dominant-baseline", "central");
 				text.setAttribute("text-anchor", "middle");
 				text.textContent = item.value.toString();
@@ -79,7 +81,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 					const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
 					index.setAttribute("x", (box.x + box.width - rightMargin).toString());
 					index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
-					index.setAttribute("color", "black");
+					index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
 					index.setAttribute("dominant-baseline", "text-bottom");
 					index.setAttribute("text-anchor", "end");
 					index.textContent = item.index.toString();
@@ -121,11 +123,12 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
 		const debuggerElement = this.output.debuggerElement;
+		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
 
 		const debuggerLines = debuggerElement.children;
-		debuggerElement.querySelectorAll(`.${codeHighlightClass}`).forEach(element => element.classList.remove(codeHighlightClass));
+		debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
 
-		step.codeHighlights.forEach((_, key) => debuggerLines[key].classList.add(codeHighlightClass));
+		step.SymbolicColors.forEach((_, key) => debuggerLines[key].classList.add(highlightClass));
 	}
 
 	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult) {
@@ -168,6 +171,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			text.setAttribute("font-size", `${textSize}px`);
 			text.setAttribute("text-anchor", "middle");
 			text.setAttribute("alignment-baseline", "bottom");
+			text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
 
 			variableRenderer.appendChild(text);
 		});

@@ -1,13 +1,13 @@
+import { Highlights } from "../../visualization/Highlights";
 import { IndexedNumber } from "../IndexedNumber";
 import { CodeStepResult } from "./CodeStepResult";
 import { FullStepResult } from "./FullStepResult";
-import { RendererHighlights } from "../../visualization/Highlights";
 
 
 
 export class StepResultArray extends FullStepResult {
 	public readonly array: IndexedNumber[];
-	public readonly highlights: RendererHighlights | null;
+	public readonly highlights: Highlights | null;
 
 	public constructor(
 		final: boolean,
@@ -15,7 +15,7 @@ export class StepResultArray extends FullStepResult {
 		isLastSubstep: boolean,
 		codeStepResult: CodeStepResult,
 		array: IndexedNumber[],
-		highlights: RendererHighlights | null
+		highlights: Highlights | null
 	) {
 		super(final, text, isLastSubstep, codeStepResult);
 
