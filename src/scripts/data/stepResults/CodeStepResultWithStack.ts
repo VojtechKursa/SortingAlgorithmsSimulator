@@ -13,4 +13,8 @@ export class CodeStepResultWithStack extends CodeStepResult {
 	) {
 		super(text, symbolicColors, variables);
 	}
+
+	public split(): [CodeStepResult, CallStackFreezed] {
+		return [new CodeStepResult(this.text, this.symbolicColors, this.variables), this.stack];
+	}
 }

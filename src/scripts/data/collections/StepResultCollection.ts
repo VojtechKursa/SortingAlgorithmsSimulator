@@ -1,6 +1,8 @@
 import { AlgorithmState } from "../AlgorithmState";
+import { CallStackFreezed } from "../CallStack";
 import { StepIndexes } from "../StepIndexes";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
+import { CodeStepResultWithStack } from "../stepResults/CodeStepResultWithStack";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { StepKind, StepKindHelper } from "../stepResults/StepKind";
 import { StepResult } from "../stepResults/StepResult";
@@ -139,9 +141,17 @@ export class StepResultCollection {
 
 	public constructor(initialStep: FullStepResult) {
 		let codeStep = initialStep.codeStepResult;
+		let stack = undefined;
 
 		this.currentStepIndexes = this.stepCounter.freeze();
-		this.states = new AlgorithmStateCollection(new AlgorithmState(codeStep, initialStep, StepKindHelper.getStepKind(initialStep), this.currentStepIndexes));
+
+		if (codeStep instanceof CodeStepResultWithStack) {
+			const temp = codeStep.split();
+			codeStep = temp[0];
+			stack = temp[1];
+		}
+
+		this.states = new AlgorithmStateCollection(new AlgorithmState(codeStep, initialStep, StepKindHelper.getStepKind(initialStep), this.currentStepIndexes, stack));
 	}
 
 	public add(stepResult: StepResult): void {
@@ -151,6 +161,7 @@ export class StepResultCollection {
 
 		let fullStep = undefined;
 		let codeStep = undefined;
+		let stack = undefined;
 
 		if (stepResult instanceof CodeStepResult) {
 			codeStep = stepResult;
@@ -169,7 +180,17 @@ export class StepResultCollection {
 			throw new Error("Invalid step result received");
 		}
 
-		this.states.insert(new AlgorithmState(codeStep, fullStep, stepKind, this.stepCounter.freeze()));
+		if (codeStep instanceof CodeStepResultWithStack) {
+			const temp = codeStep.split();
+			codeStep = temp[0];
+			stack = temp[1];
+		}
+
+		if (CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {
+			stack = this.states.lastStep.callStack;
+		}
+
+		this.states.insert(new AlgorithmState(codeStep, fullStep, stepKind, this.stepCounter.freeze(), stack));
 	}
 
 	public addAndAdvance(stepResult: StepResult): void {
