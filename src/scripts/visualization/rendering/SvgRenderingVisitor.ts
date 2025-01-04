@@ -38,8 +38,9 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		public readonly output: SimulatorOutputElements
 	) { }
 
-	public handleFullStepDraw(step: FullStepResult): void {
-		this.codeStep_preFull(step.codeStepResult);
+	public handleFullStepDraw(step: FullStepResult, drawCodeStep: boolean): void {
+		if (drawCodeStep)
+			this.codeStep_preFull(step.codeStepResult);
 
 		this.output.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
 
@@ -107,11 +108,12 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		else
 			throw new Error("Renderer not written for this step result.");
 
-		this.codeStep_postFull(step.codeStepResult);
+		if (drawCodeStep)
+			this.codeStep_postFull(step.codeStepResult);
 	}
 
-	public handleFullStepRedraw(step: FullStepResult): void {
-		this.handleFullStepDraw(step);
+	public handleFullStepRedraw(step: FullStepResult, drawCodeStep: boolean): void {
+		this.handleFullStepDraw(step, drawCodeStep);
 	}
 
 	public handleCodeStepDraw(step: CodeStepResult): void {

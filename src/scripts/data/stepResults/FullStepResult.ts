@@ -14,11 +14,11 @@ export abstract class FullStepResult extends StepResult {
 		super(text);
 	}
 
-	public display(renderer: RenderingVisitor): void {
-		renderer.handleFullStepDraw(this);
+	public display(renderer: RenderingVisitor, drawCodeStep: boolean = true): void {
+		renderer.handleFullStepDraw(this, drawCodeStep);
 	}
 
-	public redraw(renderer: RenderingVisitor): void {
-		renderer.handleFullStepRedraw(this);
+	public redraw(renderer: RenderingVisitor, drawCodeStep: boolean = true): void {
+		renderer.handleFullStepRedraw(this, drawCodeStep);
 	}
 }

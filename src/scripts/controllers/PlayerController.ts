@@ -7,8 +7,10 @@ import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 import { RenderingVisitor } from "../visualization/rendering/RenderingVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
+import { FullStepResult } from "../data/stepResults/FullStepResult";
 
 export class PlayerController {
+	private currentlyDisplayedFullStep: FullStepResult | null = null;
 	private steps: StepResultCollection;
 
 	private autoPlayTimerId: NodeJS.Timeout | number | null = null;
@@ -44,24 +46,29 @@ export class PlayerController {
 	}
 
 	public draw(): void {
-		let currentStep = this.steps.getCurrentStep();
+		let currentState = this.steps.getCurrentStep();
+		let currentStepNumbers = currentState.stepsIndex;
 
-		currentStep.display(this.renderer);
+		if (currentState.fullStepResult != this.currentlyDisplayedFullStep) {
+			currentState.fullStepResult.display(this.renderer, false);
+			this.currentlyDisplayedFullStep = currentState.fullStepResult;
+		}
 
-		let currentFullStepIndexes = this.steps.getCurrentStepNumber(StepKind.Full, false);
+		currentState.codeStepResult.display(this.renderer);
 
 		let endStepNumberFull = this.steps.getEndStepNumber(StepKind.Full);
 		let endStepNumberSub = this.steps.getEndStepNumber(StepKind.Sub);
-		this.playerControls.stepOutput.innerHTML = `${currentFullStepIndexes[0]}<sub>${currentFullStepIndexes[1] + 1} / ${endStepNumberSub == null ? "?" : endStepNumberSub + 1}</sub> / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
+		this.playerControls.stepOutput.innerHTML = `${currentStepNumbers.full}<sub>${currentStepNumbers.sub + 1} / ${endStepNumberSub == null ? "?" : endStepNumberSub + 1}</sub> / ${endStepNumberFull == null ? "?" : endStepNumberFull}`;
 
 		let endStepNumberCode = this.steps.getEndStepNumber(StepKind.Code);
-		this.debuggerControls.stepOutput.value = `${this.steps.getCurrentStepNumber(StepKind.Code)} / ${endStepNumberCode == null ? "?" : endStepNumberCode}`;
+		this.debuggerControls.stepOutput.value = `${currentStepNumbers.code} / ${endStepNumberCode == null ? "?" : endStepNumberCode}`;
 	}
 
 	public redraw(): void {
 		let currentStep = this.steps.getCurrentStep();
 
-		currentStep.redraw(this.renderer);
+		currentStep.fullStepResult.redraw(this.renderer, false);
+		currentStep.codeStepResult.redraw(this.renderer);
 	}
 
 	public forward(kind: StepKind): void {
@@ -120,7 +127,7 @@ export class PlayerController {
 
 	private updateStepControls(): void {
 		let endStep = this.steps.getEndStepNumber();
-		let currentStep = this.steps.getCurrentStepNumber();
+		let currentStep = this.steps.getCurrentStepNumbers().code;
 
 		if (this.autoPlayTimerId != null || this.playingKind != null) {
 			this.disableAllDirectStepControls(true);
