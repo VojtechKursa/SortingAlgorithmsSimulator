@@ -1,17 +1,35 @@
 import { Variable } from "./Variable";
 
-export class CallStack implements Iterable<Variable[]> {
-	private readonly array = new Array<Variable[]>();
+export class CallStackLevel {
+	public readonly functionName: string;
+	private readonly array: Variable[];
 
-	public push(level: Variable[]): void {
+	public constructor(functionName: string, variables: Variable[]) {
+		this.functionName = functionName;
+		this.array = variables.slice();
+	}
+	
+	public get variables(): Variable[] {
+		return this.array.slice();
+	}
+
+	public copy() {
+		return new CallStackLevel(this.functionName.slice(), this.array.slice());
+	}
+}
+
+export class CallStack implements Iterable<CallStackLevel> {
+	private readonly array = new Array<CallStackLevel>();
+
+	public push(level: CallStackLevel): void {
 		this.array.push(level);
 	}
 
-	public pop(): Variable[] | undefined {
+	public pop(): CallStackLevel | undefined {
 		return this.array.pop();
 	}
 
-	public top(): Variable[] | undefined {
+	public top(): CallStackLevel | undefined {
 		if (this.array.length > 0)
 			return this.array[this.array.length - 1];
 		else
@@ -22,16 +40,16 @@ export class CallStack implements Iterable<Variable[]> {
 		return new CallStackFreezed(this.array);
 	}
 
-	[Symbol.iterator](): Iterator<Variable[]> {
+	[Symbol.iterator](): Iterator<CallStackLevel> {
 		return new ReverseArrayIterator(this.array);
 	}
 }
 
-export class CallStackFreezed implements Iterable<Variable[]> {
-	private readonly array = new Array<Variable[]>();
+export class CallStackFreezed implements Iterable<CallStackLevel> {
+	private readonly array = new Array<CallStackLevel>();
 
-	public constructor(stack: Array<Variable[]>) {
-		stack.forEach(level => this.array.push(level.slice()));
+	public constructor(stack: Array<CallStackLevel>) {
+		stack.forEach(level => this.array.push(level.copy()));
 	}
 
 	public get depth(): number {
@@ -42,9 +60,9 @@ export class CallStackFreezed implements Iterable<Variable[]> {
 		return new CallStackFreezed(this.array);
 	}
 
-	public top(): Variable[] | undefined {
+	public top(): CallStackLevel | undefined {
 		if (this.array.length > 0)
-			return this.array[this.array.length - 1].slice();
+			return this.array[this.array.length - 1].copy();
 		else
 			return undefined;
 	}
@@ -53,7 +71,7 @@ export class CallStackFreezed implements Iterable<Variable[]> {
 		return this.fromTop();
 	}
 
-	public fromTop(): Iterator<Variable[], Variable[], Variable[]> {
+	public fromTop(): Iterator<CallStackLevel, CallStackLevel, CallStackLevel> {
 		return new ReverseArrayIterator(this.copy().array);
 	}
 
@@ -88,11 +106,17 @@ export class CallStackFreezed implements Iterable<Variable[]> {
 			let level1 = iterator1.next().value;
 			let level2 = iterator2.next().value;
 
-			if (level1.length != level2.length)
+			if (level1.functionName != level2.functionName)
 				return false;
 
-			let map1 = new Map<string, Variable>(level1.map(mappingFunction));
-			let map2 = new Map<string, Variable>(level2.map(mappingFunction));
+			let variables1 = level1.variables;
+			let variables2 = level2.variables
+
+			if (variables1.length != variables2.length)
+				return false;
+
+			let map1 = new Map<string, Variable>(variables1.map(mappingFunction));
+			let map2 = new Map<string, Variable>(variables2.map(mappingFunction));
 
 			for (const map1Entry of map1) {
 				const map2Var = map2.get(map1Entry[0])
