@@ -92,10 +92,10 @@ export class SelectionSort extends SortingAlgorithm {
 			}
 		}
 
-		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, undefined, final), this.current, highlights);
+		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, undefined), this.current, highlights);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined, final?: boolean): CodeStepResult {
+	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
 		if (typeof highlightedLines == "number")
 			highlightedLines = [highlightedLines];
 
@@ -104,11 +104,11 @@ export class SelectionSort extends SortingAlgorithm {
 
 		let variables = new Array<Variable>();
 		if (this.i != null)
-			variables.push(new Variable("i", this.i, final ? undefined : SymbolicColor.Variable_3));
+			variables.push(new Variable("i", this.i, SymbolicColor.Variable_3));
 		if (this.min != null)
-			variables.push(new Variable("min", this.min, final ? undefined : SymbolicColor.Variable_2));
+			variables.push(new Variable("min", this.min, SymbolicColor.Variable_2));
 		if (this.j != null)
-			variables.push(new Variable("j", this.j, final ? undefined : SymbolicColor.Variable_1));
+			variables.push(new Variable("j", this.j, SymbolicColor.Variable_1));
 
 		return new CodeStepResult(text != undefined ? text : "", highlights, variables);
 	}

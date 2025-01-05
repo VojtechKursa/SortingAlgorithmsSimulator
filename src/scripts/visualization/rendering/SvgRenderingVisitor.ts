@@ -35,7 +35,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	public constructor(
 		public colorSet: ColorSet,
-		public readonly output: SimulatorOutputElements
+		public readonly output: SimulatorOutputElements,
+		public drawFinalVariables: boolean = false
 	) { }
 
 	public handleFullStepDraw(step: FullStepResult, drawCodeStep: boolean): void {
@@ -109,7 +110,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			throw new Error("Renderer not written for this step result.");
 
 		if (drawCodeStep)
-			this.codeStep_postFull(step.codeStepResult);
+			this.codeStep_postFull(step.codeStepResult, step.final);
 	}
 
 	public handleFullStepRedraw(step: FullStepResult, drawCodeStep: boolean): void {
@@ -118,7 +119,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	public handleCodeStepDraw(step: CodeStepResult): void {
 		this.codeStep_preFull(step);
-		this.codeStep_postFull(step);
+		this.codeStep_postFull(step, false);
 	}
 
 	public handleCodeStepRedraw(step: CodeStepResult): void {
@@ -132,8 +133,9 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		this.codeStep_handleDebuggerHighlights(step);
 	}
 
-	protected codeStep_postFull(step: CodeStepResult): void {
-		this.codeStep_drawVariables(step);
+	protected codeStep_postFull(step: CodeStepResult, final: boolean): void {
+		if (!final || this.drawFinalVariables)
+			this.codeStep_drawVariables(step);
 	}
 
 	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
@@ -186,7 +188,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		const variablesAboveElements = new Array<number>(this.arrayElementLocations.length);
 
 		step.variables.filter(variable => variable.color != undefined).forEach(variable => {
-			if (variable.value >= this.arrayElementLocations.length)
+			if (variable.value < 0 || variable.value >= this.arrayElementLocations.length)
 				return;
 
 			const elementLocation = this.arrayElementLocations[variable.value];

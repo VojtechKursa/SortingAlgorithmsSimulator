@@ -4,6 +4,7 @@ import { ColorSet } from "../colors/ColorSet";
 
 export interface RenderingVisitor {
 	colorSet: ColorSet;
+	drawFinalVariables: boolean;
 
 	handleFullStepDraw(step: FullStepResult, drawCodeStep: boolean): void;
 	handleFullStepRedraw(step: FullStepResult, drawCodeStep: boolean): void;
