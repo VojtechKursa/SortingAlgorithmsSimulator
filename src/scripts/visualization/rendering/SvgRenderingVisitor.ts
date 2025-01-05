@@ -8,6 +8,7 @@ import { RendererClasses, VariableWatchClasses } from "../CssInterface";
 import { SymbolicColor } from "../colors/SymbolicColor";
 import { SymbolicColorHelper } from "../colors/SymbolicColorHelper";
 import { RenderingVisitor } from "./RenderingVisitor";
+import { Variable } from "../../data/Variable";
 
 class Rectangle {
 	public constructor(
@@ -36,7 +37,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 	public constructor(
 		public colorSet: ColorSet,
 		public readonly output: SimulatorOutputElements,
-		public drawFinalVariables: boolean = false
+		public drawFinalVariables: boolean = false,
+		public drawLastStackLevelVariables: boolean = false
 	) { }
 
 	public handleFullStepDraw(step: FullStepResult, drawCodeStep: boolean): void {
@@ -178,9 +180,6 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 	protected codeStep_drawVariables(step: CodeStepResult) {
 		const variableRenderer = this.output.renderer;
-		const textSize = 16;
-		const chevronMargin = textSize / 2;
-		const textMargin = chevronMargin / 2;
 
 		variableRenderer.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(child => variableRenderer.removeChild(child));
 		
@@ -188,46 +187,63 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		variableRenderer.querySelectorAll(`.${RendererClasses.variableTextClass}`).forEach(child => variableRenderer.removeChild(child));
 		variableRenderer.querySelectorAll(`.${RendererClasses.variablePointerClass}`).forEach(child => variableRenderer.removeChild(child));
 
+		const variablesAboveElements = new Array<number>(this.arrayElementLocations.length);
+
+		step.variables.filter(variable => variable.color != undefined).forEach(variable => this.drawVariable(variable, variablesAboveElements, variableRenderer, 1));
+		
+		if (this.drawLastStackLevelVariables && step.callStack != undefined) {
+			const lastCallLevel = step.callStack.top();
+
+			if (lastCallLevel != undefined) {
+				lastCallLevel.variables.filter(variable => variable.color != undefined).forEach(variable => this.drawVariable(variable, variablesAboveElements, variableRenderer, 0.5));
+			}
+		}
+	}
+
+	protected drawVariable(variable: Variable, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1) {
+		if (variable.value < 0 || variable.value >= this.arrayElementLocations.length)
+			return;
+
+		const textSize = 16;
+		const chevronMargin = textSize / 2;
+		const textMargin = chevronMargin / 2;
+		
 		const chevronWidth = this.boxSize;
 		const chevronHeight = this.boxSize / 2;
 
-		const variablesAboveElements = new Array<number>(this.arrayElementLocations.length);
+		const elementLocation = this.arrayElementLocations[variable.value];
+		const variableOrder = variablesAboveElements[variable.value] ?? 0;
 
-		step.variables.filter(variable => variable.color != undefined).forEach(variable => {
-			if (variable.value < 0 || variable.value >= this.arrayElementLocations.length)
-				return;
+		const chevronTop = elementLocation.y - chevronMargin - chevronHeight - (variableOrder * (chevronMargin + chevronHeight + (textMargin * 2) + textSize));
 
-			const elementLocation = this.arrayElementLocations[variable.value];
-			const variableOrder = variablesAboveElements[variable.value] ?? 0;
+		const points = new Array<Point2D>();
+		points.push(new Point2D(elementLocation.x, chevronTop));
+		points.push(new Point2D(elementLocation.x + chevronWidth, chevronTop));
+		points.push(new Point2D(elementLocation.x + (chevronWidth / 2), chevronTop + chevronHeight));
 
-			const chevronTop = elementLocation.y - chevronMargin - chevronHeight - (variableOrder * (chevronMargin + chevronHeight + (textMargin * 2) + textSize));
+		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+		chevron.classList.add(RendererClasses.variablePointerClass);
+		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
+		chevron.setAttribute("stroke", "black");
+		chevron.setAttribute("stroke-width", "1");
 
-			const points = new Array<Point2D>();
-			points.push(new Point2D(elementLocation.x, chevronTop));
-			points.push(new Point2D(elementLocation.x + chevronWidth, chevronTop));
-			points.push(new Point2D(elementLocation.x + (chevronWidth / 2), chevronTop + chevronHeight));
+		const color = this.colorSet.get(variable.color).clone();
+		color.alpha *= alphaFactor;
+		chevron.setAttribute("fill", color.toString());
 
-			const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-			chevron.classList.add(RendererClasses.variablePointerClass);
-			chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
-			chevron.setAttribute("stroke", "black");
-			chevron.setAttribute("stroke-width", "1");
-			chevron.setAttribute("fill", this.colorSet.get(variable.color).toString());
+		const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		text.textContent = variable.name;
+		text.classList.add(RendererClasses.variableTextClass);
+		text.setAttribute("x", (elementLocation.x + (elementLocation.width / 2)).toString());
+		text.setAttribute("y", (chevronTop - textMargin).toString());
+		text.setAttribute("font-size", `${textSize}px`);
+		text.setAttribute("text-anchor", "middle");
+		text.setAttribute("alignment-baseline", "bottom");
+		text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
 
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			text.textContent = variable.name;
-			text.classList.add(RendererClasses.variableTextClass);
-			text.setAttribute("x", (elementLocation.x + (elementLocation.width / 2)).toString());
-			text.setAttribute("y", (chevronTop - textMargin).toString());
-			text.setAttribute("font-size", `${textSize}px`);
-			text.setAttribute("text-anchor", "middle");
-			text.setAttribute("alignment-baseline", "bottom");
-			text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
+		output.appendChild(chevron);
+		output.appendChild(text);
 
-			variableRenderer.appendChild(chevron);
-			variableRenderer.appendChild(text);
-
-			variablesAboveElements[variable.value] = variableOrder + 1;
-		});
+		variablesAboveElements[variable.value] = variableOrder + 1;
 	}
 }
