@@ -123,7 +123,8 @@ export class QuickSort extends SortingAlgorithm {
 			return;
 		}
 
-		yield this.makeCodeStepResult(7, "Partition the list");
+		yield this.makeCodeStepResult(7);
+		yield this.makeCodeStepResult(8, "Partition the list");
 
 		const partitionResult = new PartitionResult();
 		this.beforeCall("quickSortR", this.l, this.r)
@@ -137,9 +138,9 @@ export class QuickSort extends SortingAlgorithm {
 
 		this.p = partitionResult.p;
 
-		yield this.makeCodeStepResult(7, "Assign the result of partition function to p");
+		yield this.makeCodeStepResult(8, "Assign the result of partition function to p");
 
-		yield this.makeCodeStepResult(8, "Recursively call quicksort on the left part of the list");
+		yield this.makeCodeStepResult(9, "Recursively call quicksort on the left part of the list");
 
 		this.beforeCall("quickSortR", this.l, this.p - 1);
 		for (const result of this.quickSortRecursive()) {
@@ -147,9 +148,9 @@ export class QuickSort extends SortingAlgorithm {
 		}
 		this.returnFromFunction();
 
-		yield this.makeCodeStepResult(8, "Return from recursive call on the left part of the list");
+		yield this.makeCodeStepResult(9, "Return from recursive call on the left part of the list");
 
-		yield this.makeCodeStepResult(9, "Recursively call quicksort on the right part of the list");
+		yield this.makeCodeStepResult(10, "Recursively call quicksort on the right part of the list");
 
 		this.beforeCall("quickSortR", this.p + 1, this.r);
 		for (const result of this.quickSortRecursive()) {
@@ -157,9 +158,9 @@ export class QuickSort extends SortingAlgorithm {
 		}
 		this.returnFromFunction();
 
-		yield this.makeCodeStepResult(9, "Return from recursive call on the right part of the list");
+		yield this.makeCodeStepResult(10, "Return from recursive call on the right part of the list");
 
-		yield this.makeCodeStepResult(10);
+		yield this.makeCodeStepResult(11);
 	}
 
 	protected * partition(result: PartitionResult): Generator<StepResult> {
@@ -167,31 +168,30 @@ export class QuickSort extends SortingAlgorithm {
 			throw new Error("Invalid partition call");
 
 		const whileCheckText = "See if we're at the end of the assigned section";
-		const indexIncrementText = "Increment the index counter";
 
-		yield this.makeCodeStepResult(12);
+		yield this.makeCodeStepResult(13);
 
 		this.pivot = this.r;
-		yield this.makeCodeStepResult(13, "Define pivot as r");
+		yield this.makeCodeStepResult(14, "Define pivot as r");
 
 		this.i = this.l;
-		yield this.makeCodeStepResult(14, "Define i (position to swap elements lower than pivot to) as l");
+		yield this.makeCodeStepResult(15, "Define i (position to swap elements lower than pivot to) as l");
 
 		this.j = this.l;
-		yield this.makeCodeStepResult(16);
+		yield this.makeCodeStepResult(17);
 
 		let enteredWhile = false;
 
 		if (!(this.j < this.r))
-			yield this.makeCodeStepResult(17, whileCheckText);
+			yield this.makeCodeStepResult(18, whileCheckText);
 
 		while (this.j < this.r) {
 			enteredWhile = true;
-			yield this.makeCodeStepResult(17, whileCheckText);
+			yield this.makeCodeStepResult(18, whileCheckText);
 
-			yield this.makeFullStepResult(false, "Check if the current element is lower or equal to pivot", false, false, HighlightState.Selected, 18);
+			yield this.makeFullStepResult(false, "Check if the current element is lower or equal to pivot", false, false, HighlightState.Selected, 19);
 
-			if (this.current[this.j] <= this.current[this.pivot]) {
+			if (this.current[this.j].value <= this.current[this.pivot].value) {
 				this.swapCurrent(this.i, this.j);
 				yield this.makeFullStepResult(
 					false,
@@ -199,40 +199,39 @@ export class QuickSort extends SortingAlgorithm {
 					true,
 					false,
 					HighlightState.OrderSwapped,
-					19
+					20
 				);
 
 				this.i++;
-				yield this.makeCodeStepResult(20, "Shift the end of the lower section");
+				yield this.makeCodeStepResult(21, "Shift the end of the lower section");
 
-				this.j++;
-				yield this.makeCodeStepResult(21, indexIncrementText);
 			}
 			else {
-				this.j++;
 				yield this.makeFullStepResult(
 					false,
 					"Check if the current element is lower or equal to pivot: Element is higher, don't swap.",
 					true,
 					false,
 					HighlightState.OrderCorrect,
-					21,
-					indexIncrementText
+					22
 				);
 			}
+
+			this.j++;
+			yield this.makeCodeStepResult(23, "Increment the index counter");
 		}
 
 		if (enteredWhile)
-			yield this.makeCodeStepResult(17, whileCheckText);
+			yield this.makeCodeStepResult(18, whileCheckText);
 
-		yield this.makeCodeStepResult(22, "Went through the entire assigned section");
+		yield this.makeCodeStepResult(24, "Went through the entire assigned section");
 
-		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", false, true, HighlightState.Selected, 24);
-		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", true, true, HighlightState.OrderSwapped, 24);
+		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", false, true, HighlightState.Selected, 26);
+		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", true, true, HighlightState.OrderSwapped, 26);
 
 		result.p = this.i;
 
-		yield this.makeCodeStepResult(25, "Return the new pivot point");
+		yield this.makeCodeStepResult(27, "Return the new pivot point");
 	}
 
 	protected getVariables(): Variable[] {
@@ -303,6 +302,7 @@ export class QuickSort extends SortingAlgorithm {
 			"function quicksortR(A: list, l: int, r: int)",
 			"\tif l >= r || l < 0",
 			"\t\treturn",
+			"\tend if",
 			"\tp := partition(A, l, r)",
 			"\tquicksortR(A, l, p - 1)",
 			"\tquicksortR(A, p + 1, r)",
@@ -317,6 +317,7 @@ export class QuickSort extends SortingAlgorithm {
 			"\t\tif A[j] <= A[pivot]",
 			"\t\t\tswap(A[i], A[j])",
 			"\t\t\ti := i + 1",
+			"\t\tend if",
 			"\t\tj := j + 1",
 			"\tend while",
 			"",
