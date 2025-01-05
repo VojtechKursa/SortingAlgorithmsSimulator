@@ -1,4 +1,4 @@
 import { BubbleSort } from "../sorts/BubbleSort";
 import { initSimulator } from "./simulator";
 
-initSimulator(new BubbleSort([]));
+document.addEventListener("DOMContentLoaded", _ => initSimulator(new BubbleSort([])));

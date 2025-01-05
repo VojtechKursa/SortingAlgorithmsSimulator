@@ -1,4 +1,4 @@
 import { QuickSort } from "../sorts/QuickSort";
 import { initSimulator } from "./simulator";
 
-initSimulator(new QuickSort([]));
+document.addEventListener("DOMContentLoaded", _ => initSimulator(new QuickSort([])));
