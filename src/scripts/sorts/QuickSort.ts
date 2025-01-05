@@ -227,6 +227,7 @@ export class QuickSort extends SortingAlgorithm {
 		yield this.makeCodeStepResult(24, "Went through the entire assigned section");
 
 		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", false, true, HighlightState.Selected, 26);
+		this.swapCurrent(this.i, this.pivot);
 		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", true, true, HighlightState.OrderSwapped, 26);
 
 		result.p = this.i;
