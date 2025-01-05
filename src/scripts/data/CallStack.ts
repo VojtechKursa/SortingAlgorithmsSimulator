@@ -142,7 +142,7 @@ class ReverseArrayIterator<T> implements Iterator<T, T, T> {
 
 		return {
 			value: this.array[this.index],
-			done: this.index <= 0
+			done: this.index < 0
 		};
 	}
 }
