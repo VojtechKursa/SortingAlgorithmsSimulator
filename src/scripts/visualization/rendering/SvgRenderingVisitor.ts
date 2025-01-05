@@ -131,6 +131,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 		this.codeStep_handleVariableWatchUpdate(step);
 		this.codeStep_handleDebuggerHighlights(step);
+		this.codeStep_handleCallStackUpdate(step);
 	}
 
 	protected codeStep_postFull(step: CodeStepResult, final: boolean): void {
@@ -168,6 +169,11 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			variableValueColumn.innerText = variable.value;
 			row.appendChild(variableValueColumn);
 		});
+	}
+
+	protected codeStep_handleCallStackUpdate(step: CodeStepResult) {
+		if (step.callStack != undefined)
+			this.output.callStackController.display(step.callStack);
 	}
 
 	protected codeStep_drawVariables(step: CodeStepResult) {

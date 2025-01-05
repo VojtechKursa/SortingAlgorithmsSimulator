@@ -71,7 +71,7 @@ export class CallStackFreezed implements Iterable<CallStackLevel> {
 		return this.fromTop();
 	}
 
-	public fromTop(): Iterator<CallStackLevel, CallStackLevel, CallStackLevel> {
+	public fromTop(): Iterator<CallStackLevel, CallStackLevel> {
 		return new ReverseArrayIterator(this.copy().array);
 	}
 
@@ -130,7 +130,7 @@ export class CallStackFreezed implements Iterable<CallStackLevel> {
 	}
 }
 
-class ReverseArrayIterator<T> implements Iterator<T, T, T> {
+class ReverseArrayIterator<T> implements Iterator<T, T> {
 	private index: number;
 
 	public constructor(private readonly array: Array<T>) {

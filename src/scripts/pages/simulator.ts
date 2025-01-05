@@ -13,6 +13,7 @@ import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { DarkModeHandler } from "../controllers/DarkModeHandler";
+import { CallStackController } from "../controllers/CallStackController";
 
 
 
@@ -64,7 +65,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let variableWatchElement = document.getElementById("variable_watch_body") as HTMLDivElement;
 
-		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
+		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
+		let callStackController = new CallStackController(callStackWrapper);
+
+		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController, callStackController);
 
 		let renderer = new SvgRenderingVisitor(colors.darkColors, simulatorOutputElements);
 

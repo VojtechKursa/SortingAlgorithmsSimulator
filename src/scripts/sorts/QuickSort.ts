@@ -99,7 +99,7 @@ export class QuickSort extends SortingAlgorithm {
 
 		yield this.makeCodeStepResult(1, "Call the recursive function with the entire list");
 
-		this.beforeCall("quickSortR", 0, this.current.length - 1);
+		this.beforeCall("quickSort", 0, this.current.length - 1);
 		for (const result of this.quickSortRecursive()) {
 			yield result;
 		}
@@ -263,8 +263,8 @@ export class QuickSort extends SortingAlgorithm {
 		this.p = undefined;
 	}
 
-	protected beforeCall(functionName: string, l: number, r: number): void {
-		this.callStack.push(new CallStackLevel(functionName, this.getVariables()));
+	protected beforeCall(currentFunctionName: string, l: number, r: number): void {
+		this.callStack.push(new CallStackLevel(currentFunctionName, this.getVariables()));
 		this.resetInternal();
 		this.l = l;
 		this.r = r;
