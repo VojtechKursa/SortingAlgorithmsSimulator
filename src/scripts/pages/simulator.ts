@@ -94,7 +94,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, new DarkModeHandler(darkModeButton));
 	}
 
-	window.addEventListener("load", _ => playerController.draw());    // ensure the first drawing is correct
+	window.addEventListener("load", _ => {
+		playerController.draw();
+		playerController.redraw();	// ensure the first drawing is correct
+	});
+
 	window.addEventListener("resize", _ => playerController.redraw());
 
 	sortingAlgorithm.getPseudocode().forEach((codeLine, lineNum) => {
