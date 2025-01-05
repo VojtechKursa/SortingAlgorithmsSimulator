@@ -5,8 +5,8 @@ import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { Variable } from "../data/Variable";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
-import { CodeStepResultWithStack } from "../data/stepResults/CodeStepResultWithStack";
 import { CallStack, CallStackLevel } from "../data/CallStack";
+import { CodeStepResult } from "../data/stepResults/CodeStepResult";
 
 class PartitionResult {
 	public p?: number;
@@ -84,14 +84,14 @@ export class QuickSort extends SortingAlgorithm {
 		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, codeResultText), this.current, highlights);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResultWithStack {
+	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
 		if (typeof highlightedLines == "number")
 			highlightedLines = [highlightedLines];
 
 		let highlights = new Map<number, SymbolicColor>();
 		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
 
-		return new CodeStepResultWithStack(this.callStack, text != undefined ? text : "", highlights, this.getVariables());
+		return new CodeStepResult(text != undefined ? text : "", highlights, this.getVariables(), this.callStack);
 	}
 
 	protected * stepForwardInternal(): Generator<StepResult> {
@@ -291,7 +291,7 @@ export class QuickSort extends SortingAlgorithm {
 	}
 
 	public getInitialStepResult(): FullStepResult {
-		return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResultWithStack(this.callStack), this.current, null);
+		return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult(undefined, undefined, undefined, this.callStack), this.current, null);
 	}
 
 	public getPseudocode(): string[] {

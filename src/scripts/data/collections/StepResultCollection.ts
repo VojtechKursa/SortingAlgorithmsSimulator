@@ -2,7 +2,6 @@ import { AlgorithmState } from "../AlgorithmState";
 import { CallStackFreezed } from "../CallStack";
 import { StepIndexes } from "../StepIndexes";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { CodeStepResultWithStack } from "../stepResults/CodeStepResultWithStack";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { StepKind, StepKindHelper } from "../stepResults/StepKind";
 import { StepResult } from "../stepResults/StepResult";
@@ -145,12 +144,6 @@ export class StepResultCollection {
 
 		this.currentStepIndexes = this.stepCounter.freeze();
 
-		if (codeStep instanceof CodeStepResultWithStack) {
-			const temp = codeStep.split();
-			codeStep = temp[0];
-			stack = temp[1];
-		}
-
 		this.states = new AlgorithmStateCollection(new AlgorithmState(codeStep, initialStep, StepKindHelper.getStepKind(initialStep), this.currentStepIndexes, stack));
 	}
 
@@ -180,14 +173,10 @@ export class StepResultCollection {
 			throw new Error("Invalid step result received");
 		}
 
-		if (codeStep instanceof CodeStepResultWithStack) {
-			const temp = codeStep.split();
-			codeStep = temp[0];
-			stack = temp[1];
-		}
+		const lastStack = this.states.lastStep.callStack;
 
-		if (CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {
-			stack = this.states.lastStep.callStack;
+		if (lastStack != undefined && CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {
+			codeStep.acceptEqualStack(lastStack);
 		}
 
 		this.states.insert(new AlgorithmState(codeStep, fullStep, stepKind, this.stepCounter.freeze(), stack));
