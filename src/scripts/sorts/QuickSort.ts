@@ -12,14 +12,23 @@ class PartitionResult {
 	public p?: number;
 }
 
+class Pivot {
+	public constructor(
+		public readonly index: number,
+		public readonly value: number
+	) { }
+}
+
 export class QuickSort extends SortingAlgorithm {
 	protected callStack: CallStack = new CallStack();
 	protected l?: number;
 	protected r?: number;
 	protected i?: number;
 	protected j?: number;
-	protected pivot?: number;
+	protected pivot?: Pivot;
 	protected p?: number;
+
+	protected sorted = new Set<number>();
 
 	public constructor(input: number[]) {
 		super(input);
@@ -38,15 +47,19 @@ export class QuickSort extends SortingAlgorithm {
 			}
 		}
 		else {
+			for (const index of this.sorted) {
+				highlights.set(index, SymbolicColor.Element_Sorted);
+			}
+
 			if (pivotSwap) {
 				if (this.pivot != undefined && this.i != undefined) {
 					if (highlightState == HighlightState.Selected) {
 						highlights.set(this.i, SymbolicColor.Element_Highlight_1);
-						highlights.set(this.pivot, SymbolicColor.Element_Highlight_2);
+						highlights.set(this.pivot.index, SymbolicColor.Element_Highlight_2);
 					}
 					else {
 						highlights.set(this.i, SymbolicColor.Element_OrderIncorrect);
-						highlights.set(this.pivot, SymbolicColor.Element_OrderIncorrect);
+						highlights.set(this.pivot.index, SymbolicColor.Element_OrderIncorrect);
 					}
 				}
 			}
@@ -54,19 +67,19 @@ export class QuickSort extends SortingAlgorithm {
 				if (highlightState == HighlightState.Selected) {
 					if (this.j != undefined && this.pivot != undefined) {
 						highlights.set(this.j, SymbolicColor.Element_Highlight_1);
-						highlights.set(this.pivot, SymbolicColor.Element_Highlight_2);
+						highlights.set(this.pivot.index, SymbolicColor.Element_Highlight_2);
 					}
 				}
-				else {
+				else if (highlightState == HighlightState.OrderCorrect) {
+					if (this.j != undefined && this.pivot != undefined) {
+						highlights.set(this.j, SymbolicColor.Element_OrderCorrect);
+						highlights.set(this.pivot.index, SymbolicColor.Element_OrderCorrect);
+					}
+				}
+				else if (highlightState == HighlightState.OrderSwapped) {
 					if (this.i != undefined && this.j != undefined) {
-						if (highlightState == HighlightState.OrderCorrect) {
-							highlights.set(this.i, SymbolicColor.Element_OrderCorrect);
-							highlights.set(this.j, SymbolicColor.Element_OrderCorrect);
-						}
-						else if (highlightState == HighlightState.OrderSwapped) {
-							highlights.set(this.i, SymbolicColor.Element_OrderIncorrect);
-							highlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
-						}
+						highlights.set(this.i, SymbolicColor.Element_OrderIncorrect);
+						highlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
 					}
 				}
 			}
@@ -119,12 +132,12 @@ export class QuickSort extends SortingAlgorithm {
 		yield this.makeCodeStepResult(5, "Check recursion end condition");
 
 		if (this.l >= this.r || this.l < 0) {
-			yield this.makeCodeStepResult(6, "End recursion");
+			yield this.makeFullStepResult(false, "End recursion", false, false, undefined, 6);
 			return;
 		}
 
 		yield this.makeCodeStepResult(7);
-		yield this.makeCodeStepResult(8, "Partition the list");
+		yield this.makeFullStepResult(false, "Partition the list", false, false, undefined, 8);
 
 		const partitionResult = new PartitionResult();
 		this.beforeCall("quickSortR", this.l, this.r)
@@ -138,9 +151,9 @@ export class QuickSort extends SortingAlgorithm {
 
 		this.p = partitionResult.p;
 
-		yield this.makeCodeStepResult(8, "Assign the result of partition function to p");
+		yield this.makeFullStepResult(false, "Assign the result of partition function to p", false, false, undefined, 8);
 
-		yield this.makeCodeStepResult(9, "Recursively call quicksort on the left part of the list");
+		yield this.makeFullStepResult(false, "Recursively call quicksort on the left part of the list", false, false, undefined, 9);
 
 		this.beforeCall("quickSortR", this.l, this.p - 1);
 		for (const result of this.quickSortRecursive()) {
@@ -148,9 +161,13 @@ export class QuickSort extends SortingAlgorithm {
 		}
 		this.returnFromFunction();
 
-		yield this.makeCodeStepResult(9, "Return from recursive call on the left part of the list");
+		for (let i = this.l; i <= this.p - 1; i++) {
+			this.sorted.add(i);
+		}
 
-		yield this.makeCodeStepResult(10, "Recursively call quicksort on the right part of the list");
+		yield this.makeFullStepResult(false, "Return from recursive call on the left part of the list", false, false, undefined, 9);
+
+		yield this.makeFullStepResult(false, "Recursively call quicksort on the right part of the list", false, false, undefined, 10);
 
 		this.beforeCall("quickSortR", this.p + 1, this.r);
 		for (const result of this.quickSortRecursive()) {
@@ -158,7 +175,11 @@ export class QuickSort extends SortingAlgorithm {
 		}
 		this.returnFromFunction();
 
-		yield this.makeCodeStepResult(10, "Return from recursive call on the right part of the list");
+		for (let i = this.p + 1; i <= this.r; i++) {
+			this.sorted.add(i);
+		}
+
+		yield this.makeFullStepResult(false, "Return from recursive call on the right part of the list", false, false, undefined, 10);
 
 		yield this.makeCodeStepResult(11);
 	}
@@ -171,7 +192,7 @@ export class QuickSort extends SortingAlgorithm {
 
 		yield this.makeCodeStepResult(13);
 
-		this.pivot = this.r;
+		this.pivot = new Pivot(this.r, this.current[this.r].value);
 		yield this.makeCodeStepResult(14, "Define pivot as r");
 
 		this.i = this.l;
@@ -191,7 +212,7 @@ export class QuickSort extends SortingAlgorithm {
 
 			yield this.makeFullStepResult(false, "Check if the current element is lower or equal to pivot", false, false, HighlightState.Selected, 19);
 
-			if (this.current[this.j].value <= this.current[this.pivot].value) {
+			if (this.current[this.j].value <= this.pivot.value) {
 				this.swapCurrent(this.i, this.j);
 				yield this.makeFullStepResult(
 					false,
@@ -227,10 +248,11 @@ export class QuickSort extends SortingAlgorithm {
 		yield this.makeCodeStepResult(24, "Went through the entire assigned section");
 
 		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", false, true, HighlightState.Selected, 26);
-		this.swapCurrent(this.i, this.pivot);
+		this.swapCurrent(this.i, this.pivot.index);
 		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", true, true, HighlightState.OrderSwapped, 26);
 
 		result.p = this.i;
+		this.sorted.add(this.i);
 
 		yield this.makeCodeStepResult(27, "Return the new pivot point");
 	}
@@ -247,7 +269,7 @@ export class QuickSort extends SortingAlgorithm {
 		if (this.j != undefined)
 			variables.push(new Variable("j", this.j, SymbolicColor.Variable_4));
 		if (this.pivot != undefined)
-			variables.push(new Variable("pivot", this.pivot, SymbolicColor.Variable_2));
+			variables.push(new Variable("pivot", this.pivot.value, SymbolicColor.Variable_2, this.pivot.index));
 		if (this.p != undefined)
 			variables.push(new Variable("p", this.p, SymbolicColor.Variable_3));
 
@@ -284,8 +306,12 @@ export class QuickSort extends SortingAlgorithm {
 				case "r": this.r = variable.value; break;
 				case "i": this.i = variable.value; break;
 				case "j": this.j = variable.value; break;
-				case "pivot": this.pivot = variable.value; break;
 				case "p": this.p = variable.value; break;
+				case "pivot":
+					if (variable.drawAtIndex == null)
+						throw new Error("Attempted to reassign invalid pivot");
+					this.pivot = new Pivot(variable.drawAtIndex, variable.value);
+					break;
 			}
 		});
 	}
@@ -310,19 +336,19 @@ export class QuickSort extends SortingAlgorithm {
 			"end function",
 			"",
 			"function partition(A: list, l: int, r: int)",
-			"\tpivot := r",
+			"\tpivot := A[r]",
 			"\ti := l",
 			"",
 			"\tj := l",
 			"\twhile j < r",
-			"\t\tif A[j] <= A[pivot]",
+			"\t\tif A[j] <= pivot",
 			"\t\t\tswap(A[i], A[j])",
 			"\t\t\ti := i + 1",
 			"\t\tend if",
 			"\t\tj := j + 1",
 			"\tend while",
 			"",
-			"\tswap(A[i], A[pivot])",
+			"\tswap(A[i], A[r])",
 			"\treturn i",
 			"end function"
 		];
