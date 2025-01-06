@@ -8,7 +8,7 @@ import { RendererClasses, VariableWatchClasses } from "../CssInterface";
 import { SymbolicColor } from "../colors/SymbolicColor";
 import { SymbolicColorHelper } from "../colors/SymbolicColorHelper";
 import { RenderingVisitor } from "./RenderingVisitor";
-import { Variable } from "../../data/Variable";
+import { VariableDrawInformation } from "../../data/Variable";
 
 class Rectangle {
 	public constructor(
@@ -174,8 +174,14 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 	}
 
 	protected codeStep_handleCallStackUpdate(step: CodeStepResult) {
-		if (step.callStack != undefined)
-			this.output.callStackController.display(step.callStack);
+		const stackController = this.output.callStackController;
+
+		if (step.callStack != undefined) {
+			if (!stackController.visible)
+				stackController.visible = true;
+
+			stackController.display(step.callStack);
+		}
 	}
 
 	protected codeStep_drawVariables(step: CodeStepResult) {
@@ -189,19 +195,27 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 
 		const variablesAboveElements = new Array<number>(this.arrayElementLocations.length);
 
-		step.variables.filter(variable => variable.color != undefined).forEach(variable => this.drawVariable(variable, variablesAboveElements, variableRenderer, 1));
+		step.variables.forEach(variable => {
+			const drawInformation = variable.getDrawInformation();
+			if (drawInformation != null)
+				this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 1);
+		});
 		
 		if (this.drawLastStackLevelVariables && step.callStack != undefined) {
 			const lastCallLevel = step.callStack.top();
 
 			if (lastCallLevel != undefined) {
-				lastCallLevel.variables.filter(variable => variable.color != undefined).forEach(variable => this.drawVariable(variable, variablesAboveElements, variableRenderer, 0.5));
+				lastCallLevel.variables.forEach(variable => {
+					const drawInformation = variable.getDrawInformation();
+					if (drawInformation != null)
+						this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 0.5);
+				});
 			}
 		}
 	}
 
-	protected drawVariable(variable: Variable, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1) {
-		if (variable.value < 0 || variable.value >= this.arrayElementLocations.length)
+	protected drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1) {
+		if (variable.drawAtIndex == null || variable.drawAtIndex < 0 || variable.drawAtIndex >= this.arrayElementLocations.length)
 			return;
 
 		const textSize = 16;
@@ -211,8 +225,8 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		const chevronWidth = this.boxSize;
 		const chevronHeight = this.boxSize / 2;
 
-		const elementLocation = this.arrayElementLocations[variable.value];
-		const variableOrder = variablesAboveElements[variable.value] ?? 0;
+		const elementLocation = this.arrayElementLocations[variable.drawAtIndex];
+		const variableOrder = variablesAboveElements[variable.drawAtIndex] ?? 0;
 
 		const chevronTop = elementLocation.y - chevronMargin - chevronHeight - (variableOrder * (chevronMargin + chevronHeight + (textMargin * 2) + textSize));
 
@@ -232,7 +246,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		chevron.setAttribute("fill", color.toString());
 
 		const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-		text.textContent = variable.name;
+		text.textContent = variable.variableName;
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", (elementLocation.x + (elementLocation.width / 2)).toString());
 		text.setAttribute("y", (chevronTop - textMargin).toString());
@@ -244,6 +258,6 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		output.appendChild(chevron);
 		output.appendChild(text);
 
-		variablesAboveElements[variable.value] = variableOrder + 1;
+		variablesAboveElements[variable.drawAtIndex] = variableOrder + 1;
 	}
 }
