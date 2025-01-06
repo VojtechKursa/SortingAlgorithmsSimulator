@@ -55,10 +55,10 @@ export class InsertionSort extends SortingAlgorithm {
 			}
 		}
 
-		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, undefined, final), this.current, highlights);
+		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, undefined), this.current, highlights);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined, final?: boolean): CodeStepResult {
+	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
 		if (typeof highlightedLines == "number")
 			highlightedLines = [highlightedLines];
 
@@ -66,12 +66,12 @@ export class InsertionSort extends SortingAlgorithm {
 		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
 
 		let variables = new Array<Variable>();
-		if (this.i != null)
-			variables.push(new Variable("i", this.i, final ? undefined : SymbolicColor.Variable_1));
-		if (this.x != null)
+		if (this.i != undefined)
+			variables.push(new Variable("i", this.i, SymbolicColor.Variable_1));
+		if (this.x != undefined)
 			variables.push(new Variable("x", this.x, undefined));
-		if (this.j != null)
-			variables.push(new Variable("j", this.j, final ? undefined : SymbolicColor.Variable_2));
+		if (this.j != undefined)
+			variables.push(new Variable("j", this.j, SymbolicColor.Variable_2));
 
 		return new CodeStepResult(text != undefined ? text : "", highlights, variables);
 	}

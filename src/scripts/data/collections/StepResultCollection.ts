@@ -1,214 +1,292 @@
+import { AlgorithmState } from "../AlgorithmState";
+import { CallStackFreezed } from "../CallStack";
+import { StepIndexes } from "../StepIndexes";
+import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
 import { StepKind, StepKindHelper } from "../stepResults/StepKind";
 import { StepResult } from "../stepResults/StepResult";
 
-export class StepResultCollection {
-	private readonly steps: Array<StepResult>;
-	private readonly fullStepIndexes: Array<Array<number>>;
-	private pointer: number;
+class StepCounter {
+	private _previousFullWasLastSubstep: boolean;
 
-	private previousFullWasLastSubstep: boolean = false;
-	private endStep: number | null;
-	private endFullStep: number | null;
+	public constructor(
+		protected code: number = 0,
+		protected sub: number = 0,
+		protected full: number = 0,
+		previousFullWasLastSubstep: boolean = false
+	) {
+		this._previousFullWasLastSubstep = previousFullWasLastSubstep;
+	}
 
-	public constructor(initialStep: StepResult) {
-		this.steps = new Array<StepResult>();
-		this.fullStepIndexes = new Array<Array<number>>();
-		this.pointer = 0;
+	public get previousFullWasLastSubstep(): boolean {
+		return this._previousFullWasLastSubstep;
+	}
+	private set previousFullWasLastSubstep(value: boolean) {
+		this._previousFullWasLastSubstep = value;
+	}
 
-		this.endStep = this.endFullStep = null;
+	public add(stepKind: StepKind) {
+		switch (stepKind) {
+			case StepKind.Full:
+			case StepKind.Sub:
+				if (this.previousFullWasLastSubstep) {
+					this.full++;
+					this.sub = 0;
+					this.previousFullWasLastSubstep = false;
+				}
+				else {
+					this.sub++;
+				}
+			case StepKind.Code:
+				this.code++;
+				break;
+		}
 
-		this.fullStepIndexes.push([0]);
-		this.steps.push(initialStep);
-
-		if (initialStep instanceof FullStepResult) {
-			this.previousFullWasLastSubstep = initialStep.isLastSubstep;
+		if (stepKind == StepKind.Full) {
+			this.previousFullWasLastSubstep = true;
 		}
 	}
 
-	public add(stepResult: StepResult): void {
-		this.steps.push(stepResult);
+	public get(stepKind: StepKind): number {
+		switch (stepKind) {
+			case StepKind.Code: return this.code;
+			case StepKind.Sub: return this.sub;
+			case StepKind.Full: return this.full;
+		}
+	}
 
-		if (stepResult instanceof FullStepResult) {
-			if (this.previousFullWasLastSubstep)
-				this.fullStepIndexes.push([this.steps.length - 1]);
-			else
-				this.fullStepIndexes[this.fullStepIndexes.length - 1].push(this.steps.length - 1);
+	public freeze(): StepIndexes {
+		return new StepIndexes(this.full, this.sub, this.code);
+	}
+}
+
+class AlgorithmStateCollection {
+	private steps = new Array<AlgorithmState>();
+	private fullSteps = new Array<Array<AlgorithmState>>();
+
+	public constructor(initialState: AlgorithmState) {
+		this.insert(initialState);
+	}
+
+	public get lastStep(): AlgorithmState {
+		return this.steps[this.steps.length - 1];
+	}
+
+	public insert(state: AlgorithmState): void {
+		this.steps[state.stepsIndex.code] = state;
+
+		if (state.stepKind != StepKind.Code) {
+			const fullStepIndex = state.stepsIndex.full;
+
+			if (this.fullSteps[fullStepIndex] == undefined)
+				this.fullSteps[fullStepIndex] = [];
+
+			this.fullSteps[fullStepIndex][state.stepsIndex.sub] = state;
+		}
+	}
+
+	public get(stepKind: StepKind.Code | StepKind.Full, step: number): AlgorithmState | undefined;
+	public get(stepKind: StepKind.Sub, fullStep: number, subStep: number): AlgorithmState | undefined;
+	public get(stepKind: StepKind, step: number, subStep?: number): AlgorithmState | undefined {
+		switch (stepKind) {
+			case StepKind.Code:
+				if (step >= 0 && step < this.steps.length)
+					return this.steps[step];
+
+				return undefined;
+			case StepKind.Sub:
+			case StepKind.Full:
+				let subSteps;
+				if (step >= 0 && step < this.fullSteps.length)
+					subSteps = this.fullSteps[step];
+				else
+					return undefined;
+
+				switch (stepKind) {
+					case StepKind.Sub:
+						if (subStep == undefined)
+							throw new Error("Sub-step requested but sub-step index is undefined");
+
+						if (subStep >= 0 && subStep <= subSteps.length)
+							return subSteps[subStep];
+
+						return undefined;
+					case StepKind.Full:
+						let possibleFullStep = subSteps[subSteps.length - 1];
+
+						if (possibleFullStep.stepKind == StepKind.Full)
+							return possibleFullStep;
+
+						return undefined;
+				}
+		}
+	}
+
+	public getSubSteps(fullStepIndex: number): AlgorithmState[] | undefined {
+		if (fullStepIndex >= 0 && fullStepIndex < this.fullSteps.length)
+			return this.fullSteps[fullStepIndex];
+
+		return undefined;
+	}
+}
+
+export class StepResultCollection {
+	private readonly stepCounter = new StepCounter(0, 0, 0, true);
+	private currentStepIndexes: StepIndexes;
+	private readonly states: AlgorithmStateCollection;
+
+	private endStep: number | null = null;
+	private endFullStep: number | null = null;
+
+	public constructor(initialStep: FullStepResult) {
+		let codeStep = initialStep.codeStepResult;
+		let stack = undefined;
+
+		this.currentStepIndexes = this.stepCounter.freeze();
+
+		this.states = new AlgorithmStateCollection(new AlgorithmState(codeStep, initialStep, StepKindHelper.getStepKind(initialStep), this.currentStepIndexes, stack));
+	}
+
+	public add(stepResult: StepResult): void {
+		const lastStep = this.states.lastStep;
+		const stepKind = StepKindHelper.getStepKind(stepResult);
+		this.stepCounter.add(stepKind);
+
+		let fullStep = undefined;
+		let codeStep = undefined;
+		let stack = undefined;
+
+		if (stepResult instanceof CodeStepResult) {
+			codeStep = stepResult;
+			fullStep = lastStep.fullStepResult;
+		}
+		else if (stepResult instanceof FullStepResult) {
+			codeStep = stepResult.codeStepResult;
+			fullStep = stepResult;
 
 			if (stepResult.final) {
-				this.endStep = this.steps.length - 1;
-				this.endFullStep = this.fullStepIndexes.length - 1;
+				this.endStep = this.stepCounter.get(StepKind.Code);
+				this.endFullStep = this.stepCounter.get(StepKind.Full);
 			}
-
-			this.previousFullWasLastSubstep = stepResult.isLastSubstep;
 		}
+		else {
+			throw new Error("Invalid step result received");
+		}
+
+		const lastStack = this.states.lastStep.callStack;
+
+		if (lastStack != undefined && CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {
+			codeStep.acceptEqualStack(lastStack);
+		}
+
+		this.states.insert(new AlgorithmState(codeStep, fullStep, stepKind, this.stepCounter.freeze(), stack));
 	}
 
 	public addAndAdvance(stepResult: StepResult): void {
 		this.add(stepResult);
-		this.pointer = this.steps.length - 1;
+		this.currentStepIndexes = this.stepCounter.freeze();
 	}
 
 	public forward(kind: StepKind): boolean {
+		let nextState;
+
 		switch (kind) {
 			case StepKind.Code:
-				if (this.pointer + 1 < this.steps.length) {
-					this.pointer++;
-					return true;
-				}
-				return false;
-
-			case StepKind.Sub:
+				nextState = this.states.get(StepKind.Code, this.currentStepIndexes.code + 1);
+				break;
 			case StepKind.Full:
-				let currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
-				let subStepIndexes: number[] | undefined;
-				let currentStepKind = this.getStepKind();
-
-				if (currentStepKind == StepKind.Full) {
-					if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
-						subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
-					}
-				} else {
-					subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0]];
+			case StepKind.Sub:
+				if (kind == StepKind.Full) {
+					// Get to the end of current full step's substeps
+					nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full);
+				}
+				else {
+					// Get the current substep
+					nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub);
 				}
 
-				if (subStepIndexes == undefined)
+				// If there isn't even the current step can't continue further
+				if (nextState == undefined)
 					return false;
 
-				let targetIndex: number | undefined;
-
-				if (kind == StepKind.Full) {
-					targetIndex = subStepIndexes[subStepIndexes.length - 1];
-				} else {
-					if (currentStepKind == StepKind.Full) {
-						if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
-							subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
-							targetIndex = subStepIndexes[0];
-						}
+				// If already at the step or past it, go to the next one
+				if (this.currentStepIndexes.code >= nextState.stepsIndex.code) {
+					if (kind == StepKind.Full) {
+						nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full + 1);
 					}
 					else {
-						if (currentFullStepIndexes[1] + 1 < subStepIndexes.length)
-							targetIndex = subStepIndexes[currentFullStepIndexes[1] + 1]
-						else if (currentFullStepIndexes[0] + 1 < this.fullStepIndexes.length) {
-							subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] + 1];
-							targetIndex = subStepIndexes[0];
+						nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub + 1);
+
+						// If next substep in the current steps doesn't exist, go to the beginning of the next substeps
+						if (nextState == undefined) {
+							nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full + 1, 0);
 						}
 					}
 				}
 
-				if (targetIndex == undefined)
-					return false;
-
-				if (kind == StepKind.Sub || (kind == StepKind.Full && this.getStepKind(targetIndex) == StepKind.Full)) {
-					this.pointer = targetIndex;
-					return true;
-				}
-
-				return false;
+				break;
 		}
+
+		if (nextState != undefined) {
+			this.currentStepIndexes = nextState.stepsIndex;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	public backward(kind: StepKind): boolean {
-		let currentFullStepIndexes: [number, number];
+		let nextState;
 
 		switch (kind) {
 			case StepKind.Code:
-				if (this.pointer > 0) {
-					this.pointer--;
-					return true;
-				}
-				return false;
-
-			case StepKind.Sub:
-				currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
-				let targetIndex: number | undefined;
-
-				if (currentFullStepIndexes[1] > 0) {
-					let subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0]];
-					targetIndex = subStepIndexes[currentFullStepIndexes[1] - 1];
-				} else if (currentFullStepIndexes[0] - 1 >= 0) {
-					let subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] - 1];
-					targetIndex = subStepIndexes[subStepIndexes.length - 1];
-				}
-
-				if (targetIndex == undefined)
-					return false;
-
-				this.pointer = targetIndex;
-				return true;
-
+				nextState = this.states.get(StepKind.Code, this.currentStepIndexes.code - 1);
+				break;
 			case StepKind.Full:
-				currentFullStepIndexes = this.getCurrentStepNumber(StepKind.Full, false);
-
-				if (currentFullStepIndexes[0] - 1 >= 0) {
-					let subStepIndexes = this.fullStepIndexes[currentFullStepIndexes[0] - 1];
-					let targetIndex = subStepIndexes[subStepIndexes.length - 1];
-
-					this.pointer = targetIndex;
-					return true;
-				}
-
-				return false;
-		}
-	}
-
-	public getCurrentStepNumber(): number;
-	public getCurrentStepNumber(kind: StepKind.Code): number;
-	public getCurrentStepNumber(kind: StepKind.Full | StepKind.Sub, justOne: true): number;
-	public getCurrentStepNumber(kind: StepKind.Full | StepKind.Sub, justOne: false): [number, number];
-	public getCurrentStepNumber(kind: StepKind = StepKind.Code, justOne?: boolean): number | [number, number] {
-		switch (kind) {
-			case StepKind.Code:
-				return this.pointer;
-
 			case StepKind.Sub:
-			case StepKind.Full:
-				let stepIndexes = this.binarySearchFullStepIndex();
-				if (justOne) {
+				// Get the current step of the desired kind
+				if (kind == StepKind.Full)
+					nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full);
+				else
+					nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub);
+
+				// If the current full step is undefined, we can't be past it, so go to the previous step
+				// If we are before or at the current step, go to the previous step (if past it, nextState stays at the current step, going back to it)
+				if (nextState == undefined || this.currentStepIndexes.code <= nextState.stepsIndex.code) {
 					if (kind == StepKind.Full)
-						return stepIndexes[0];
-					else
-						return stepIndexes[1];
-				} else {
-					return stepIndexes;
+						nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full - 1);
+					else {
+						nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub - 1);
+
+						// If previous substep in the current sub-steps doesn't exist, go to the end of previous substeps
+						if (nextState == undefined) {
+							nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full - 1);
+						}
+					}
 				}
+
+				break;
 		}
+
+		if (nextState != undefined) {
+			this.currentStepIndexes = nextState.stepsIndex;
+			return true;
+		}
+		else
+			return false;
 	}
 
-	private binarySearchFullStepIndex(targetStep: number = this.pointer): [number, number] {
-		let current = this.fullStepIndexes[this.fullStepIndexes.length - 1];
-
-		if (targetStep >= current[0]) {
-			return [this.fullStepIndexes.length - 1, this.getSubstepIndex(current, targetStep)];
-		}
-
-		let l = 0;
-		let r = this.fullStepIndexes.length - 1;
-
-		while (l <= r) {
-			let i = Math.floor((l + r) / 2);
-
-			current = this.fullStepIndexes[i];
-			let next = i + 1 < this.fullStepIndexes.length ? this.fullStepIndexes[i + 1] : null;
-
-			if (targetStep >= current[0] && (next == null || targetStep < next[0]))
-				return [i, this.getSubstepIndex(current, targetStep)];
-			else if (targetStep < current[0])
-				r = i - 1;
-			else	// targetStep > current
-				l = i + 1;
-		}
-
-		throw new Error("Full step indexes for given target step not found");
+	public getCurrentStepNumbers(): StepIndexes {
+		return this.currentStepIndexes;
 	}
 
-	private getSubstepIndex(subSteps: Array<number>, targetStep: number): number {
-		for (let i = subSteps.length - 1; i >= 0; i--) {
-			if (subSteps[i] <= targetStep)
-				return i;
-		}
+	public getCurrentStep(): AlgorithmState {
+		const state = this.states.get(StepKind.Code, this.currentStepIndexes.code);
 
-		throw new Error("Invalid substeps array for specified target step");
+		if (state == undefined)
+			throw new Error("Current step doesn't exist");
+
+		return state;
 	}
 
 	public getEndStepNumber(): number | null;
@@ -220,26 +298,16 @@ export class StepResultCollection {
 			case StepKind.Full: return this.endFullStep;
 			case StepKind.Sub:
 				if (fullStepNumber == undefined)
-					fullStepNumber = this.getCurrentStepNumber(StepKind.Full, true);
-				else if (fullStepNumber < 0 || fullStepNumber >= this.fullStepIndexes.length)
+					fullStepNumber = this.currentStepIndexes.full;
+
+				const subSteps = this.states.getSubSteps(fullStepNumber);
+				if (subSteps == undefined)
 					throw new Error("Invalid full step number");
 
-				let subStepIndexes = this.fullStepIndexes[fullStepNumber];
-				if (this.getStepKind(subStepIndexes[subStepIndexes.length - 1]) == StepKind.Full)
-					return subStepIndexes.length - 1;
+				if (subSteps[subSteps.length - 1].stepKind == StepKind.Full)
+					return subSteps.length - 1;
 				else
 					return null;
-		}
-	}
-
-	public getCurrentStep(): StepResult;
-	public getCurrentStep(kind: StepKind.Code): StepResult;
-	public getCurrentStep(kind: StepKind.Sub | StepKind.Full): FullStepResult;
-	public getCurrentStep(kind: StepKind = StepKind.Code): StepResult {
-		switch (kind) {
-			case StepKind.Code: return this.steps[this.pointer];
-			case StepKind.Sub:
-			case StepKind.Full: return this.steps[this.getCurrentStepNumber(kind, true)] as FullStepResult;
 		}
 	}
 
@@ -247,68 +315,61 @@ export class StepResultCollection {
 	public goToStep(step: number, kind: StepKind.Code | StepKind.Full): boolean;
 	public goToStep(fullStep: number, kind: StepKind.Sub, subStep: number): boolean;
 	public goToStep(step: number, kind: StepKind = StepKind.Code, subStep?: number): boolean {
+		let state;
+
 		switch (kind) {
 			case StepKind.Code:
-				if (step > -1 && step < this.steps.length) {
-					this.pointer = step;
-					return true;
-				}
-				return false;
+			case StepKind.Full:
+				state = this.states.get(kind, step);
+				break;
 
 			case StepKind.Sub:
 				if (subStep == undefined)
 					throw new Error("goToStep called with SubStep step kind, but no sub-step index was given");
 
-				if (step > -1 && step < this.fullStepIndexes.length) {
-					let subStepIndexes = this.fullStepIndexes[step];
-
-					if (subStep > -1 && subStep < subStepIndexes.length - 1) {
-						let targetIndex = subStepIndexes[subStep];
-
-						this.pointer = targetIndex;
-						return true;
-					}
-				}
-				return false;
-
-			case StepKind.Full:
-				if (step > -1 && step < this.fullStepIndexes.length) {
-					let subStepIndexes = this.fullStepIndexes[step];
-					let targetIndex = subStepIndexes[subStepIndexes.length - 1];
-
-					if (this.getStepKind(targetIndex) == StepKind.Full) {
-						this.pointer = targetIndex;
-						return true;
-					}
-				}
-				return false;
+				state = this.states.get(StepKind.Sub, step, subStep);
+				break;
 		}
+
+		if (state != undefined) {
+			this.currentStepIndexes = state.stepsIndex;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	public goToLastKnownStep(): void {
-		this.pointer = this.steps.length - 1;
+		this.currentStepIndexes = this.states.lastStep.stepsIndex;
 	}
 
 	public getLastKnownStepNumber(): number;
 	public getLastKnownStepNumber(kind: StepKind.Code | StepKind.Full): number;
 	public getLastKnownStepNumber(kind: StepKind.Sub, fullStep?: number): number;
 	public getLastKnownStepNumber(kind: StepKind = StepKind.Code, fullStep?: number): number {
+		const lastStepIndexes = this.states.lastStep.stepsIndex;
+
 		switch (kind) {
-			case StepKind.Code: return this.steps.length - 1;
-			case StepKind.Full: return this.fullStepIndexes.length - 1;
+			case StepKind.Code: return lastStepIndexes.code;
+			case StepKind.Full: return lastStepIndexes.full;
 			case StepKind.Sub:
 				if (fullStep == undefined)
-					fullStep = this.getCurrentStepNumber(StepKind.Full, true);
-				else if (fullStep < 0 || fullStep >= this.fullStepIndexes.length)
+					fullStep = this.currentStepIndexes.full;
+
+				const subSteps = this.states.getSubSteps(fullStep);
+				if (subSteps == undefined)
 					throw new Error("Invalid full step number");
 
-				return this.fullStepIndexes[fullStep].length - 1;
+				return subSteps.length - 1;
 		}
 	}
 
-	public getStepKind(stepIndex: number = this.pointer): StepKind {
-		const currentStep = this.steps[stepIndex];
+	public getStepKind(stepIndex: number = this.currentStepIndexes.code): StepKind {
+		const currentStep = this.states.get(StepKind.Code, stepIndex);
 
-		return StepKindHelper.getStepKind(currentStep);
+		if (currentStep != undefined)
+			return currentStep.stepKind;
+		else
+			throw new Error("Current step doesn't exist");
 	}
 }

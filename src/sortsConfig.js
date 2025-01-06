@@ -20,6 +20,11 @@ module.exports = {
 			name: "Insertion sort",
 			nameMachine: "insertionSort",
 			description: "Description of Insertion sort here."
+		},
+		{
+			name: "Quick sort",
+			nameMachine: "quickSort",
+			description: "Description of Quick sort here."
 		}
 	]
 };

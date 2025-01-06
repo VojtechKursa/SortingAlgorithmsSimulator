@@ -1,4 +1,3 @@
-import { ColorSet } from "../visualization/colors/ColorSet";
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
@@ -9,10 +8,10 @@ import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
-import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { DarkModeHandler } from "../controllers/DarkModeHandler";
+import { CallStackController } from "../controllers/CallStackController";
 
 
 
@@ -64,7 +63,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let variableWatchElement = document.getElementById("variable_watch_body") as HTMLDivElement;
 
-		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController);
+		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
+		let callStackController = new CallStackController(callStackWrapper);
+
+		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController, callStackController);
 
 		let renderer = new SvgRenderingVisitor(colors.darkColors, simulatorOutputElements);
 
@@ -92,7 +94,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, new DarkModeHandler(darkModeButton));
 	}
 
-	window.addEventListener("load", _ => playerController.draw());    // ensure the first drawing is correct
+	window.addEventListener("load", _ => {
+		playerController.draw();
+		playerController.redraw();	// ensure the first drawing is correct
+	});
+
 	window.addEventListener("resize", _ => playerController.redraw());
 
 	sortingAlgorithm.getPseudocode().forEach((codeLine, lineNum) => {

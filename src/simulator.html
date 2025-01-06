@@ -74,21 +74,32 @@
 					</div>
 					<div id="debugger_row">
 						<div id="debugger"></div>
-							<div id="variable_watch_wrapper">
-								<table id="variable_watch">
-									<thead>
-										<td>Name</td>
-										<td>Value</td>
-									</thead>
-									<tbody id="variable_watch_body">
+						<div id="variable_watch_wrapper">
+							<table id="variable_watch">
+								<thead>
+									<td>Name</td>
+									<td>Value</td>
+								</thead>
+								<tbody id="variable_watch_body">
 
-									</tbody>
-								</table>
-							</div>
+								</tbody>
+							</table>
+						</div>
+						<div id="call_stack_wrapper">
+							<table id="call_stack">
+								<thead>
+									<td>Function name</td>
+									<td>Variables</td>
+								</thead>
+								<tbody id="call_stack_body"></tbody>
+							</table>
 						</div>
 					</div>
 				</div>
 			</div>
+		</div>
+
+		<div class="container-fluid">
 			<div id="row_simulator_controls">
 				<button id="button_show_dialog_input" class="btn btn-primary">Input</button>
 				<button id="button_reset" class="btn btn-danger"><i class="bi bi-arrow-repeat"></i> Reset</button>

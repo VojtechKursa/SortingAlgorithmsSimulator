@@ -22,3 +22,5 @@ export class RendererClasses {
 	public static readonly variableTextClass: string = "variable-text";
 	public static readonly variablePointerClass: string = "variable-pointer";
 }
+
+export const hiddenClass: string = "hidden";
