@@ -189,6 +189,29 @@ select {
 					}
 				}
 			}
+
+			#call_stack_wrapper {
+				@include common.margin-horizontal();
+
+				#call_stack {
+					thead {
+						background-color: green;
+					}
+
+					td {
+						border: 2px solid black;
+					}
+
+					tbody {
+
+						tr {
+							&:nth-child(odd) {
+								background-color: grey;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
