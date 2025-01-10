@@ -4,7 +4,7 @@ export enum StepDescriptionKind {
 };
 
 export class StepDescriptionController {
-	public descriptions: Map<StepDescriptionKind, string> = new Map<StepDescriptionKind, string>();
+	public descriptions = new Map<StepDescriptionKind, string>();
 
 	public constructor(
 		public readonly stepDescriptionElement: HTMLDivElement

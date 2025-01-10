@@ -6,18 +6,21 @@ import { DebuggerControlElements } from "../data/collections/htmlElementCollecti
 import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
-import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
 import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { DarkModeHandler } from "../controllers/DarkModeHandler";
 import { CallStackController } from "../controllers/CallStackController";
+import { DebuggerController } from "../controllers/DebuggerController";
+import { HtmlCallStackDisplayVisitor } from "../visualization/rendering/HtmlCallStackDisplayVisitor";
+import { HtmlVariableWatchDisplayVisitor } from "../visualization/rendering/HtmlVariableWatchDisplayVisitor";
+import { VariableWatchController } from "../controllers/VariableWatchController";
+import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/HtmlDebuggerDisplayVisitor";
+import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDescriptionDisplayVisitor";
 
 
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
-	let debug_view = document.getElementById("debugger") as HTMLDivElement;
-
 	let playerController: PlayerController;
 	{
 		let playerElementContainer: RendererControlElements;
@@ -53,7 +56,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		}
 
 		let output = ((document.getElementById("canvas") as any) as SVGSVGElement);
+
 		let debug_view = document.getElementById("debugger") as HTMLDivElement;
+		let debuggerController = new DebuggerController(debug_view);
 
 		let reset = document.getElementById("button_reset") as HTMLButtonElement;
 		let colors = PageColors.load();
@@ -66,11 +71,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
 		let callStackController = new CallStackController(callStackWrapper);
 
-		let simulatorOutputElements = new SimulatorOutputElements(output, debug_view, variableWatchElement, stepDescriptionController, callStackController);
+		let svgRenderingVisitor = new SvgRenderingVisitor(output, false, false, colors.currentColorSet, null);
+		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, svgRenderingVisitor);
+		let callStackVisitor = new HtmlCallStackDisplayVisitor(callStackController, descriptionVisitor);
+		let variableWatchVisitor = new HtmlVariableWatchDisplayVisitor(new VariableWatchController(variableWatchElement), callStackVisitor);
+		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
 
-		let renderer = new SvgRenderingVisitor(colors.darkColors, simulatorOutputElements);
-
-		playerController = new PlayerController(sortingAlgorithm, simulatorOutputElements, playerElementContainer, debuggerElementContainer, continuousControlElements, renderer, colors, reset);
+		playerController = new PlayerController(sortingAlgorithm, playerElementContainer, debuggerElementContainer, debuggerController, continuousControlElements, debuggerVisitor, colors, reset);
 	}
 
 	let inputController: InputController;
@@ -90,8 +97,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 	{
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
 		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
+		let darkModeHandler = new DarkModeHandler(darkModeButton);
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, new DarkModeHandler(darkModeButton));
+		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, darkModeHandler);
 	}
 
 	window.addEventListener("load", _ => {
@@ -100,24 +108,6 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 	});
 
 	window.addEventListener("resize", _ => playerController.redraw());
-
-	sortingAlgorithm.getPseudocode().forEach((codeLine, lineNum) => {
-		let line = document.createElement("div");
-		line.classList.add("code-line");
-
-		let header = document.createElement("div");
-		header.classList.add("code-header");
-		header.textContent = (lineNum + 1).toString();
-
-		let text = document.createElement("div");
-		text.classList.add("code-text")
-		text.textContent = codeLine.replace(/\t/g, " ".repeat(4));
-
-		line.appendChild(header);
-		line.appendChild(text);
-
-		debug_view.appendChild(line);
-	});
 
 	return simulatorPageController;
 }

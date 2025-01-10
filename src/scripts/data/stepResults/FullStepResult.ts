@@ -1,6 +1,6 @@
 import { CodeStepResult } from "./CodeStepResult";
 import { StepResult } from "./StepResult";
-import { RenderingVisitor } from "../../visualization/rendering/RenderingVisitor";
+import { StepDisplayVisitor } from "../../visualization/rendering/StepDisplayVisitor";
 
 
 
@@ -14,11 +14,11 @@ export abstract class FullStepResult extends StepResult {
 		super(text);
 	}
 
-	public display(renderer: RenderingVisitor, drawCodeStep: boolean = true): void {
-		renderer.handleFullStepDraw(this, drawCodeStep);
+	public display(renderer: StepDisplayVisitor, drawCodeStep: boolean = true): void {
+		renderer.displayFullStep(this, drawCodeStep, false);
 	}
 
-	public redraw(renderer: RenderingVisitor, drawCodeStep: boolean = true): void {
-		renderer.handleFullStepRedraw(this, drawCodeStep);
+	public redraw(renderer: StepDisplayVisitor, drawCodeStep: boolean = true): void {
+		renderer.displayFullStep(this, drawCodeStep, true);
 	}
 }

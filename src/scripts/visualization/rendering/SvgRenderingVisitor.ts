@@ -1,14 +1,11 @@
-import { StepDescriptionKind } from "../../controllers/StepDescriptionController";
-import { SimulatorOutputElements } from "../../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
 import { ColorSet } from "../colors/ColorSet";
-import { RendererClasses, VariableWatchClasses } from "../CssInterface";
+import { RendererClasses } from "../CssInterface";
 import { SymbolicColor } from "../colors/SymbolicColor";
-import { SymbolicColorHelper } from "../colors/SymbolicColorHelper";
-import { RenderingVisitor } from "./RenderingVisitor";
 import { VariableDrawInformation } from "../../data/Variable";
+import { StepDisplayVisitorWithColor } from "./StepDisplayVisitorWithColor";
 
 class Rectangle {
 	public constructor(
@@ -30,165 +27,100 @@ class Point2D {
 	}
 }
 
-export class SvgRenderingVisitor implements RenderingVisitor {
+export class SvgRenderingVisitor extends StepDisplayVisitorWithColor {
 	private readonly arrayElementLocations = new Array<Rectangle>();
 	private boxSize = 0;
 
 	public constructor(
-		public colorSet: ColorSet,
-		public readonly output: SimulatorOutputElements,
+		public readonly output: SVGSVGElement,
 		public drawFinalVariables: boolean = false,
-		public drawLastStackLevelVariables: boolean = false
-	) { }
+		public drawLastStackLevelVariables: boolean = false,
+		colorSet: ColorSet,
+		next: SvgRenderingVisitor | null = null
+	) {
+		super(colorSet, next);
+	}
 
-	public handleFullStepDraw(step: FullStepResult, drawCodeStep: boolean): void {
-		if (drawCodeStep)
-			this.codeStep_preFull(step.codeStepResult);
-
-		this.output.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
-
+	protected override displayFullStepInternal(step: FullStepResult): void {
 		if (step instanceof StepResultArray) {
-			const parent = this.output.renderer;
-			parent.querySelectorAll(`.${RendererClasses.elementClass},.${RendererClasses.elementValueClass},.${RendererClasses.elementIndexClass}`)
-				.forEach(element => element.remove());
-
-			this.arrayElementLocations.splice(0, this.arrayElementLocations.length);
-
-			let borderWidth = 2;
-
-			let boxSize = Math.min((parent.clientWidth / step.array.length) - borderWidth, parent.clientHeight - borderWidth);
-			this.boxSize = boxSize;
-			let y = (parent.clientHeight - boxSize) / 2;
-			let leftOffset = (parent.clientWidth - step.array.length * boxSize) / 2;
-
-			let boxSizeStr = boxSize.toString();
-
-			for (let i = 0; i < step.array.length; i++) {
-				const item = step.array[i];
-
-				const box = new Rectangle(leftOffset + i * boxSize, y, boxSize, boxSize);
-				this.arrayElementLocations.push(box);
-
-				const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-				rect.setAttribute("x", box.x.toString());
-				rect.setAttribute("y", y.toString());
-				rect.setAttribute("height", boxSizeStr);
-				rect.setAttribute("width", boxSizeStr);
-				rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
-				rect.setAttribute("stroke-width", `${borderWidth}px`);
-				rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background).toString());
-				rect.classList.add(RendererClasses.elementClass);
-
-				const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-				text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
-				text.setAttribute("y", (y + (boxSize / 2)).toString());
-				text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
-				text.setAttribute("dominant-baseline", "central");
-				text.setAttribute("text-anchor", "middle");
-				text.textContent = item.value.toString();
-				text.classList.add(RendererClasses.elementValueClass);
-
-				parent.appendChild(rect);
-				parent.appendChild(text);
-
-				if (item.index != null) {
-					const rightMargin = 4;
-					const bottomMargin = 4;
-
-					const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
-					index.setAttribute("x", (box.x + box.width - rightMargin).toString());
-					index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
-					index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
-					index.setAttribute("dominant-baseline", "text-bottom");
-					index.setAttribute("text-anchor", "end");
-					index.textContent = item.index.toString();
-					index.classList.add(RendererClasses.elementIndexClass);
-
-					parent.appendChild(index);
-				}
-			}
+			this.drawArray(step);
 		}
 		else
-			throw new Error("Renderer not written for this step result.");
-
-		if (drawCodeStep)
-			this.codeStep_postFull(step.codeStepResult, step.final);
+			throw new Error("Step result type not supported by this visitor.");
 	}
 
-	public handleFullStepRedraw(step: FullStepResult, drawCodeStep: boolean): void {
-		this.handleFullStepDraw(step, drawCodeStep);
+	protected override displayCodeStepInternal(step: CodeStepResult): void {
+		this.drawVariables(step);
 	}
 
-	public handleCodeStepDraw(step: CodeStepResult): void {
-		this.codeStep_preFull(step);
-		this.codeStep_postFull(step, false);
-	}
+	private drawArray(step: StepResultArray) {
+		const parent = this.output;
 
-	public handleCodeStepRedraw(step: CodeStepResult): void {
-		this.codeStep_drawVariables(step);
-	}
+		parent.querySelectorAll(`.${RendererClasses.elementClass},.${RendererClasses.elementValueClass},.${RendererClasses.elementIndexClass}`)
+			.forEach(element => element.remove());
 
-	protected codeStep_preFull(step: CodeStepResult): void {
-		this.output.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
+		this.arrayElementLocations.splice(0, this.arrayElementLocations.length);
 
-		this.codeStep_handleVariableWatchUpdate(step);
-		this.codeStep_handleDebuggerHighlights(step);
-		this.codeStep_handleCallStackUpdate(step);
-	}
+		let borderWidth = 2;
 
-	protected codeStep_postFull(step: CodeStepResult, final: boolean): void {
-		if (!final || this.drawFinalVariables)
-			this.codeStep_drawVariables(step);
-	}
+		let boxSize = Math.min((parent.clientWidth / step.array.length) - borderWidth, parent.clientHeight - borderWidth);
+		this.boxSize = boxSize;
+		let y = (parent.clientHeight - boxSize) / 2;
+		let leftOffset = (parent.clientWidth - step.array.length * boxSize) / 2;
 
-	protected codeStep_handleDebuggerHighlights(step: CodeStepResult): void {
-		const debuggerElement = this.output.debuggerElement;
-		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
+		let boxSizeStr = boxSize.toString();
 
-		const debuggerLines = debuggerElement.children;
-		debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
+		for (let i = 0; i < step.array.length; i++) {
+			const item = step.array[i];
 
-		step.symbolicColors.forEach((_, key) => debuggerLines[key].classList.add(highlightClass));
-	}
+			const box = new Rectangle(leftOffset + i * boxSize, y, boxSize, boxSize);
+			this.arrayElementLocations.push(box);
 
-	protected codeStep_handleVariableWatchUpdate(step: CodeStepResult) {
-		const variableWatchElement = this.output.variableWatch;
+			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+			rect.setAttribute("x", box.x.toString());
+			rect.setAttribute("y", y.toString());
+			rect.setAttribute("height", boxSizeStr);
+			rect.setAttribute("width", boxSizeStr);
+			rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
+			rect.setAttribute("stroke-width", `${borderWidth}px`);
+			rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background).toString());
+			rect.classList.add(RendererClasses.elementClass);
 
-		variableWatchElement.innerText = "";
+			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+			text.setAttribute("x", (leftOffset + (i + 0.5) * boxSize).toString());
+			text.setAttribute("y", (y + (boxSize / 2)).toString());
+			text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
+			text.setAttribute("dominant-baseline", "central");
+			text.setAttribute("text-anchor", "middle");
+			text.textContent = item.value.toString();
+			text.classList.add(RendererClasses.elementValueClass);
 
-		step.variables.forEach(variable => {
-			let row = document.createElement("tr");
-			row.classList.add(VariableWatchClasses.row);
-			variableWatchElement.appendChild(row);
+			parent.appendChild(rect);
+			parent.appendChild(text);
 
-			let variableNameColumn = document.createElement("td");
-			variableNameColumn.classList.add(VariableWatchClasses.nameColumn);
-			variableNameColumn.innerText = variable.name;
-			row.appendChild(variableNameColumn);
+			if (item.index != null) {
+				const rightMargin = 4;
+				const bottomMargin = 4;
 
-			let variableValueColumn = document.createElement("td");
-			variableValueColumn.classList.add(VariableWatchClasses.valueColumn);
-			variableValueColumn.innerText = variable.value;
-			row.appendChild(variableValueColumn);
-		});
-	}
+				const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
+				index.setAttribute("x", (box.x + box.width - rightMargin).toString());
+				index.setAttribute("y", (box.y + box.height - bottomMargin).toString());
+				index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
+				index.setAttribute("dominant-baseline", "text-bottom");
+				index.setAttribute("text-anchor", "end");
+				index.textContent = item.index.toString();
+				index.classList.add(RendererClasses.elementIndexClass);
 
-	protected codeStep_handleCallStackUpdate(step: CodeStepResult) {
-		const stackController = this.output.callStackController;
-
-		if (step.callStack != undefined) {
-			if (!stackController.visible)
-				stackController.visible = true;
-
-			stackController.display(step.callStack);
+				parent.appendChild(index);
+			}
 		}
 	}
 
-	protected codeStep_drawVariables(step: CodeStepResult) {
-		const variableRenderer = this.output.renderer;
+	private drawVariables(step: CodeStepResult) {
+		const variableRenderer = this.output;
 
 		variableRenderer.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(child => variableRenderer.removeChild(child));
-		
+
 		// temp
 		variableRenderer.querySelectorAll(`.${RendererClasses.variableTextClass}`).forEach(child => variableRenderer.removeChild(child));
 		variableRenderer.querySelectorAll(`.${RendererClasses.variablePointerClass}`).forEach(child => variableRenderer.removeChild(child));
@@ -200,7 +132,7 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 			if (drawInformation != null)
 				this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 1);
 		});
-		
+
 		if (this.drawLastStackLevelVariables && step.callStack != undefined) {
 			const lastCallLevel = step.callStack.top();
 
@@ -214,14 +146,14 @@ export class SvgRenderingVisitor implements RenderingVisitor {
 		}
 	}
 
-	protected drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1) {
+	private drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1) {
 		if (variable.drawAtIndex == null || variable.drawAtIndex < 0 || variable.drawAtIndex >= this.arrayElementLocations.length)
 			return;
 
 		const textSize = 16;
 		const chevronMargin = textSize / 2;
 		const textMargin = chevronMargin / 2;
-		
+
 		const chevronWidth = this.boxSize;
 		const chevronHeight = this.boxSize / 2;
 
