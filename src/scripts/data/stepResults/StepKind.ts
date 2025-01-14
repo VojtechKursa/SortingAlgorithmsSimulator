@@ -1,7 +1,7 @@
 import { FullStepResult } from "./FullStepResult";
 import { StepResult } from "./StepResult";
 
-export enum StepKind {
+export const enum StepKind {
 	Full,
 	Sub,
 	Code

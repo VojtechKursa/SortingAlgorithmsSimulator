@@ -12,7 +12,7 @@ export class BubbleSortOptimized extends BubbleSort {
 		this.l = this.current.length;
 	}
 
-	protected * stepForwardInternal(): Generator<StepResult> {
+	protected override * stepForwardInternal(): Generator<StepResult> {
 		let next_l = this.current.length;
 
 		while (next_l >= 2) {
@@ -32,13 +32,13 @@ export class BubbleSortOptimized extends BubbleSort {
 		yield this.makeFullStepResult(true, "", true, undefined, []);
 	}
 
-	protected resetInternal(): void {
+	protected override resetInternal(): void {
 		super.resetInternal();
 
 		this.l = this.current.length;
 	}
 
-	public getPseudocode(): string[] {
+	public override getPseudocode(): string[] {
 		return [
 			"function bubbleSort(a: list of comparable items)",
 			"\tnext_l := length(a)",

@@ -1,4 +1,4 @@
-export enum StepDescriptionKind {
+export const enum StepDescriptionKind {
 	FullStepDescription,
 	CodeStepDescription
 };
