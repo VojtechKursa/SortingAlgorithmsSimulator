@@ -7,7 +7,7 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
-import { SvgRenderingVisitor } from "../visualization/rendering/SvgRenderingVisitor";
+import { SvgArrayRenderVisitor } from "../visualization/rendering/SvgArrayRenderVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { DarkModeHandler } from "../controllers/DarkModeHandler";
 import { CallStackController } from "../controllers/CallStackController";
@@ -71,7 +71,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
 		let callStackController = new CallStackController(callStackWrapper);
 
-		let svgRenderingVisitor = new SvgRenderingVisitor(colors.currentColorSet, output, false, false, null);
+		let svgRenderingVisitor = new SvgArrayRenderVisitor(colors.currentColorSet, output, false, false, null);
 		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, svgRenderingVisitor);
 		let callStackVisitor = new HtmlCallStackDisplayVisitor(callStackController, descriptionVisitor);
 		let variableWatchVisitor = new HtmlVariableWatchDisplayVisitor(new VariableWatchController(variableWatchElement), callStackVisitor);

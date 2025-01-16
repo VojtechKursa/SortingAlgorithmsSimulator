@@ -27,7 +27,7 @@ class Point2D {
 	}
 }
 
-export class SvgRenderingVisitor extends StepDisplayVisitorWithColor {
+export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 	private readonly arrayElementLocations = new Array<Rectangle>();
 	private boxSize = 0;
 
@@ -36,7 +36,7 @@ export class SvgRenderingVisitor extends StepDisplayVisitorWithColor {
 		public readonly output: SVGSVGElement,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		next: SvgRenderingVisitor | null = null
+		next: SvgArrayRenderVisitor | null = null
 	) {
 		super(colorSet, next);
 	}
