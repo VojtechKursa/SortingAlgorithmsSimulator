@@ -1,7 +1,6 @@
 import { DebuggerController } from "../../controllers/DebuggerController";
 import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { ColorSet } from "../colors/ColorSet";
 import { StepDisplayVisitor } from "./StepDisplayVisitor";
 
 export class HtmlDebuggerDisplayVisitor extends StepDisplayVisitor {

@@ -32,10 +32,10 @@ export class SvgRenderingVisitor extends StepDisplayVisitorWithColor {
 	private boxSize = 0;
 
 	public constructor(
+		colorSet: ColorSet,
 		public readonly output: SVGSVGElement,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		colorSet: ColorSet,
 		next: SvgRenderingVisitor | null = null
 	) {
 		super(colorSet, next);
