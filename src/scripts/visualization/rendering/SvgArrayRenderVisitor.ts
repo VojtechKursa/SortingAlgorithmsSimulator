@@ -107,18 +107,6 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 
 		parent.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
-		//TODO: Set properties of SVG elements using CSS styling embedded into SVG
-		/*
-		const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
-
-		style.sheet?.insertRule("aaa {aa:aa;}");
-		--- or ---
-		style.appendChild(document.createTextNode("aaa {aa: aa;}"));
-
-		Perhaps a better approach is adding rules directly using text nodes as there isn't a nullability issue with sheet
-			and I'm writing the CSS directly anyway.
-		*/
-
 		this.currentArrayLength = step.array.length;
 
 		for (let i = 0; i < step.array.length; i++) {
