@@ -22,6 +22,7 @@ import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDe
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
 	let playerController: PlayerController;
+	let callStackController: CallStackController;
 	{
 		let playerElementContainer: RendererControlElements;
 		{
@@ -68,8 +69,8 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let variableWatchElement = document.getElementById("variable_watch_body") as HTMLDivElement;
 
-		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
-		let callStackController = new CallStackController(callStackWrapper);
+		let callStackWrapper = document.getElementById("call_stack_outer_wrapper") as HTMLDivElement;
+		callStackController = new CallStackController(callStackWrapper);
 
 		let svgRenderingVisitor = new SvgArrayRenderVisitor(colors.currentColorSet, output, false, false, null);
 		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, svgRenderingVisitor);
@@ -78,6 +79,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
 
 		playerController = new PlayerController(sortingAlgorithm, playerElementContainer, debuggerElementContainer, debuggerController, continuousControlElements, debuggerVisitor, colors, reset);
+
+		window.addEventListener("load", _ => {
+			playerController.draw();
+			playerController.redraw();	// ensure the first drawing is correct
+		});
 	}
 
 	let inputController: InputController;
@@ -95,19 +101,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 	let simulatorPageController: SimulatorPageController;
 	{
+		let debuggerColumn = document.getElementById("col_debugger") as HTMLDivElement;
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
 		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
 		let darkModeHandler = new DarkModeHandler(darkModeButton);
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, darkModeHandler);
+		simulatorPageController = new SimulatorPageController(playerController, inputController, debuggerColumn, callStackController, settingsOpenButton, darkModeHandler);
 	}
-
-	window.addEventListener("load", _ => {
-		playerController.draw();
-		playerController.redraw();	// ensure the first drawing is correct
-	});
-
-	window.addEventListener("resize", _ => playerController.redraw());
 
 	return simulatorPageController;
 }

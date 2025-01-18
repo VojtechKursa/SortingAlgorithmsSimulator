@@ -15,7 +15,7 @@ export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 
 	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
 		if (step.callStack != undefined && !redraw) {
-			this.callStackController.visible = true;
+			this.callStackController.isPresent = true;
 
 			this.callStackController.display(step.callStack);
 		}

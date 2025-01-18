@@ -8,6 +8,11 @@
 	margin-right: $margin;
 }
 
+@mixin pad-horizontal($padding: 1rem) {
+	padding-left: $padding;
+	padding-right: $padding;
+}
+
 .right-align {
 	margin-left: auto;
 	margin-right: 0;

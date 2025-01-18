@@ -48,8 +48,8 @@
 				<div id="continuous_control-kind-wrapper" class="radio_buttons_wrapper"></div>
 			</div>
 
-			<div id="row_main" class="row">
-				<div id="col_renderer" class="col-lg">
+			<div id="row_main">
+				<div id="col_renderer">
 					<div class="control_module">
 						<div id="stepping" class="btn-group" role="group">
 							<button id="step_beginning" type="button" class="btn btn-primary"><i class="bi bi-skip-backward-fill"></i></button>
@@ -66,35 +66,54 @@
 					</div>
 					<div id="step_description"></div>
 				</div>
-				<div id="col_debugger" class="col-lg">
-					<div class="control_module">
-						<div id="stepping_code" class="btn-group" role="group">
-							<button id="step_code_back" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
-							<output id="step_code_id" type="number" class="btn btn-secondary disabled">0</output>
-							<button id="step_code_next" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
+				<div id="col_debugger_wrapper" class="hide_wrapper">
+					<button type="button" data-bs-toggle="collapse" data-bs-target="#col_debugger" aria-expanded="true" aria-controls="col_debugger">
+						<i class="bi"></i>
+						<span class="target">debugger</span>
+						<i class="bi"></i>
+					</button>
+					<div id="col_debugger" class="collapse show">
+						<div class="control_module">
+							<div id="stepping_code" class="btn-group" role="group">
+								<button id="step_code_back" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
+								<output id="step_code_id" type="number" class="btn btn-secondary disabled">0</output>
+								<button id="step_code_next" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
+							</div>
 						</div>
-					</div>
-					<div id="debugger_row">
-						<div id="debugger"></div>
-						<div id="variable_watch_wrapper">
-							<table id="variable_watch">
-								<thead>
-									<td>Name</td>
-									<td>Value</td>
-								</thead>
-								<tbody id="variable_watch_body">
-
-								</tbody>
-							</table>
-						</div>
-						<div id="call_stack_wrapper">
-							<table id="call_stack">
-								<thead>
-									<td>Function name</td>
-									<td>Variables</td>
-								</thead>
-								<tbody id="call_stack_body"></tbody>
-							</table>
+						<div id="debugger_row">
+							<div id="debugger"></div>
+							<div id="variable_watch_outer_wrapper" class="hide_wrapper">
+								<button type="button" data-bs-toggle="collapse" data-bs-target="#variable_watch_wrapper" aria-expanded="true" aria-controls="variable_watch_wrapper">
+									<i class="bi"></i>
+									<span class="target">variables</span>
+									<i class="bi"></i>
+								</button>
+								<div id="variable_watch_wrapper" class="collapse show collapse-horizontal">
+									<table id="variable_watch">
+										<thead>
+											<td>Name</td>
+											<td>Value</td>
+										</thead>
+										<tbody id="variable_watch_body"></tbody>
+									</table>
+								</div>
+							</div>
+							<div id="call_stack_outer_wrapper" class="hide_wrapper">
+								<button type="button" data-bs-toggle="collapse" data-bs-target="#call_stack_wrapper" aria-expanded="true" aria-controls="call_stack_wrapper">
+									<i class="bi"></i>
+									<span class="target">call stack</span>
+									<i class="bi"></i>
+								</button>
+								<div id="call_stack_wrapper" class="collapse show collapse-horizontal">
+									<table id="call_stack">
+										<thead>
+											<td>Function name</td>
+											<td>Variables</td>
+										</thead>
+										<tbody id="call_stack_body"></tbody>
+									</table>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

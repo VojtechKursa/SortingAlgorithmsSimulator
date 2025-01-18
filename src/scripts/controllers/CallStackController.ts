@@ -8,7 +8,7 @@ export class CallStackController {
 		public readonly callStackWrapper: HTMLDivElement,
 		visible: boolean = false
 	) {
-		this.visible = visible;
+		this.isPresent = visible;
 
 		const body = callStackWrapper.querySelector("tbody#call_stack_body") as HTMLTableSectionElement | null;
 		if (body == null)
@@ -17,14 +17,16 @@ export class CallStackController {
 		this.tableBody = body;
 	}
 
-	public get visible(): boolean {
+	public get isPresent(): boolean {
 		return !this.callStackWrapper.classList.contains(hiddenClass);
 	}
-	public set visible(visible: boolean) {
-		if (visible)
+	public set isPresent(isPresent: boolean) {
+		if (isPresent) {
 			this.callStackWrapper.classList.remove(hiddenClass);
-		else
+		}
+		else {
 			this.callStackWrapper.classList.add(hiddenClass);
+		}
 	}
 
 	public display(stack: CallStack | CallStackFreezed): void {
