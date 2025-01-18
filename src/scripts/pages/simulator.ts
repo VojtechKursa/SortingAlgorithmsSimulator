@@ -6,7 +6,7 @@ import { DebuggerControlElements } from "../data/collections/htmlElementCollecti
 import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
-import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
+import { ContinuousControlController } from "../controllers/ContinuousControlController";
 import { SvgArrayRenderVisitor } from "../visualization/rendering/SvgArrayRenderVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { DarkModeHandler } from "../controllers/DarkModeHandler";
@@ -45,14 +45,14 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			debuggerElementContainer = new DebuggerControlElements(backCode, nextCode, stepCode);
 		}
 
-		let continuousControlElements: ContinuousControlElements;
+		let continuousControlElements: ContinuousControlController;
 		{
 			let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
 			let pauseButton = document.getElementById("player_control_pause") as HTMLInputElement;
 			let playButton = document.getElementById("player_control_play") as HTMLInputElement;
 			let radioWrapper = document.getElementById("continuous_control-kind-wrapper") as HTMLDivElement;
 
-			continuousControlElements = new ContinuousControlElements(periodInput, pauseButton, playButton, radioWrapper);
+			continuousControlElements = new ContinuousControlController(periodInput, pauseButton, playButton, radioWrapper);
 		}
 
 		let output = ((document.getElementById("canvas") as any) as SVGSVGElement);

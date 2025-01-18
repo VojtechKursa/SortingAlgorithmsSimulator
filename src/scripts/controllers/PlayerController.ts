@@ -3,7 +3,7 @@ import { StepResultCollection } from "../data/collections/StepResultCollection";
 import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
 import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { StepKind } from "../data/stepResults/StepKind";
-import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
+import { ContinuousControlController } from "./ContinuousControlController";
 import { StepDisplayVisitor } from "../visualization/rendering/StepDisplayVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { FullStepResult } from "../data/stepResults/FullStepResult";
@@ -24,7 +24,7 @@ export class PlayerController {
 		private readonly playerControls: RendererControlElements,
 		private readonly debuggerControls: DebuggerControlElements,
 		private readonly debuggerController: DebuggerController,
-		private readonly continuousControls: ContinuousControlElements,
+		private readonly continuousControls: ContinuousControlController,
 		private readonly displayVisitor: StepDisplayVisitor,
 		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement

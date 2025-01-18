@@ -1,8 +1,8 @@
-import { StepKind, StepKindHelper } from "../../stepResults/StepKind";
+import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 
 export type ContinuousControlEventHandler = (start: boolean, stepKind: StepKind, interval: number) => void;
 
-export class ContinuousControlElements {
+export class ContinuousControlController {
 	private readonly handlers = new Array<ContinuousControlEventHandler>();
 	private playing: boolean;
 
