@@ -2,31 +2,36 @@ import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 import { StepResultCollection } from "../data/collections/StepResultCollection";
 import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
 import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
-import { SimulatorOutputElements } from "../data/collections/htmlElementCollections/SimulatorOutputElements";
 import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlElements } from "../data/collections/htmlElementCollections/ContinuousControlElements";
-import { RenderingVisitor } from "../visualization/rendering/RenderingVisitor";
+import { StepDisplayVisitor } from "../visualization/rendering/StepDisplayVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
 import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { ColorSet } from "../visualization/colors/ColorSet";
+import { DebuggerController } from "./DebuggerController";
+import { StepDisplayVisitorWithColor } from "../visualization/rendering/StepDisplayVisitorWithColor";
 
 export class PlayerController {
 	private currentlyDisplayedFullStep: FullStepResult | null = null;
 	private steps: StepResultCollection;
+	private currentColorSet: ColorSet;
 
 	private autoPlayTimerId: NodeJS.Timeout | number | null = null;
 	private playingKind: StepKind | null = null;
 
 	public constructor(
 		private readonly algorithm: SortingAlgorithm,
-		private readonly outputElements: SimulatorOutputElements,
 		private readonly playerControls: RendererControlElements,
 		private readonly debuggerControls: DebuggerControlElements,
+		private readonly debuggerController: DebuggerController,
 		private readonly continuousControls: ContinuousControlElements,
-		private readonly renderer: RenderingVisitor,
+		private readonly displayVisitor: StepDisplayVisitor,
 		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
 	) {
 		this.steps = new StepResultCollection(this.algorithm.getInitialStepResult());
+
+		this.debuggerController.setCode(algorithm.getPseudocode());
 
 		this.reset();
 
@@ -43,6 +48,8 @@ export class PlayerController {
 		this.resetButton.addEventListener("click", _ => this.reset());
 
 		this.continuousControls.registerHandler((start, kind, interval) => this.playHandler(start, kind, interval));
+
+		this.currentColorSet = colors.currentColorSet;
 	}
 
 	public draw(): void {
@@ -50,11 +57,11 @@ export class PlayerController {
 		let currentStepNumbers = currentState.stepsIndex;
 
 		if (currentState.fullStepResult != this.currentlyDisplayedFullStep) {
-			currentState.fullStepResult.display(this.renderer, false);
+			currentState.fullStepResult.display(this.displayVisitor, false);
 			this.currentlyDisplayedFullStep = currentState.fullStepResult;
 		}
 
-		currentState.codeStepResult.display(this.renderer);
+		currentState.codeStepResult.display(this.displayVisitor);
 
 		let endStepNumberFull = this.steps.getEndStepNumber(StepKind.Full);
 		let endStepNumberSub = this.steps.getEndStepNumber(StepKind.Sub);
@@ -67,8 +74,8 @@ export class PlayerController {
 	public redraw(): void {
 		let currentStep = this.steps.getCurrentStep();
 
-		currentStep.fullStepResult.redraw(this.renderer, false);
-		currentStep.codeStepResult.redraw(this.renderer);
+		currentStep.fullStepResult.redraw(this.displayVisitor, false);
+		currentStep.codeStepResult.redraw(this.displayVisitor);
 	}
 
 	public forward(kind: StepKind): void {
@@ -249,11 +256,21 @@ export class PlayerController {
 	}
 
 	public setDarkMode(darkMode: boolean): void {
-		const originalColorSet = this.renderer.colorSet;
 		const newColorSet = darkMode ? this.colors.darkColors : this.colors.lightColors;
 
-		if (originalColorSet != newColorSet) {
-			this.renderer.colorSet = newColorSet;
+		if (this.currentColorSet != newColorSet) {
+			this.currentColorSet = newColorSet;
+
+			let selectedVisitor: StepDisplayVisitor | null = this.displayVisitor;
+
+			while (selectedVisitor != null) {
+				if (selectedVisitor instanceof StepDisplayVisitorWithColor) {
+					selectedVisitor.colorSet = newColorSet;
+				}
+
+				selectedVisitor = selectedVisitor.next;
+			}
+
 			this.redraw();
 		}
 	}

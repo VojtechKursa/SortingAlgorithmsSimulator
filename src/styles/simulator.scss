@@ -104,10 +104,11 @@ select {
 			border-right: $border;
 		}
 
-		#canvas {
+		#canvas_wrapper {
 			width: 100%;
-			
 			flex-grow: 1;
+
+			align-content: start;
 		}
 
 		#step_description {

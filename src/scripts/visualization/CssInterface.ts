@@ -15,12 +15,15 @@ export class VariableWatchClasses {
 }
 
 export class RendererClasses {
-	public static readonly elementClass: string = "array_item";
+	public static readonly elementWrapperClass: string = "element";
+	public static readonly elementBoxClass: string = "box";
 	public static readonly elementValueClass: string = "value";
 	public static readonly elementIndexClass: string = "index";
-	public static readonly variableWrapperClass: string = "variable-wrapper";
-	public static readonly variableTextClass: string = "variable-text";
-	public static readonly variablePointerClass: string = "variable-pointer";
+	public static readonly variableWrapperClass: string = "variable";
+	public static readonly variableTextClass: string = "text";
+	public static readonly variablePointerClass: string = "pointer";
 }
+
+export const verticalLayoutBreakPoint: number = 1400;
 
 export const hiddenClass: string = "hidden";

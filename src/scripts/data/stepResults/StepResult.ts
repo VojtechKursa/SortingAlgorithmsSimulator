@@ -1,8 +1,8 @@
-import { RenderingVisitor } from "../../visualization/rendering/RenderingVisitor";
+import { StepDisplayVisitor } from "../../visualization/rendering/StepDisplayVisitor";
 
 export abstract class StepResult {
 	protected constructor(public readonly text: string = "") { }
 
-	public abstract display(renderer: RenderingVisitor): void;
-	public abstract redraw(renderer: RenderingVisitor): void;
+	public abstract display(renderer: StepDisplayVisitor): void;
+	public abstract redraw(renderer: StepDisplayVisitor): void;
 }

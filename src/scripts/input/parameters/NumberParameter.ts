@@ -1,7 +1,7 @@
 import { InputParameter } from "./InputParameter";
 import { NotMandatoryError } from "../../errors/NotMandatoryError";
 
-export enum RoundBehavior {
+export const enum RoundBehavior {
 	AllowDecimals,
 	Round,
 	Floor,

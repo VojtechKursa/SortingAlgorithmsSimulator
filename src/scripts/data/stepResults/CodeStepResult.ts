@@ -1,6 +1,6 @@
 import { Variable } from "../Variable";
 import { StepResult } from "./StepResult";
-import { RenderingVisitor } from "../../visualization/rendering/RenderingVisitor";
+import { StepDisplayVisitor } from "../../visualization/rendering/StepDisplayVisitor";
 import { Highlights } from "../../visualization/Highlights";
 import { SymbolicColor } from "../../visualization/colors/SymbolicColor";
 import { CallStack, CallStackFreezed } from "../CallStack";
@@ -12,7 +12,7 @@ export class CodeStepResult extends StepResult {
 
 	public constructor(
 		text: string = "",
-		public readonly symbolicColors: Highlights = new Map<number, SymbolicColor>(),
+		public readonly highlightedLines: Highlights = new Map<number, SymbolicColor>(),
 		public readonly variables: Variable[] = [],
 		stack: CallStack | CallStackFreezed | undefined = undefined
 	) {
@@ -28,12 +28,12 @@ export class CodeStepResult extends StepResult {
 		return this.stack;
 	}
 
-	public display(renderer: RenderingVisitor): void {
-		renderer.handleCodeStepDraw(this);
+	public display(renderer: StepDisplayVisitor): void {
+		renderer.displayCodeStep(this, false);
 	}
 
-	public redraw(renderer: RenderingVisitor): void {
-		renderer.handleCodeStepRedraw(this);
+	public redraw(renderer: StepDisplayVisitor): void {
+		renderer.displayCodeStep(this, true);
 	}
 
 	public acceptEqualStack(stack: CallStack | CallStackFreezed) {

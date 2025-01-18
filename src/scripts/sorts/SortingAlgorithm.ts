@@ -23,7 +23,7 @@ class IndexingData {
 
 
 
-export enum HighlightState {
+export const enum HighlightState {
 	Selected,
 	OrderCorrect,
 	OrderSwapped
