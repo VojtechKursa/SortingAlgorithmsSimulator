@@ -8,7 +8,7 @@ export class CallStackLevel {
 		this.functionName = functionName;
 		this.array = variables.slice();
 	}
-	
+
 	public get variables(): Variable[] {
 		return this.array.slice();
 	}

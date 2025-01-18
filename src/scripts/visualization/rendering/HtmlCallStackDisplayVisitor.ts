@@ -7,7 +7,7 @@ export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 	public constructor(
 		public readonly callStackController: CallStackController,
 		next: StepDisplayVisitor | null
-	) { 
+	) {
 		super(next);
 	}
 

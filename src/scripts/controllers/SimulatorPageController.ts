@@ -15,8 +15,7 @@ export class SimulatorPageController {
 		private readonly callStackController: CallStackController,
 		private readonly settingsOpenButton: HTMLButtonElement,
 		darkModeHandler: DarkModeHandler
-	)
-	{
+	) {
 		darkModeHandler.addEventHandler(dark => {
 			playerController.setDarkMode(dark);
 		});

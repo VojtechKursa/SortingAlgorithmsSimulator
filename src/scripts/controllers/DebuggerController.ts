@@ -40,7 +40,7 @@ export class DebuggerController {
 
 	public clearHighlights(): void {
 		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
-		
+
 		this.debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
 	}
 

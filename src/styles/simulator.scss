@@ -1,7 +1,5 @@
 @use "common";
 
-
-
 :root {
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
 }
@@ -24,7 +22,7 @@ select {
 	* {
 		min-height: 100%;
 	}
-	
+
 	> * {
 		min-width: max-content;
 	}
@@ -50,7 +48,7 @@ select {
 	}
 
 	.radio_buttons_wrapper {
-		input[type=radio] {
+		input[type="radio"] {
 			margin-left: 2em;
 		}
 	}
@@ -62,10 +60,10 @@ select {
 
 		label {
 			width: 100px;
-	
+
 			margin-right: 1em;
 		}
-	
+
 		input {
 			flex-grow: 1;
 		}
@@ -74,13 +72,13 @@ select {
 
 .hide_wrapper {
 	display: flex;
-    flex-flow: row;
+	flex-flow: row;
 
 	& > button {
 		display: flex;
-    	flex-flow: row;
+		flex-flow: row;
 
-    	align-items: center;
+		align-items: center;
 		justify-content: space-evenly;
 
 		text-orientation: upright;
@@ -119,22 +117,21 @@ body.vertical {
 	}
 }
 
-
 #navbar {
 	display: flex;
 
 	@include common.margin-vertical(8px);
-	
+
 	#settings_button_wrapper {
 		width: fit-content;
-		
+
 		@extend .right-align;
 	}
 }
 
 #row_main {
 	$border: 2px solid black;
-	
+
 	display: flex;
 	flex-flow: row;
 
@@ -358,7 +355,7 @@ body.vertical {
 		width: 100%;
 
 		@include common.margin-horizontal(0.5em);
-		
+
 		&:first-child {
 			margin-left: 0;
 		}

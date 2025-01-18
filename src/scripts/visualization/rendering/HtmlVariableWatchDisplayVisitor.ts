@@ -4,7 +4,7 @@ import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepDisplayVisitor } from "./StepDisplayVisitor";
 
 export class HtmlVariableWatchDisplayVisitor extends StepDisplayVisitor {
-	public constructor (
+	public constructor(
 		public readonly variableWatchController: VariableWatchController,
 		next: StepDisplayVisitor | null
 	) {

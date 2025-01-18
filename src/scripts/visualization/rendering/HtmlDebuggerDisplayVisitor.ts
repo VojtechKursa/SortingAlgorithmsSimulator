@@ -11,7 +11,7 @@ export class HtmlDebuggerDisplayVisitor extends StepDisplayVisitor {
 		super(next);
 	}
 
-	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void {	}
+	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void { }
 
 	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
 		if (!redraw)
