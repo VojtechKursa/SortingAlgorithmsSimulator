@@ -15,7 +15,7 @@ const htmlBundlerPluginConfig = {
 		// define HTML files here
 		
 		index: {
-			import: "src/index.html",
+			import: "src/templates/index.html",
 			data: {
 				algorithms: [ ]
 			}
@@ -37,7 +37,7 @@ htmlBundlerPluginConfig.entry.index.data.algorithms = AlgorithmsConfig.algorithm
 // Data for individual simulator pages
 AlgorithmsConfig.algorithms.forEach(algorithm => {
 	htmlBundlerPluginConfig.entry[algorithm.nameMachine] = {
-		import: 'src/simulator.html',
+		import: 'src/templates/simulator.html',
 		data: algorithm
 	};
 });
