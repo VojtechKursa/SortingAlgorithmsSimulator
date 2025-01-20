@@ -337,43 +337,24 @@ body.vertical2 {
 					}
 				}
 
+				#call_stack_wrapper,
 				#variable_watch_wrapper {
 					@include common.pad-horizontal();
 
-					#variable_watch {
+					table {
 						thead {
-							background-color: green;
+							background-color: var(--bs-primary-bg-subtle);
 						}
 
 						td {
 							border: 2px solid black;
-						}
 
-						#variable_watch_body {
-							.variable_watch-row {
-								&:nth-child(odd) {
-									background-color: grey;
-								}
-							}
-						}
-					}
-				}
-
-				#call_stack_wrapper {
-					@include common.pad-horizontal();
-
-					#call_stack {
-						thead {
-							background-color: green;
-						}
-
-						td {
-							border: 2px solid black;
+							@include common.pad-horizontal(0.5em);
 						}
 
 						tbody {
 							tr {
-								&:nth-child(odd) {
+								&:nth-child(even) {
 									background-color: grey;
 								}
 
