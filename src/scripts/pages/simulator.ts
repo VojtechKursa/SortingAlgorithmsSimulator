@@ -69,7 +69,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let variableWatchElement = document.getElementById("variable_watch_body") as HTMLDivElement;
 
-		let callStackWrapper = document.getElementById("call_stack_outer_wrapper") as HTMLDivElement;
+		let callStackWrapper = document.getElementById("call_stack_hide_wrapper") as HTMLDivElement;
 		callStackController = new CallStackController(callStackWrapper);
 
 		let svgRenderingVisitor = new SvgArrayRenderVisitor(colors.currentColorSet, output, false, false, null);

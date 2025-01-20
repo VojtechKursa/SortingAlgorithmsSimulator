@@ -81,37 +81,43 @@
 							</div>
 						</div>
 						<div id="debugger_row">
-							<div id="debugger"></div>
-							<div id="variable_watch_outer_wrapper" class="hide_wrapper">
-								<button type="button" data-bs-toggle="collapse" data-bs-target="#variable_watch_wrapper" aria-expanded="true" aria-controls="variable_watch_wrapper">
+							<div id="debugger_wrapper">
+								<div id="debugger"></div>
+							</div>
+							<div id="variable_watch_hide_wrapper" class="hide_wrapper">
+								<button type="button" data-bs-toggle="collapse" data-bs-target="#variable_watch_collapse_wrapper" aria-expanded="true" aria-controls="variable_watch_collapse_wrapper">
 									<i class="bi"></i>
 									<span class="target">variables</span>
 									<i class="bi"></i>
 								</button>
-								<div id="variable_watch_wrapper" class="collapse show collapse-horizontal">
-									<table id="variable_watch">
-										<thead>
-											<td>Name</td>
-											<td>Value</td>
-										</thead>
-										<tbody id="variable_watch_body"></tbody>
-									</table>
+								<div id="variable_watch_collapse_wrapper" class="collapse show collapse-horizontal">
+									<div id="variable_watch_wrapper">
+										<table id="variable_watch">
+											<thead>
+												<td>Name</td>
+												<td>Value</td>
+											</thead>
+											<tbody id="variable_watch_body"></tbody>
+										</table>
+									</div>
 								</div>
 							</div>
-							<div id="call_stack_outer_wrapper" class="hide_wrapper">
-								<button type="button" data-bs-toggle="collapse" data-bs-target="#call_stack_wrapper" aria-expanded="true" aria-controls="call_stack_wrapper">
+							<div id="call_stack_hide_wrapper" class="hide_wrapper">
+								<button type="button" data-bs-toggle="collapse" data-bs-target="#call_stack_collapse_wrapper" aria-expanded="true" aria-controls="call_stack_collapse_wrapper">
 									<i class="bi"></i>
 									<span class="target">call stack</span>
 									<i class="bi"></i>
 								</button>
-								<div id="call_stack_wrapper" class="collapse show collapse-horizontal">
-									<table id="call_stack">
-										<thead>
-											<td>Function name</td>
-											<td>Variables</td>
-										</thead>
-										<tbody id="call_stack_body"></tbody>
-									</table>
+								<div id="call_stack_collapse_wrapper" class="collapse show collapse-horizontal">
+									<div id="call_stack_wrapper">
+										<table id="call_stack">
+											<thead>
+												<td>Function name</td>
+												<td>Variables</td>
+											</thead>
+											<tbody id="call_stack_body"></tbody>
+										</table>
+									</div>
 								</div>
 							</div>
 						</div>

@@ -104,11 +104,14 @@ select {
 		text-orientation: upright;
 		writing-mode: vertical-lr;
 
-		background-color: inherit;
+		background-color: grey;
+
 		border: none;
 
+		@include common.pad-horizontal(0.5rem);
+
 		i {
-			margin: 1em;
+			@include common.margin-vertical(1em);
 
 			&::before {
 				content: "\f22d";
@@ -201,7 +204,13 @@ body.vertical {
 			& > button {
 				writing-mode: horizontal-tb;
 
+				@include common.pad-vertical(0.5em);
+				@include common.pad-horizontal(0);
+
 				i {
+					@include common.margin-vertical(0);
+					@include common.margin-horizontal(1em);
+
 					&::before {
 						content: "\f235";
 					}
@@ -218,54 +227,57 @@ body.vertical {
 		#col_debugger {
 			flex-grow: 1;
 
-			@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+			padding-left: calc(var(--bs-gutter-x) / 2);
 
 			#debugger_row {
 				display: flex;
 				flex-direction: row;
 
-				#debugger {
+				#debugger_wrapper {
 					flex-grow: 1;
 
-					color: white;
+					padding-right: calc(var(--bs-gutter-x) / 2);
 
-					text-align: left;
-					align-content: center;
-
-					.code-line {
-						display: grid;
-						grid-template-columns: 3em auto;
-
+					#debugger {
+						color: white;
 						background-color: black;
 
-						font-family: monospace;
+						text-align: left;
+						align-content: center;
 
-						.code-header {
-							grid-column: 1;
+						.code-line {
+							display: grid;
+							grid-template-columns: 3em auto;
 
-							background-color: grey;
+							font-family: monospace;
 
-							text-align: right;
-							padding-right: 0.5em;
+							.code-header {
+								grid-column: 1;
 
-							user-select: none; /* Make the text un-selectable */
+								background-color: grey;
+
+								text-align: right;
+								padding-right: 0.5em;
+
+								user-select: none; /* Make the text un-selectable */
+							}
+
+							.code-text {
+								grid-column: 2;
+
+								padding-left: 0.5em;
+								white-space: pre;
+							}
 						}
 
-						.code-text {
-							grid-column: 2;
-
-							padding-left: 0.5em;
-							white-space: pre;
+						.code-line_active {
+							background-color: var(--color-code-line_active);
 						}
-					}
-
-					.code-line_active {
-						background-color: var(--color-code-line_active);
 					}
 				}
 
 				#variable_watch_wrapper {
-					@include common.margin-horizontal();
+					@include common.pad-horizontal();
 
 					#variable_watch {
 						thead {
@@ -287,7 +299,7 @@ body.vertical {
 				}
 
 				#call_stack_wrapper {
-					@include common.margin-horizontal();
+					@include common.pad-horizontal();
 
 					#call_stack {
 						thead {
