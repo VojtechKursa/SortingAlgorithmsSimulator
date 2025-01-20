@@ -186,7 +186,9 @@ body.vertical {
 
 		#step_description {
 			height: fit-content;
-			min-height: 1.5em;
+			min-height: 3.5em;
+
+			align-content: center;
 
 			$margin: 0.25em;
 
