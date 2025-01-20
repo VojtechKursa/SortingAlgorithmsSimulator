@@ -26,4 +26,5 @@ export class RendererClasses {
 
 export const hiddenClass: string = "hidden";
 
-export const bodyVerticalLayoutClass: string = "vertical";
+export const bodyVertical1LayoutClass: string = "vertical1";
+export const bodyVertical2LayoutClass: string = "vertical2";

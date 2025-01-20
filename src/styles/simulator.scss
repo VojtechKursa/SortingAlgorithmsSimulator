@@ -101,19 +101,21 @@ select {
 
 	& > button {
 		display: flex;
-		flex-flow: row;
+		flex-flow: column;
 
 		align-items: center;
 		justify-content: space-evenly;
 
-		text-orientation: upright;
-		writing-mode: vertical-lr;
-
-		background-color: grey;
+		background-color: var(--bs-info-bg-subtle);
 
 		border: none;
 
 		@include common.pad-horizontal(0.5rem);
+
+		span {
+			text-orientation: sideways;
+			writing-mode: sideways-lr;
+		}
 
 		i {
 			@include common.margin-vertical(1em);
@@ -137,11 +139,92 @@ select {
 			}
 		}
 	}
+
+	&:has(> div:not(.collapse-horizontal)) {
+		flex-flow: column;
+
+		& > button {
+			flex-flow: row;
+	
+			@include common.pad-vertical(0.5em);
+			@include common.pad-horizontal(0);
+
+			span {
+				writing-mode: horizontal-tb;
+			}
+
+			i {
+				@include common.margin-vertical(0);
+				@include common.margin-horizontal(1em);
+
+				&::before {
+					content: "\f235";
+				}
+			}
+
+			&[aria-expanded="false"] {
+				i::before {
+					content: "\f229";
+				}
+			}
+		}
+	}
 }
 
-body.vertical {
+body.vertical1 {
 	#row_main {
 		display: block;
+	}
+
+	#col_renderer {
+		height: fit-content;
+	}
+}
+
+body.vertical2 {
+	#col_debugger {
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+
+		#debugger_row {
+			flex-wrap: wrap;
+
+			#debugger_wrapper {
+				padding-right: 0 !important;
+				width: 100%;
+			}
+
+			#variable_watch_hide_wrapper,
+			#call_stack_hide_wrapper {
+				margin-top: 1em;
+
+				width: 50%;
+
+				.collapse,
+				.collapsing {
+					> div {
+						// wrappers
+						@include common.pad-vertical(1em);
+
+						table {
+							width: 100%;
+
+							td {
+								width: 50%;
+							}
+						}
+					}
+				}
+			}
+
+			#variable_watch_hide_wrapper {
+				padding-right: 1em;
+
+				&:has(+#call_stack_hide_wrapper.hidden) {
+					width: 100%;
+					padding-right: 0;
+				}
+			}
+		}
 	}
 }
 
@@ -205,32 +288,6 @@ body.vertical {
 	}
 
 	#col_debugger_wrapper {
-		&:has(#col_debugger:not(.collapse-horizontal)) {
-			flex-direction: column;
-
-			& > button {
-				writing-mode: horizontal-tb;
-
-				@include common.pad-vertical(0.5em);
-				@include common.pad-horizontal(0);
-
-				i {
-					@include common.margin-vertical(0);
-					@include common.margin-horizontal(1em);
-
-					&::before {
-						content: "\f235";
-					}
-				}
-
-				&[aria-expanded="false"] {
-					i::before {
-						content: "\f229";
-					}
-				}
-			}
-		}
-
 		#col_debugger {
 			flex-grow: 1;
 

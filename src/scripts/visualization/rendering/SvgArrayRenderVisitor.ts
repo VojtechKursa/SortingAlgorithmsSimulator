@@ -2,7 +2,7 @@ import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
 import { ColorSet } from "../colors/ColorSet";
-import { RendererClasses, bodyVerticalLayoutClass } from "../CssInterface";
+import { RendererClasses, bodyVertical1LayoutClass } from "../CssInterface";
 import { SymbolicColor } from "../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../data/Variable";
 import { StepDisplayVisitorWithColor } from "./StepDisplayVisitorWithColor";
@@ -287,7 +287,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 	 * even when stacking variables increase the height of the SVG element.
 	*/
 	private adjustMargin(): void {
-		if (document.body.classList.contains(bodyVerticalLayoutClass)) {
+		if (document.body.classList.contains(bodyVertical1LayoutClass)) {
 			this.output.style.marginTop = "";
 			return;
 		}
