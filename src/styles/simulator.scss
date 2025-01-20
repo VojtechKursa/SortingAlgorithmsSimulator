@@ -1,5 +1,7 @@
 @use "common";
 
+$border: 2px solid black;
+
 :root {
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
 }
@@ -178,6 +180,9 @@ body.vertical1 {
 
 	#col_renderer {
 		height: fit-content;
+
+		border-right: none !important;
+		border-bottom: $border;
 	}
 }
 
@@ -241,8 +246,6 @@ body.vertical2 {
 }
 
 #row_main {
-	$border: 2px solid black;
-
 	display: flex;
 	flex-flow: row;
 
@@ -257,13 +260,7 @@ body.vertical2 {
 
 		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 
-		@media (max-width: 991px) {
-			height: fit-content;
-			border-bottom: $border;
-		}
-		@media (min-width: 992px) {
-			border-right: $border;
-		}
+		border-right: $border;
 
 		#canvas_wrapper {
 			width: 100%;
