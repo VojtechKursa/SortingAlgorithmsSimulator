@@ -108,11 +108,12 @@ export class QuickSort extends SortingAlgorithm {
 	}
 
 	protected * stepForwardInternal(): Generator<StepResult> {
+		this.callStack.currentFunctionName = "quickSort";
 		yield this.makeCodeStepResult(0, "Enter the facade function");
 
 		yield this.makeCodeStepResult(1, "Call the recursive function with the entire list");
 
-		this.beforeCall("quickSort", 0, this.current.length - 1);
+		this.beforeCall("quickSortR", 0, this.current.length - 1);
 		for (const result of this.quickSortRecursive()) {
 			yield result;
 		}
@@ -140,7 +141,7 @@ export class QuickSort extends SortingAlgorithm {
 		yield this.makeFullStepResult(false, "Partition the list", false, false, undefined, 8);
 
 		const partitionResult = new PartitionResult();
-		this.beforeCall("quickSortR", this.l, this.r)
+		this.beforeCall("partition", this.l, this.r)
 		for (const result of this.partition(partitionResult)) {
 			yield result;
 		}
@@ -277,6 +278,12 @@ export class QuickSort extends SortingAlgorithm {
 	}
 
 	protected resetInternal(): void {
+		this.resetVariables();
+
+		this.callStack = new CallStack();
+	}
+
+	protected resetVariables(): void {
 		this.l = undefined;
 		this.r = undefined;
 		this.i = undefined;
@@ -285,9 +292,9 @@ export class QuickSort extends SortingAlgorithm {
 		this.p = undefined;
 	}
 
-	protected beforeCall(currentFunctionName: string, l: number, r: number): void {
-		this.callStack.push(new CallStackLevel(currentFunctionName, this.getVariables()));
-		this.resetInternal();
+	protected beforeCall(nextFunctionName: string, l: number, r: number): void {
+		this.callStack.push(this.getVariables(), nextFunctionName);
+		this.resetVariables();
 		this.l = l;
 		this.r = r;
 	}
@@ -298,7 +305,7 @@ export class QuickSort extends SortingAlgorithm {
 		if (level == undefined)
 			throw new Error("Failed to return from function, presumably the call stack is empty");
 
-		this.resetInternal();
+		this.resetVariables();
 
 		level.variables.forEach(variable => {
 			switch (variable.name) {

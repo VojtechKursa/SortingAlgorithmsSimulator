@@ -315,6 +315,11 @@ body.vertical {
 								&:nth-child(odd) {
 									background-color: grey;
 								}
+
+								td > div > div {
+									display: flex;
+									justify-content: space-evenly;
+								}
 							}
 						}
 					}

@@ -189,7 +189,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		});
 
 		if (this.drawLastStackLevelVariables && step.callStack != undefined) {
-			const lastCallLevel = step.callStack.top();
+			const lastCallLevel = step.callStack.secondToTop();
 
 			if (lastCallLevel != undefined) {
 				lastCallLevel.variables.forEach(variable => {

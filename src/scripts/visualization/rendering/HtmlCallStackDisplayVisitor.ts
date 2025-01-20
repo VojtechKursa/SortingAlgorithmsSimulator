@@ -17,7 +17,7 @@ export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 		if (step.callStack != undefined && !redraw) {
 			this.callStackController.isPresent = true;
 
-			this.callStackController.display(step.callStack);
+			this.callStackController.display(step.callStack, step.variables);
 		}
 	}
 }

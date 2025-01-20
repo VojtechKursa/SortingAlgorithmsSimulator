@@ -1,11 +1,27 @@
-import { CallStack, CallStackFreezed } from "../data/CallStack";
+import { CallStack, CallStackFreezed, CallStackLevel } from "../data/CallStack";
+import { Variable } from "../data/Variable";
 import { hiddenClass } from "../visualization/CssInterface";
 
 export class CallStackController {
 	protected readonly tableBody: HTMLTableSectionElement;
 
+	private lastDisplayData: [CallStackFreezed, Variable[]?] | undefined;
+
+	private _variableSeparationSymbol: string;
+	public set variableSeparationSymbol(newSymbol: string) {
+		this._variableSeparationSymbol = newSymbol;
+
+		if (this.lastDisplayData != undefined) {
+			this.display(this.lastDisplayData[0], this.lastDisplayData[1]);
+		}
+	}
+	public get variableSeparationSymbol(): string {
+		return this._variableSeparationSymbol;
+	}
+
 	public constructor(
 		public readonly callStackWrapper: HTMLDivElement,
+		variableSeparationSymbol: string = "=",
 		visible: boolean = false
 	) {
 		this.isPresent = visible;
@@ -15,6 +31,8 @@ export class CallStackController {
 			throw new Error("Invalid call stack wrapper, doesn't contain 'tbody' element with id 'call_stack_body'");
 
 		this.tableBody = body;
+
+		this._variableSeparationSymbol = variableSeparationSymbol;
 	}
 
 	public get isPresent(): boolean {
@@ -29,27 +47,59 @@ export class CallStackController {
 		}
 	}
 
-	public display(stack: CallStack | CallStackFreezed): void {
-		if (stack instanceof CallStack)
-			stack = stack.freeze();
+	public display(stack: CallStack | CallStackFreezed, currentLevelVariables?: Variable[]): void {
+		const localStack = stack instanceof CallStackFreezed ? stack : stack.freeze();
 
 		this.tableBody.textContent = "";
 
-		for (const level of stack) {
-			const functionNameCol = document.createElement("td");
-			functionNameCol.textContent = level.functionName;
-
-			const variablesCol = document.createElement("td");
-			const variablesTextBuilder = new Array<string>();
-			level.variables.forEach(variable => variablesTextBuilder.push(`${variable.name}=${variable.value}`));
-			variablesCol.textContent = variablesTextBuilder.join(" ");
-
-			const row = document.createElement("tr");
-
-			row.appendChild(functionNameCol);
-			row.appendChild(variablesCol);
-
-			this.tableBody.appendChild(row);
+		if (localStack.currentFunctionName != undefined && currentLevelVariables != undefined) {
+			this.tableBody.appendChild(this.createStackLevelRow(new CallStackLevel(localStack.currentFunctionName, currentLevelVariables)));
 		}
+
+		for (const level of stack) {
+			this.tableBody.appendChild(this.createStackLevelRow(level));
+		}
+
+		this.lastDisplayData = [localStack, currentLevelVariables];
+	}
+
+	private createStackLevelRow(level: CallStackLevel): HTMLTableRowElement {
+		const functionNameCol = document.createElement("td");
+		functionNameCol.textContent = level.functionName;
+
+		const variablesCol = document.createElement("td");
+		variablesCol.appendChild(this.createVariablesCell(level.variables));
+
+		const row = document.createElement("tr");
+
+		row.appendChild(functionNameCol);
+		row.appendChild(variablesCol);
+
+		return row;
+	}
+
+	private createVariablesCell(variables: Variable[]): HTMLDivElement {
+		const wrapper = document.createElement("div");
+
+		for (const variable of variables) {
+			const line = document.createElement("div");
+
+			const varName = document.createElement("div");
+			varName.textContent = variable.name;
+
+			const splitter = document.createElement("div");
+			splitter.textContent = this.variableSeparationSymbol;
+
+			const varValue = document.createElement("div");
+			varValue.textContent = variable.value;
+
+			line.appendChild(varName);
+			line.appendChild(splitter);
+			line.appendChild(varValue);
+
+			wrapper.appendChild(line);
+		}
+
+		return wrapper;
 	}
 }

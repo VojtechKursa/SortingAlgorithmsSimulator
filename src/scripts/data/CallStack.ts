@@ -19,17 +19,45 @@ export class CallStackLevel {
 }
 
 export class CallStack implements Iterable<CallStackLevel> {
-	private readonly array = new Array<CallStackLevel>();
+	protected readonly array = new Array<CallStackLevel>();
 
-	public push(level: CallStackLevel): void {
+	protected _currentFunctionName: string | undefined;
+	public set currentFunctionName(value: string | undefined) {
+		this._currentFunctionName = value;
+	}
+	public get currentFunctionName(): string | undefined {
+		return this._currentFunctionName;
+	}
+
+	public constructor(initialFunctionName?: string) {
+		this.currentFunctionName = initialFunctionName;
+	}
+
+	public push(level: CallStackLevel | Variable[], newFunctionName?: string): void {
+		if (level instanceof Array) {
+			if (this.currentFunctionName == undefined)
+				throw new Error("Push called with variable array parameter on call stack where current function name is not defined.");
+
+			level = new CallStackLevel(this.currentFunctionName, level);
+		}
+
 		this.array.push(level);
+		this.currentFunctionName = newFunctionName;
 	}
 
 	public pop(): CallStackLevel | undefined {
+		this.currentFunctionName = this.secondToTop()?.functionName;
 		return this.array.pop();
 	}
 
-	public top(): CallStackLevel | undefined {
+	public top(variables: Variable[]): CallStackLevel | undefined {
+		if (this.currentFunctionName == undefined)
+			throw new Error("Top called on call stack without a defined current function name");
+
+		return new CallStackLevel(this.currentFunctionName, variables)
+	}
+
+	public secondToTop(): CallStackLevel | undefined {
 		if (this.array.length > 0)
 			return this.array[this.array.length - 1];
 		else
@@ -37,37 +65,42 @@ export class CallStack implements Iterable<CallStackLevel> {
 	}
 
 	public freeze(): CallStackFreezed {
-		return new CallStackFreezed(this.array);
+		return new CallStackFreezed(this.array, this.currentFunctionName);
 	}
 
+	/**
+	 * @returns Iterator, which iterates over the stack from second-to-top to bottom as top isn't stored as an actual level.
+	 */
 	[Symbol.iterator](): Iterator<CallStackLevel> {
 		return new ReverseArrayIterator(this.array);
 	}
 }
 
-export class CallStackFreezed implements Iterable<CallStackLevel> {
-	private readonly array = new Array<CallStackLevel>();
+export class CallStackFreezed extends CallStack implements Iterable<CallStackLevel> {
+	public constructor(
+		stack: Array<CallStackLevel>,
+		currentFunctionName?: string
+	) {
+		super();
 
-	public constructor(stack: Array<CallStackLevel>) {
+		this._currentFunctionName = currentFunctionName;
 		stack.forEach(level => this.array.push(level.copy()));
 	}
 
+	private override set currentFunctionName(value: string | undefined) {}
+	public override get currentFunctionName(): string | undefined {
+		return this._currentFunctionName;
+	}
+
 	public get depth(): number {
-		return this.array.length
+		return this.array.length;
 	}
 
 	public copy(): CallStackFreezed {
-		return new CallStackFreezed(this.array);
+		return this.freeze();
 	}
 
-	public top(): CallStackLevel | undefined {
-		if (this.array.length > 0)
-			return this.array[this.array.length - 1].copy();
-		else
-			return undefined;
-	}
-
-	public [Symbol.iterator]() {
+	public override [Symbol.iterator]() {
 		return this.fromTop();
 	}
 
@@ -77,24 +110,18 @@ export class CallStackFreezed implements Iterable<CallStackLevel> {
 
 	public static equalSimple(callStack1?: CallStackFreezed, callStack2?: CallStackFreezed): boolean {
 		if (callStack1 == undefined || callStack2 == undefined) {
-			if (callStack1 == undefined && callStack2 == undefined)
-				return true;
-			else
-				return false;
+			return callStack1 == undefined && callStack2 == undefined;
 		}
 
-		return callStack1.depth == callStack2.depth;
+		return callStack1.depth === callStack2.depth && callStack1.currentFunctionName === callStack2.currentFunctionName;
 	}
 
 	public static equal(callStack1?: CallStackFreezed, callStack2?: CallStackFreezed): boolean {
 		if (callStack1 == undefined || callStack2 == undefined) {
-			if (callStack1 == undefined && callStack2 == undefined)
-				return true;
-			else
-				return false;
+			return callStack1 == undefined && callStack2 == undefined;
 		}
 
-		if (callStack1.depth != callStack2.depth)
+		if (callStack1.depth !== callStack2.depth || callStack1.currentFunctionName !== callStack2.currentFunctionName)
 			return false;
 
 		const mappingFunction: (variable: Variable) => [string, Variable] = (variable) => [variable.name, variable]
