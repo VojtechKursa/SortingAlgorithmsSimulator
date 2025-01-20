@@ -32,15 +32,22 @@ select {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
 
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 
 	& > * {
 		width: fit-content;
+		
+		@include common.pad-vertical(0.5em);
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 	}
 
 	.period_container {
-		margin-right: 16px;
+		label[for="player_control_period"] {
+			padding-right: 0.25em;
+		}
 
 		input {
 			width: 3em;
@@ -48,8 +55,21 @@ select {
 	}
 
 	.radio_buttons_wrapper {
-		input[type="radio"] {
-			margin-left: 2em;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-content: center;
+
+		& > div {
+			padding-left: 1em;
+
+			&:first-of-type {
+				padding-left: 0;
+			}
+	
+			label {
+				margin-left: 0.5em;
+			}
 		}
 	}
 }

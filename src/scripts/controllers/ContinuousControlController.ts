@@ -12,28 +12,35 @@ export class ContinuousControlController {
 		public readonly playButton: HTMLInputElement,
 		public readonly radioButtonWrapper: HTMLDivElement
 	) {
-		let firstRadioButton: HTMLInputElement | undefined;
+		let firstRadioButton: HTMLInputElement | null = null;
 
 		for (const kind of StepKindHelper.getStepKindsStrings()) {
-			let radio = document.createElement("input");
+			const radio = document.createElement("input");
 			radio.type = "radio";
 			radio.name = "continuous_control-step_kind";
 			radio.value = kind.machineName;
 			radio.id = `input-continuous_control-step_kind-${kind.machineName}`;
 
-			let label = document.createElement("label");
+			const label = document.createElement("label");
 			label.setAttribute("for", radio.id);
 			label.textContent = kind.displayName;
 
-			radioButtonWrapper.appendChild(radio);
-			radioButtonWrapper.appendChild(label);
+			const div = document.createElement("div");
+			div.appendChild(radio);
+			div.appendChild(label);
 
-			if (firstRadioButton == undefined)
+			radioButtonWrapper.appendChild(div);
+
+			if (firstRadioButton == null)
 				firstRadioButton = radio;
 		}
 
-		if (firstRadioButton != undefined)
-			firstRadioButton.checked = true;
+		let defaultRadioButton = radioButtonWrapper.querySelector(`input[type="radio"][value="${StepKindHelper.toString(StepKind.Sub).machineName}"]`) as HTMLInputElement | null;
+		if (defaultRadioButton == null)
+			defaultRadioButton = firstRadioButton;
+
+		if (defaultRadioButton != null)
+			defaultRadioButton.checked = true;
 
 		this.playing = false;
 

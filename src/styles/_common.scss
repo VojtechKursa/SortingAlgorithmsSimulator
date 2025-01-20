@@ -13,6 +13,11 @@
 	padding-right: $padding;
 }
 
+@mixin pad-vertical($padding: 1rem) {
+	padding-top: $padding;
+	padding-bottom: $padding;
+}
+
 .right-align {
 	margin-left: auto;
 	margin-right: 0;
