@@ -235,7 +235,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 		chevron.classList.add(RendererClasses.variablePointerClass);
 		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
-		chevron.setAttribute("stroke", "black");
+		chevron.setAttribute("stroke", this.colorSet.get(SymbolicColor.Simulator_Border).toString());
 		chevron.setAttribute("stroke-width", this.variableSettings.chevronStrokeWidth.toString());
 
 		const color = this.colorSet.get(variable.color).clone();
@@ -251,7 +251,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		text.setAttribute("y", (chevronBorderTop - this.variableSettings.textMarginBottom).toString());
 		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
 		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
-		text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
+		text.setAttribute("fill", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
 		text.setAttribute("dominant-baseline", "text-bottom");
 

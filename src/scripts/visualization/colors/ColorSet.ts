@@ -97,6 +97,7 @@ export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 		return new ColorSet([
 			[SymbolicColor.Simulator_Background, new Color("transparent")],
 			[SymbolicColor.Simulator_Foreground, new Color("black")],
+			[SymbolicColor.Simulator_Border, new Color("black")],
 			[SymbolicColor.Element_Background, new Color("white")],
 			[SymbolicColor.Element_Foreground, new Color("black")],
 			[SymbolicColor.Element_Border, new Color("black")],
@@ -117,7 +118,8 @@ export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 	public static getDefaultDark(): ColorSet {
 		return new ColorSet([
 			[SymbolicColor.Simulator_Background, new Color("transparent")],
-			[SymbolicColor.Simulator_Foreground, new Color("black")],
+			[SymbolicColor.Simulator_Foreground, new Color("white")],
+			[SymbolicColor.Simulator_Border, new Color("black")],
 			[SymbolicColor.Element_Background, new Color("white")],
 			[SymbolicColor.Element_Foreground, new Color("black")],
 			[SymbolicColor.Element_Border, new Color("black")],

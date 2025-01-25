@@ -6,6 +6,24 @@ $border: 2px solid black;
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
 }
 
+body,
+body[data-bs-theme="light"] {
+	--bs-border-color: #6d6d70;
+
+	--debugger-bg: var(--bs-secondary-bg);
+
+	--step-counter-bg: var(--bs-tertiary-bg);
+	--step-counter-color: black;
+}
+
+body[data-bs-theme="dark"] {
+	--bs-border-color: #737f8c;
+
+	--debugger-bg: black;
+
+	--step-counter-color: var(--bs-body-color);
+}
+
 select {
 	margin-top: 4px;
 }
@@ -27,6 +45,11 @@ select {
 
 	> * {
 		min-width: max-content;
+	}
+
+	output.disabled {
+		color: var(--step-counter-color);
+		background-color: var(--step-counter-bg);
 	}
 }
 
@@ -300,8 +323,8 @@ body.vertical2 {
 					padding-right: calc(var(--bs-gutter-x) / 2);
 
 					#debugger {
-						color: white;
-						background-color: black;
+						color: var(--bs-body-color);
+						background-color: var(--debugger-bg);
 
 						text-align: left;
 						align-content: center;
@@ -315,7 +338,7 @@ body.vertical2 {
 							.code-header {
 								grid-column: 1;
 
-								background-color: grey;
+								background-color: var(--bs-tertiary-bg);
 
 								text-align: right;
 								padding-right: 0.5em;
@@ -355,7 +378,7 @@ body.vertical2 {
 						tbody {
 							tr {
 								&:nth-child(even) {
-									background-color: grey;
+									background-color: var(--bs-secondary-bg-subtle);
 								}
 
 								td > div > div {

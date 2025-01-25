@@ -82,8 +82,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		playerController = new PlayerController(sortingAlgorithm, playerElementContainer, debuggerElementContainer, debuggerController, continuousControlElements, debuggerVisitor, colors, reset);
 
 		window.addEventListener("load", _ => {
+			// Ensure correct theme is selected
+			playerController.setDarkMode(document.body.getAttribute("data-bs-theme") === "dark");
+
+			// Initial render
 			playerController.draw();
-			playerController.redraw();	// ensure the first drawing is correct
 		});
 	}
 

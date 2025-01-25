@@ -247,7 +247,7 @@ export class PlayerController {
 				selectedVisitor = selectedVisitor.next;
 			}
 
-			this.redraw();
+			this.draw();
 		}
 	}
 }
