@@ -292,21 +292,33 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 			return;
 		}
 
-		const parentHeight = this.output.parentElement?.clientHeight;
-		if (parentHeight == undefined)
+		if (this.output.parentElement == undefined)
 			return;
 
-		const svgHeight = this.output.clientHeight;
-		const viewBoxHeight = this.output.viewBox.baseVal.height;
+		let currentParentHeight = this.output.parentElement.clientHeight;
+		if (currentParentHeight == undefined)
+			return;
 
-		const pixelToUnitRatio = svgHeight / viewBoxHeight;
-		const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
+		let lastParentHeight = undefined;
 
-		const margin = (parentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
+		while (currentParentHeight != lastParentHeight) {
+			const svgHeight = this.output.clientHeight;
+			const viewBoxHeight = this.output.viewBox.baseVal.height;
 
-		// Prevents clipping of the SVG above it's parent
-		if (margin >= 0) {
-			this.output.style.marginTop = `${margin}px`;
+			const pixelToUnitRatio = svgHeight / viewBoxHeight;
+			const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
+
+			const margin = (currentParentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
+
+			// Prevents clipping of the SVG above it's parent
+			if (margin >= 0) {
+				this.output.style.marginTop = `${margin}px`;
+			} else {
+				this.output.style.marginTop = "";
+			}
+
+			lastParentHeight = currentParentHeight;
+			currentParentHeight = this.output.parentElement.clientHeight;
 		}
 	}
 }

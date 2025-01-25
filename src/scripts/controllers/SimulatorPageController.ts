@@ -16,6 +16,7 @@ export class SimulatorPageController {
 		private readonly playerController: PlayerController,
 		private readonly inputController: InputController,
 		private readonly collapseWrappers: CollapseWrappers,
+		debuggerCollapseButton: HTMLButtonElement,
 		private readonly callStackController: CallStackController,
 		private readonly settingsOpenButton: HTMLButtonElement,
 		darkModeHandler: DarkModeHandler
@@ -25,6 +26,21 @@ export class SimulatorPageController {
 		});
 
 		window.addEventListener("resize", _ => this.resizeHandler());
+		debuggerCollapseButton.addEventListener("click", _ => {
+			const period = 1000 / 30;
+			const limit = 400;
+
+			let ranFor = 0;
+
+			const intervalId = setInterval(() => {
+				playerController.redraw();
+
+				ranFor += period;
+				if (ranFor >= limit) {
+					clearInterval(intervalId);
+				}
+			}, period);
+		});
 
 		this.resizeHandler();
 	}
@@ -46,7 +62,7 @@ export class SimulatorPageController {
 				document.body.classList.add(bodyVertical2LayoutClass);
 				this.collapseWrappers.variableWatchWrapper.classList.remove(horizontalCollapseClass);
 				this.collapseWrappers.callStackWrapper.classList.remove(horizontalCollapseClass);
-				
+
 			} else {
 				document.body.classList.remove(bodyVertical2LayoutClass);
 				this.collapseWrappers.variableWatchWrapper.classList.add(horizontalCollapseClass);

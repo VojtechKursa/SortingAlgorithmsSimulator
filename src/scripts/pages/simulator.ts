@@ -107,11 +107,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackCollapseWrapper = document.getElementById("call_stack_collapse_wrapper") as HTMLDivElement;
 		let collapseWrappers = new CollapseWrappers(debuggerCollapseWrapper, variableWatchCollapseWrapper, callStackCollapseWrapper);
 
+		let debuggerCollapseButton = document.getElementById("button_hide_debugger") as HTMLButtonElement;
+
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
 		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
 		let darkModeHandler = new DarkModeHandler(darkModeButton);
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, collapseWrappers, callStackController, settingsOpenButton, darkModeHandler);
+		simulatorPageController = new SimulatorPageController(playerController, inputController, collapseWrappers, debuggerCollapseButton, callStackController, settingsOpenButton, darkModeHandler);
 	}
 
 	return simulatorPageController;
