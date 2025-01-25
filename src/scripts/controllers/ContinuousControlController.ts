@@ -43,18 +43,15 @@ export class ContinuousControlController {
 			radio.name = "continuous_control-step_kind";
 			radio.value = kind.machineName;
 			radio.id = `input-continuous_control-step_kind-${kind.machineName}`;
-			radio.classList.add("form-check-input");
+			radio.classList.add("btn-check");
 
 			const label = document.createElement("label");
 			label.setAttribute("for", radio.id);
 			label.textContent = kind.displayName;
-			label.classList.add("form-check-label");
+			label.classList.add("btn", "btn-outline-primary");
 
-			const div = document.createElement("div");
-			div.appendChild(radio);
-			div.appendChild(label);
-
-			radioButtonWrapper.appendChild(div);
+			radioButtonWrapper.appendChild(radio);
+			radioButtonWrapper.appendChild(label);
 
 			if (firstRadioButton == null)
 				firstRadioButton = radio;
