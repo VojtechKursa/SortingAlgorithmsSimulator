@@ -87,7 +87,7 @@ export class CallStackFreezed extends CallStack implements Iterable<CallStackLev
 		stack.forEach(level => this.array.push(level.copy()));
 	}
 
-	private override set currentFunctionName(value: string | undefined) {}
+	private override set currentFunctionName(_: string | undefined) { }
 	public override get currentFunctionName(): string | undefined {
 		return this._currentFunctionName;
 	}
@@ -100,7 +100,7 @@ export class CallStackFreezed extends CallStack implements Iterable<CallStackLev
 		return this.freeze();
 	}
 
-	public override [Symbol.iterator]() {
+	public override[Symbol.iterator]() {
 		return this.fromTop();
 	}
 
