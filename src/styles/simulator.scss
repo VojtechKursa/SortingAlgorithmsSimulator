@@ -244,18 +244,6 @@ body.vertical2 {
 	}
 }
 
-#navbar {
-	display: flex;
-
-	@include common.margin-vertical(8px);
-
-	#settings_button_wrapper {
-		width: fit-content;
-
-		@extend .right-align;
-	}
-}
-
 #row_main {
 	display: flex;
 	flex-flow: row;

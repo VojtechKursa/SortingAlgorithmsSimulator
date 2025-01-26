@@ -63,8 +63,28 @@
 #topbar {
 	background-color: var(--bs-secondary-bg-subtle);
 	color: var(--bs-body-color);
-	font-size: 24px;
+	font-size: 1.75rem;
 	padding: 8px 12px;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	#settings_button_wrapper {
+		width: fit-content;
+
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+
+		button {
+			margin-left: 0.5rem;
+
+			&:first-child {
+				margin-left: 0;
+			}
+		}
+	}
 }
 
 .btn-group {

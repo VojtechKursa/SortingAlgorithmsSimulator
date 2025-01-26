@@ -18,10 +18,14 @@ import { VariableWatchController } from "../controllers/VariableWatchController"
 import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/HtmlDebuggerDisplayVisitor";
 import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDescriptionDisplayVisitor";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
+import { initCommon } from "./common";
 
 
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
+	const initCommonResult = initCommon();
+	const darkModeHandler = initCommonResult.darkModeHandler;
+
 	let playerController: PlayerController;
 	let callStackController: CallStackController;
 	{
@@ -113,8 +117,6 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let debuggerCollapseButton = document.getElementById("button_hide_debugger") as HTMLButtonElement;
 
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
-		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
-		let darkModeHandler = new DarkModeHandler(darkModeButton);
 
 		simulatorPageController = new SimulatorPageController(playerController, inputController, collapseWrappers, debuggerCollapseButton, callStackController, settingsOpenButton, darkModeHandler);
 	}

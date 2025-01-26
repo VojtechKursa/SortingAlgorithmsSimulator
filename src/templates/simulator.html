@@ -16,6 +16,10 @@
 	<body data-bs-theme="dark">
 		<div id="topbar" class="container-fluid">
 			<a class="navbar-brand" href="">Sorting algorithms simulator - {{name}}</a>
+			<div id="settings_button_wrapper">
+				<button id="dark_mode" type="button" class="btn btn-primary"></button>
+				<button id="settings_open" type="button" class="btn btn-primary"><i class="bi bi-gear-fill"></i></button>
+			</div>
 		</div>
 
 		<div class="container-fluid">
@@ -26,10 +30,6 @@
 						<li class="breadcrumb-item" active>{{name}}</li>
 					</ol>
 				</nav>
-				<div id="settings_button_wrapper">
-					<button id="dark_mode" type="button" class="btn btn-primary"></button>
-					<button id="settings_open" type="button" class="btn btn-primary"><i class="bi bi-gear-fill"></i></button>
-				</div>
 			</div>
 
 			<div class="continuous_control">
