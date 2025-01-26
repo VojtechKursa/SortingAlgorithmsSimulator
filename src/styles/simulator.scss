@@ -50,6 +50,10 @@ select {
 	output.disabled {
 		color: var(--step-counter-color);
 		background-color: var(--step-counter-bg);
+
+		& > sub {
+			margin-left: 0.15em;
+		}
 	}
 }
 
