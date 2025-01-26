@@ -18,7 +18,7 @@ export class StepKindHelper {
 	private static readonly map = new Map<StepKind, StepKindDescription>([
 		[StepKind.Code, new StepKindDescription("code", "Code step")],
 		[StepKind.Sub, new StepKindDescription("sub", "Sub-step")],
-		[StepKind.Full, new StepKindDescription("full", "Step")]
+		[StepKind.Full, new StepKindDescription("full", "Full step")]
 	]);
 
 	public static getStepKind(step: StepResult): StepKind {

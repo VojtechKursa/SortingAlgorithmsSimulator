@@ -14,7 +14,7 @@ export class HtmlDescriptionDisplayVisitor extends StepDisplayVisitor {
 	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void {
 		this.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
 	}
-	
+
 	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
 		this.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
 	}

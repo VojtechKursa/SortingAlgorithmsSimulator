@@ -7,7 +7,7 @@ export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 	public constructor(
 		public readonly callStackController: CallStackController,
 		next: StepDisplayVisitor | null
-	) { 
+	) {
 		super(next);
 	}
 
@@ -15,9 +15,9 @@ export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 
 	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
 		if (step.callStack != undefined && !redraw) {
-			this.callStackController.visible = true;
+			this.callStackController.isPresent = true;
 
-			this.callStackController.display(step.callStack);
+			this.callStackController.display(step.callStack, step.variables);
 		}
 	}
 }

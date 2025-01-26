@@ -152,9 +152,9 @@ export class StepResultCollection {
 		const stepKind = StepKindHelper.getStepKind(stepResult);
 		this.stepCounter.add(stepKind);
 
-		let fullStep = undefined;
-		let codeStep = undefined;
-		let stack = undefined;
+		let fullStep: FullStepResult;
+		let codeStep: CodeStepResult;
+		let stack: CallStackFreezed | undefined;
 
 		if (stepResult instanceof CodeStepResult) {
 			codeStep = stepResult;
@@ -173,6 +173,7 @@ export class StepResultCollection {
 			throw new Error("Invalid step result received");
 		}
 
+		stack = codeStep.callStack;
 		const lastStack = this.states.lastStep.callStack;
 
 		if (lastStack != undefined && CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {

@@ -1,10 +1,33 @@
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 
-export type ContinuousControlEventHandler = (start: boolean, stepKind: StepKind, interval: number) => void;
+export interface PlayEventHandler { (stepKind: StepKind, interval: number): void }
+export interface PauseEventHandler { (): void }
+export interface TickEventHandler { (stepKind: StepKind): void }
 
 export class ContinuousControlController {
-	private readonly handlers = new Array<ContinuousControlEventHandler>();
-	private playing: boolean;
+	private readonly playHandlers = new Array<PlayEventHandler>();
+	private readonly pauseHandlers = new Array<PauseEventHandler>();
+	private readonly tickHandlers = new Array<TickEventHandler>();
+
+	private intervalId: NodeJS.Timeout | number | null = null;
+
+	private _playing: boolean = false;
+	private set playing(value: boolean) {
+		this._playing = value;
+	}
+	public get playing(): boolean {
+		return this._playing;
+	}
+
+	public get selectedStepKind(): StepKind {
+		// This getter hides the method for future optimization
+		return this.getSelectedStepKind();
+	}
+
+	public get timerIntervalMs(): number {
+		// This getter hides the method for future optimization
+		return this.getTimerIntervalMs(false);
+	}
 
 	public constructor(
 		public readonly periodInput: HTMLInputElement,
@@ -12,30 +35,34 @@ export class ContinuousControlController {
 		public readonly playButton: HTMLInputElement,
 		public readonly radioButtonWrapper: HTMLDivElement
 	) {
-		let firstRadioButton: HTMLInputElement | undefined;
+		let firstRadioButton: HTMLInputElement | null = null;
 
 		for (const kind of StepKindHelper.getStepKindsStrings()) {
-			let radio = document.createElement("input");
+			const radio = document.createElement("input");
 			radio.type = "radio";
 			radio.name = "continuous_control-step_kind";
 			radio.value = kind.machineName;
 			radio.id = `input-continuous_control-step_kind-${kind.machineName}`;
+			radio.classList.add("btn-check");
 
-			let label = document.createElement("label");
+			const label = document.createElement("label");
 			label.setAttribute("for", radio.id);
 			label.textContent = kind.displayName;
+			label.classList.add("btn", "btn-outline-primary");
 
 			radioButtonWrapper.appendChild(radio);
 			radioButtonWrapper.appendChild(label);
 
-			if (firstRadioButton == undefined)
+			if (firstRadioButton == null)
 				firstRadioButton = radio;
 		}
 
-		if (firstRadioButton != undefined)
-			firstRadioButton.checked = true;
+		let defaultRadioButton = radioButtonWrapper.querySelector(`input[type="radio"][value="${StepKindHelper.toString(StepKind.Sub).machineName}"]`) as HTMLInputElement | null;
+		if (defaultRadioButton == null)
+			defaultRadioButton = firstRadioButton;
 
-		this.playing = false;
+		if (defaultRadioButton != null)
+			defaultRadioButton.checked = true;
 
 		pauseButton.addEventListener("click", _ => this.pause());
 		playButton.addEventListener("click", _ => this.play());
@@ -46,10 +73,10 @@ export class ContinuousControlController {
 			return false;
 
 		if (kind == undefined)
-			kind = this.getStepKind();
+			kind = this.selectedStepKind;
 
 		if (intervalMs == undefined)
-			intervalMs = this.getTimerIntervalMs();
+			intervalMs = this.getTimerIntervalMs(true);
 
 		this.playing = true;
 		this.updateActiveElementDisabledState(true);
@@ -57,14 +84,19 @@ export class ContinuousControlController {
 		if (!this.playButton.checked)
 			this.playButton.checked = true;
 
-		this.handlers.forEach(handler => handler(true, kind, intervalMs))
+		this.playHandlers.forEach(handler => handler(kind, intervalMs));
+
+		this.intervalId = setInterval(() => this.tick(), intervalMs);
 
 		return true;
 	}
 
 	public pause(): boolean {
-		if (!this.playing)
+		if (this.intervalId == null)
 			return false;
+
+		clearInterval(this.intervalId);
+		this.intervalId = null;
 
 		this.playing = false;
 		this.updateActiveElementDisabledState(false);
@@ -72,9 +104,13 @@ export class ContinuousControlController {
 		if (!this.pauseButton.checked)
 			this.pauseButton.checked = true;
 
-		this.handlers.forEach(handler => handler(false, this.getStepKind(), this.getTimerIntervalMs()));
+		this.pauseHandlers.forEach(handler => handler());
 
 		return true;
+	}
+
+	private tick() {
+		this.tickHandlers.forEach(handler => handler(this.selectedStepKind));
 	}
 
 	private updateActiveElementDisabledState(disabled?: boolean) {
@@ -82,22 +118,22 @@ export class ContinuousControlController {
 			disabled = this.playing;
 
 		this.periodInput.disabled = disabled;
-		(this.radioButtonWrapper.querySelectorAll("input[type=radio]") as NodeListOf<HTMLInputElement>).forEach(radio => radio.disabled = disabled);
 	}
 
-	public getTimerIntervalMs(): number {
+	private getTimerIntervalMs(updateControl: boolean = true): number {
 		let value = this.periodInput.valueAsNumber;
 
 		if (value <= 0 || Number.isNaN(value)) {
 			value = Number.parseFloat(this.periodInput.min);
 
-			this.periodInput.valueAsNumber = value;
+			if (updateControl)
+				this.periodInput.valueAsNumber = value;
 		}
 
 		return value * 1000;
 	}
 
-	public getStepKind(): StepKind {
+	private getSelectedStepKind(): StepKind {
 		let checkedRadio = this.radioButtonWrapper.querySelector("input[type=radio]:checked") as HTMLInputElement | null;
 
 		if (checkedRadio == null)
@@ -111,18 +147,31 @@ export class ContinuousControlController {
 		return kind;
 	}
 
-	public registerHandler(handler: ContinuousControlEventHandler): void {
-		this.handlers.push(handler);
+	public addEventListenerPlay(handler: PlayEventHandler): void {
+		this.playHandlers.push(handler);
+	}
+	public addEventListenerPause(handler: PauseEventHandler): void {
+		this.pauseHandlers.push(handler);
+	}
+	public addEventListenerTick(handler: TickEventHandler): void {
+		this.tickHandlers.push(handler);
 	}
 
-	public unregisterHandler(handler: ContinuousControlEventHandler): void {
-		let index: number;
+	public removeEventListener(event: "play" | "pause" | "tick", handler: Function): void {
+		let array;
+		switch (event) {
+			case "play": array = this.playHandlers; break;
+			case "pause": array = this.pauseHandlers; break;
+			case "tick": array = this.tickHandlers; break;
+			default: throw new Error("Invalid event type");
+		}
 
+		let index: number;
 		do {
-			index = this.handlers.findIndex(val => val == handler);
+			index = array.findIndex(val => val == handler);
 
 			if (index != -1)
-				this.handlers.splice(index, 1);
+				array.splice(index, 1);
 		} while (index != -1);
 	}
 }

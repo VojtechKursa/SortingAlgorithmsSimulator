@@ -1,9 +1,27 @@
 @use "common";
 
-
+$border: 2px solid black;
 
 :root {
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
+}
+
+body,
+body[data-bs-theme="light"] {
+	--bs-border-color: #6d6d70;
+
+	--debugger-bg: var(--bs-secondary-bg);
+
+	--step-counter-bg: var(--bs-tertiary-bg);
+	--step-counter-color: black;
+}
+
+body[data-bs-theme="dark"] {
+	--bs-border-color: #737f8c;
+
+	--debugger-bg: black;
+
+	--step-counter-color: var(--bs-body-color);
 }
 
 select {
@@ -24,9 +42,18 @@ select {
 	* {
 		min-height: 100%;
 	}
-	
+
 	> * {
 		min-width: max-content;
+	}
+
+	output.disabled {
+		color: var(--step-counter-color);
+		background-color: var(--step-counter-bg);
+
+		& > sub {
+			margin-left: 0.15em;
+		}
 	}
 }
 
@@ -34,25 +61,38 @@ select {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
 
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 
 	& > * {
 		width: fit-content;
+
+		@include common.pad-vertical(0.5em);
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 	}
 
 	.period_container {
-		margin-right: 16px;
+		label {
+			padding-right: 0.5em;
+		}
 
 		input {
-			width: 3em;
+			display: inline-block;
+			width: 4.5em;
+		}
+
+		span {
+			padding-left: 0.25em;
 		}
 	}
 
 	.radio_buttons_wrapper {
-		input[type=radio] {
-			margin-left: 2em;
-		}
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-content: center;
 	}
 }
 
@@ -62,47 +102,168 @@ select {
 
 		label {
 			width: 100px;
-	
+
 			margin-right: 1em;
 		}
-	
+
 		input {
 			flex-grow: 1;
 		}
 	}
 }
 
-
-#navbar {
+.hide_wrapper {
 	display: flex;
+	flex-flow: row;
 
-	@include common.margin-vertical(8px);
-	
-	#settings_button_wrapper {
-		width: fit-content;
-		
-		@extend .right-align;
+	& > button {
+		display: flex;
+		flex-flow: column;
+
+		align-items: center;
+		justify-content: space-evenly;
+
+		background-color: var(--bs-info-bg-subtle);
+
+		border: none;
+
+		@include common.pad-horizontal(0.5rem);
+
+		span {
+			text-orientation: sideways;
+			writing-mode: sideways-lr;
+		}
+
+		i {
+			@include common.margin-vertical(1em);
+
+			&::before {
+				content: "\f22d";
+			}
+		}
+
+		span::before {
+			content: "Show ";
+		}
+
+		&[aria-expanded="true"] {
+			i::before {
+				content: "\f231";
+			}
+
+			span::before {
+				content: "Hide ";
+			}
+		}
+	}
+
+	&:has(> div:not(.collapse-horizontal)) {
+		flex-flow: column;
+
+		& > button {
+			flex-flow: row;
+
+			@include common.pad-vertical(0.5em);
+			@include common.pad-horizontal(0);
+
+			span {
+				writing-mode: horizontal-tb;
+			}
+
+			i {
+				@include common.margin-vertical(0);
+				@include common.margin-horizontal(1em);
+
+				&::before {
+					content: "\f235";
+				}
+			}
+
+			&[aria-expanded="false"] {
+				i::before {
+					content: "\f229";
+				}
+			}
+		}
+	}
+}
+
+body.vertical1 {
+	#row_main {
+		display: block;
+	}
+
+	#col_renderer {
+		height: fit-content;
+
+		border-right: none !important;
+		border-bottom: $border;
+	}
+}
+
+body.vertical2 {
+	#col_debugger {
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+
+		#debugger_row {
+			flex-wrap: wrap;
+
+			#debugger_wrapper {
+				padding-right: 0 !important;
+				width: 100%;
+			}
+
+			#variable_watch_hide_wrapper,
+			#call_stack_hide_wrapper {
+				margin-top: 1em;
+
+				width: 50%;
+
+				.collapse,
+				.collapsing {
+					> div {
+						// wrappers
+						@include common.pad-vertical(1em);
+
+						table {
+							width: 100%;
+
+							td {
+								width: 50%;
+							}
+						}
+					}
+				}
+			}
+
+			#variable_watch_hide_wrapper {
+				padding-right: 1em;
+
+				&:has(+ #call_stack_hide_wrapper.hidden) {
+					width: 100%;
+					padding-right: 0;
+				}
+			}
+		}
 	}
 }
 
 #row_main {
-	$border: 2px solid black;
-	
+	display: flex;
+	flex-flow: row;
+
 	border: $border;
 	text-align: center;
 
-
 	#col_renderer {
+		flex-grow: 1;
+
 		display: flex;
 		flex-flow: column;
 
-		@media (max-width: 991px) {
-			height: fit-content;
-			border-bottom: $border;
-		}
-		@media (min-width: 992px) {
-			border-right: $border;
-		}
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+
+		border-right: $border;
 
 		#canvas_wrapper {
 			width: 100%;
@@ -113,7 +274,9 @@ select {
 
 		#step_description {
 			height: fit-content;
-			min-height: 1.5em;
+			min-height: 3.5em;
+
+			align-content: center;
 
 			$margin: 0.25em;
 
@@ -123,91 +286,85 @@ select {
 			border: 2px solid green;
 		}
 	}
-	
-	#col_debugger {
-		max-width: fit-content;
-		
-		#debugger_row {
-			display: flex;
-			flex-direction: row;
 
-			#debugger {
-				background-color: black;
-				color: white;
+	#col_debugger_wrapper {
+		#col_debugger {
+			flex-grow: 1;
 
-				text-align: left;
-				align-content: center;
+			padding-left: calc(var(--bs-gutter-x) / 2);
 
-				.code-line {
-					display: grid;
-					grid-template-columns: 3em auto;
-		
-					font-family: monospace;
-		
-					.code-header {
-						grid-column: 1;
-		
-						background-color: grey;
-		
-						text-align: right;
-						padding-right: 0.5em;
-		
-						user-select: none;  /* Make the text un-selectable */
-					}
-		
-					.code-text {
-						grid-column: 2;
-		
-						padding-left: 0.5em;
-						white-space: pre;
-					}
-				}
-		
-				.code-line_active {
-					background-color: var(--color-code-line_active);
-				}
-			}
+			#debugger_row {
+				display: flex;
+				flex-direction: row;
 
-			#variable_watch_wrapper {
-				@include common.margin-horizontal();
+				#debugger_wrapper {
+					flex-grow: 1;
 
-				#variable_watch {
-					thead {
-						background-color: green;
-					}
+					padding-right: calc(var(--bs-gutter-x) / 2);
 
-					td {
-						border: 2px solid black;
-					}
+					#debugger {
+						color: var(--bs-body-color);
+						background-color: var(--debugger-bg);
 
-					#variable_watch_body {
+						text-align: left;
+						align-content: center;
 
-						.variable_watch-row {
-							&:nth-child(odd) {
-								background-color: grey;
+						.code-line {
+							display: grid;
+							grid-template-columns: 3em auto;
+
+							font-family: monospace;
+
+							.code-header {
+								grid-column: 1;
+
+								background-color: var(--bs-tertiary-bg);
+
+								text-align: right;
+								padding-right: 0.5em;
+
+								user-select: none; /* Make the text un-selectable */
 							}
+
+							.code-text {
+								grid-column: 2;
+
+								padding-left: 0.5em;
+								white-space: pre;
+							}
+						}
+
+						.code-line_active {
+							background-color: var(--color-code-line_active);
 						}
 					}
 				}
-			}
 
-			#call_stack_wrapper {
-				@include common.margin-horizontal();
+				#call_stack_wrapper,
+				#variable_watch_wrapper {
+					@include common.pad-horizontal();
 
-				#call_stack {
-					thead {
-						background-color: green;
-					}
+					table {
+						thead {
+							background-color: var(--bs-primary-bg-subtle);
+						}
 
-					td {
-						border: 2px solid black;
-					}
+						td {
+							border: 2px solid black;
 
-					tbody {
+							@include common.pad-horizontal(0.5em);
+						}
 
-						tr {
-							&:nth-child(odd) {
-								background-color: grey;
+						tbody {
+							tr {
+								&:nth-child(even) {
+									background-color: var(--bs-secondary-bg-subtle);
+								}
+
+								td > div > div {
+									display: flex;
+									justify-content: space-evenly;
+								}
 							}
 						}
 					}
@@ -221,7 +378,7 @@ select {
 	display: flex;
 	justify-content: space-between;
 
-	margin-top: 1em;
+	margin: 1em 0;
 
 	min-width: fit-content;
 
@@ -280,7 +437,7 @@ select {
 		width: 100%;
 
 		@include common.margin-horizontal(0.5em);
-		
+
 		&:first-child {
 			margin-left: 0;
 		}

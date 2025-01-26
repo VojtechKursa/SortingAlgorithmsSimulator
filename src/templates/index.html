@@ -6,14 +6,20 @@
 
 		<title>Sorting algorithms simulator</title>
 
-		<script src="./scripts/pages/index.ts" defer="defer"></script>
-
 		<link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-		<link href="./styles/index.scss" rel="stylesheet">
+		<link href="bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
+		<script src="bootstrap/dist/js/bootstrap.bundle.min.js" defer></script>
+
+		<link href="../styles/index.scss" rel="stylesheet">
+		<script src="../scripts/pages/index.ts" defer></script>
 	</head>
 	<body data-bs-theme="dark">
 		<div id="topbar" class="container-fluid">
 			<a class="navbar-brand" href="#">Sorting algorithms simulator</a>
+			<div id="settings_button_wrapper">
+				<button id="dark_mode" type="button" class="btn btn-primary"></button>
+				<button id="settings_open" type="button" class="btn btn-primary"><i class="bi bi-gear-fill"></i></button>
+			</div>
 		</div>
 
 		<div id="card_container" class="container-fluid">
@@ -26,16 +32,12 @@
 							<p class="card-text">{{description}}</p>
 						</div>
 						<div class="card-footer">
-							<a href="./{{nameMachine}}.html" class="btn btn-primary">Try</a>
+							<a href="{{nameMachine}}.html" class="btn btn-primary">Try</a>
 						</div>
 					</div>
 				</div>
 				{{/each}}
 			</div>
 		</div>
-
-
-
-		<script src="bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>

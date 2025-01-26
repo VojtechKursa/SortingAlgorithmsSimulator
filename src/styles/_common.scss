@@ -8,6 +8,16 @@
 	margin-right: $margin;
 }
 
+@mixin pad-horizontal($padding: 1rem) {
+	padding-left: $padding;
+	padding-right: $padding;
+}
+
+@mixin pad-vertical($padding: 1rem) {
+	padding-top: $padding;
+	padding-bottom: $padding;
+}
+
 .right-align {
 	margin-left: auto;
 	margin-right: 0;
@@ -51,10 +61,30 @@
 }
 
 #topbar {
-	background-color: #222222;
-	color: white;
-	font-size: 24px;
+	background-color: var(--bs-secondary-bg-subtle);
+	color: var(--bs-body-color);
+	font-size: 1.75rem;
 	padding: 8px 12px;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	#settings_button_wrapper {
+		width: fit-content;
+
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+
+		button {
+			margin-left: 0.5rem;
+
+			&:first-child {
+				margin-left: 0;
+			}
+		}
+	}
 }
 
 .btn-group {

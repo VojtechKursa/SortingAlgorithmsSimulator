@@ -17,11 +17,17 @@ import { HtmlVariableWatchDisplayVisitor } from "../visualization/rendering/Html
 import { VariableWatchController } from "../controllers/VariableWatchController";
 import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/HtmlDebuggerDisplayVisitor";
 import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDescriptionDisplayVisitor";
+import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
+import { initCommon } from "./common";
 
 
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
+	const initCommonResult = initCommon();
+	const darkModeHandler = initCommonResult.darkModeHandler;
+
 	let playerController: PlayerController;
+	let callStackController: CallStackController;
 	{
 		let playerElementContainer: RendererControlElements;
 		{
@@ -68,8 +74,8 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let variableWatchElement = document.getElementById("variable_watch_body") as HTMLDivElement;
 
-		let callStackWrapper = document.getElementById("call_stack_wrapper") as HTMLDivElement;
-		let callStackController = new CallStackController(callStackWrapper);
+		let callStackWrapper = document.getElementById("call_stack_hide_wrapper") as HTMLDivElement;
+		callStackController = new CallStackController(callStackWrapper);
 
 		let svgRenderingVisitor = new SvgArrayRenderVisitor(colors.currentColorSet, output, false, false, null);
 		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, svgRenderingVisitor);
@@ -78,6 +84,14 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
 
 		playerController = new PlayerController(sortingAlgorithm, playerElementContainer, debuggerElementContainer, debuggerController, continuousControlElements, debuggerVisitor, colors, reset);
+
+		window.addEventListener("load", _ => {
+			// Ensure correct theme is selected
+			playerController.setDarkMode(document.body.getAttribute("data-bs-theme") === "dark");
+
+			// Initial render
+			playerController.draw();
+		});
 	}
 
 	let inputController: InputController;
@@ -95,19 +109,17 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 	let simulatorPageController: SimulatorPageController;
 	{
+		let debuggerCollapseWrapper = document.getElementById("col_debugger") as HTMLDivElement;
+		let variableWatchCollapseWrapper = document.getElementById("variable_watch_collapse_wrapper") as HTMLDivElement;
+		let callStackCollapseWrapper = document.getElementById("call_stack_collapse_wrapper") as HTMLDivElement;
+		let collapseWrappers = new CollapseWrappers(debuggerCollapseWrapper, variableWatchCollapseWrapper, callStackCollapseWrapper);
+
+		let debuggerCollapseButton = document.getElementById("button_hide_debugger") as HTMLButtonElement;
+
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
-		let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
-		let darkModeHandler = new DarkModeHandler(darkModeButton);
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, settingsOpenButton, darkModeHandler);
+		simulatorPageController = new SimulatorPageController(playerController, inputController, collapseWrappers, debuggerCollapseButton, callStackController, settingsOpenButton, darkModeHandler);
 	}
-
-	window.addEventListener("load", _ => {
-		playerController.draw();
-		playerController.redraw();	// ensure the first drawing is correct
-	});
-
-	window.addEventListener("resize", _ => playerController.redraw());
 
 	return simulatorPageController;
 }

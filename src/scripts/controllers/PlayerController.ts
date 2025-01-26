@@ -16,9 +16,6 @@ export class PlayerController {
 	private steps: StepResultCollection;
 	private currentColorSet: ColorSet;
 
-	private autoPlayTimerId: NodeJS.Timeout | number | null = null;
-	private playingKind: StepKind | null = null;
-
 	public constructor(
 		private readonly algorithm: SortingAlgorithm,
 		private readonly playerControls: RendererControlElements,
@@ -47,7 +44,9 @@ export class PlayerController {
 
 		this.resetButton.addEventListener("click", _ => this.reset());
 
-		this.continuousControls.registerHandler((start, kind, interval) => this.playHandler(start, kind, interval));
+		this.continuousControls.addEventListenerPlay((kind, intervalMs) => this.play(kind, intervalMs, true));
+		this.continuousControls.addEventListenerPause(() => this.pause(true));
+		this.continuousControls.addEventListenerTick((kind) => this.forward(kind));
 
 		this.currentColorSet = colors.currentColorSet;
 	}
@@ -136,7 +135,7 @@ export class PlayerController {
 		let endStep = this.steps.getEndStepNumber();
 		let currentStep = this.steps.getCurrentStepNumbers().code;
 
-		if (this.autoPlayTimerId != null || this.playingKind != null) {
+		if (this.continuousControls.playing) {
 			this.disableAllDirectStepControls(true);
 
 			if (currentStep == endStep)
@@ -191,30 +190,13 @@ export class PlayerController {
 		this.debuggerControls.backCodeStepButton.disabled = disabled;
 	}
 
-	private playHandler(start: boolean, kind: StepKind, intervalMs: number): void {
-		if (start) {
-			this.play(kind, intervalMs, true);
-		} else {
-			this.pause(true);
-		}
-	}
-
-	public play(kind: StepKind, intervalMs?: number, triggeredByHandler: boolean = false): void {
+	public play(kind: StepKind, _?: number, triggeredByHandler: boolean = false): void {
 		if (!triggeredByHandler) {
 			this.continuousControls.play();
 			return;
 		}
 
-		if (this.autoPlayTimerId == null) {
-			if (intervalMs == undefined)
-				intervalMs = this.continuousControls.getTimerIntervalMs();
-
-			this.playingKind = kind;
-
-			this.forward(kind);
-
-			this.autoPlayTimerId = setInterval(() => this.forward(kind), intervalMs);
-		}
+		this.forward(kind);
 	}
 
 	public pause(triggeredByHandler: boolean = false): void {
@@ -223,20 +205,14 @@ export class PlayerController {
 			return;
 		}
 
-		if (this.autoPlayTimerId != null) {
-			clearInterval(this.autoPlayTimerId);
-			this.autoPlayTimerId = null;
-			this.playingKind = null;
+		this.disableAllDirectStepControls(false);
 
-			this.disableAllDirectStepControls(false);
-
-			// update step controls after enabling all of them
-			this.updateStepControls();
-		}
+		// update step controls after enabling all of them
+		this.updateStepControls();
 	}
 
 	public reset(): void {
-		if (this.autoPlayTimerId != null) {
+		if (this.continuousControls.playing) {
 			this.pause();
 		}
 
@@ -271,7 +247,7 @@ export class PlayerController {
 				selectedVisitor = selectedVisitor.next;
 			}
 
-			this.redraw();
+			this.draw();
 		}
 	}
 }

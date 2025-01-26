@@ -18,10 +18,9 @@ export class CodeStepResult extends StepResult {
 	) {
 		super(text);
 
-		if (stack instanceof CallStack)
-			stack = stack.freeze()
-
-		this.stack = stack;
+		if (stack != undefined) {
+			this.stack = stack instanceof CallStackFreezed ? stack : stack.freeze();
+		}
 	}
 
 	public get callStack(): CallStackFreezed | undefined {
@@ -37,10 +36,9 @@ export class CodeStepResult extends StepResult {
 	}
 
 	public acceptEqualStack(stack: CallStack | CallStackFreezed) {
-		if (stack instanceof CallStack)
-			stack = stack.freeze();
+		const localStack = stack instanceof CallStackFreezed ? stack : stack.freeze();
 
-		if (CallStackFreezed.equal(this.stack, stack))
-			this.stack = stack;
+		if (CallStackFreezed.equal(this.stack, localStack))
+			this.stack = localStack;
 	}
 }

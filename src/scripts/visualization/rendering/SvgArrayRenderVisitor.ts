@@ -2,7 +2,7 @@ import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../data/stepResults/StepResultArray";
 import { ColorSet } from "../colors/ColorSet";
-import { RendererClasses, verticalLayoutBreakPoint } from "../CssInterface";
+import { RendererClasses, bodyVertical1LayoutClass } from "../CssInterface";
 import { SymbolicColor } from "../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../data/Variable";
 import { StepDisplayVisitorWithColor } from "./StepDisplayVisitorWithColor";
@@ -189,7 +189,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		});
 
 		if (this.drawLastStackLevelVariables && step.callStack != undefined) {
-			const lastCallLevel = step.callStack.top();
+			const lastCallLevel = step.callStack.secondToTop();
 
 			if (lastCallLevel != undefined) {
 				lastCallLevel.variables.forEach(variable => {
@@ -235,7 +235,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 		chevron.classList.add(RendererClasses.variablePointerClass);
 		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
-		chevron.setAttribute("stroke", "black");
+		chevron.setAttribute("stroke", this.colorSet.get(SymbolicColor.Simulator_Border).toString());
 		chevron.setAttribute("stroke-width", this.variableSettings.chevronStrokeWidth.toString());
 
 		const color = this.colorSet.get(variable.color).clone();
@@ -251,7 +251,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		text.setAttribute("y", (chevronBorderTop - this.variableSettings.textMarginBottom).toString());
 		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
 		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
-		text.setAttribute("color", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
+		text.setAttribute("fill", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
 		text.setAttribute("dominant-baseline", "text-bottom");
 
@@ -287,26 +287,38 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 	 * even when stacking variables increase the height of the SVG element.
 	*/
 	private adjustMargin(): void {
-		if (window.innerWidth < verticalLayoutBreakPoint) {
+		if (document.body.classList.contains(bodyVertical1LayoutClass)) {
 			this.output.style.marginTop = "";
 			return;
 		}
 
-		const parentHeight = this.output.parentElement?.clientHeight;
-		if (parentHeight == undefined)
+		if (this.output.parentElement == undefined)
 			return;
 
-		const svgHeight = this.output.clientHeight;
-		const viewBoxHeight = this.output.viewBox.baseVal.height;
+		let currentParentHeight = this.output.parentElement.clientHeight;
+		if (currentParentHeight == undefined)
+			return;
 
-		const pixelToUnitRatio = svgHeight / viewBoxHeight;
-		const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
+		let lastParentHeight = undefined;
 
-		const margin = (parentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
+		while (currentParentHeight != lastParentHeight) {
+			const svgHeight = this.output.clientHeight;
+			const viewBoxHeight = this.output.viewBox.baseVal.height;
 
-		// Prevents clipping of the SVG above it's parent
-		if (margin >= 0) {
-			this.output.style.marginTop = `${margin}px`;
+			const pixelToUnitRatio = svgHeight / viewBoxHeight;
+			const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
+
+			const margin = (currentParentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
+
+			// Prevents clipping of the SVG above it's parent
+			if (margin >= 0) {
+				this.output.style.marginTop = `${margin}px`;
+			} else {
+				this.output.style.marginTop = "";
+			}
+
+			lastParentHeight = currentParentHeight;
+			currentParentHeight = this.output.parentElement.clientHeight;
 		}
 	}
 }
