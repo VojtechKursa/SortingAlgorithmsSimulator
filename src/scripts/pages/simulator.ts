@@ -9,7 +9,6 @@ import { StepDescriptionController } from "../controllers/StepDescriptionControl
 import { ContinuousControlController } from "../controllers/ContinuousControlController";
 import { SvgArrayRenderVisitor } from "../visualization/rendering/SvgArrayRenderVisitor";
 import { PageColors } from "../visualization/colors/PageColors";
-import { DarkModeHandler } from "../controllers/DarkModeHandler";
 import { CallStackController } from "../controllers/CallStackController";
 import { DebuggerController } from "../controllers/DebuggerController";
 import { HtmlCallStackDisplayVisitor } from "../visualization/rendering/HtmlCallStackDisplayVisitor";
@@ -19,6 +18,7 @@ import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/HtmlDebug
 import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDescriptionDisplayVisitor";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { initCommon } from "./common";
+import { StepKindController } from "../controllers/StepKindController";
 
 
 
@@ -51,14 +51,20 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			debuggerElementContainer = new DebuggerControlElements(backCode, nextCode, stepCode);
 		}
 
+		let stepKindController: StepKindController;
+		{
+			let radioWrapper = document.getElementById("step_kind_selector") as HTMLDivElement;
+
+			stepKindController = new StepKindController(radioWrapper);
+		}
+
 		let continuousControlElements: ContinuousControlController;
 		{
 			let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
 			let pauseButton = document.getElementById("player_control_pause") as HTMLInputElement;
 			let playButton = document.getElementById("player_control_play") as HTMLInputElement;
-			let radioWrapper = document.getElementById("continuous_control-kind-wrapper") as HTMLDivElement;
 
-			continuousControlElements = new ContinuousControlController(periodInput, pauseButton, playButton, radioWrapper);
+			continuousControlElements = new ContinuousControlController(periodInput, pauseButton, playButton, stepKindController);
 		}
 
 		let output = ((document.getElementById("canvas") as any) as SVGSVGElement);

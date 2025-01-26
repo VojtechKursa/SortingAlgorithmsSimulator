@@ -1,4 +1,5 @@
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
+import { StepKindController } from "./StepKindController";
 
 export interface PlayEventHandler { (stepKind: StepKind, interval: number): void }
 export interface PauseEventHandler { (): void }
@@ -19,11 +20,6 @@ export class ContinuousControlController {
 		return this._playing;
 	}
 
-	public get selectedStepKind(): StepKind {
-		// This getter hides the method for future optimization
-		return this.getSelectedStepKind();
-	}
-
 	public get timerIntervalMs(): number {
 		// This getter hides the method for future optimization
 		return this.getTimerIntervalMs(false);
@@ -33,37 +29,8 @@ export class ContinuousControlController {
 		public readonly periodInput: HTMLInputElement,
 		public readonly pauseButton: HTMLInputElement,
 		public readonly playButton: HTMLInputElement,
-		public readonly radioButtonWrapper: HTMLDivElement
+		public readonly stepKindController: StepKindController
 	) {
-		let firstRadioButton: HTMLInputElement | null = null;
-
-		for (const kind of StepKindHelper.getStepKindsStrings()) {
-			const radio = document.createElement("input");
-			radio.type = "radio";
-			radio.name = "continuous_control-step_kind";
-			radio.value = kind.machineName;
-			radio.id = `input-continuous_control-step_kind-${kind.machineName}`;
-			radio.classList.add("btn-check");
-
-			const label = document.createElement("label");
-			label.setAttribute("for", radio.id);
-			label.textContent = kind.displayName;
-			label.classList.add("btn", "btn-outline-primary");
-
-			radioButtonWrapper.appendChild(radio);
-			radioButtonWrapper.appendChild(label);
-
-			if (firstRadioButton == null)
-				firstRadioButton = radio;
-		}
-
-		let defaultRadioButton = radioButtonWrapper.querySelector(`input[type="radio"][value="${StepKindHelper.toString(StepKind.Sub).machineName}"]`) as HTMLInputElement | null;
-		if (defaultRadioButton == null)
-			defaultRadioButton = firstRadioButton;
-
-		if (defaultRadioButton != null)
-			defaultRadioButton.checked = true;
-
 		pauseButton.addEventListener("click", _ => this.pause());
 		playButton.addEventListener("click", _ => this.play());
 	}
@@ -73,7 +40,7 @@ export class ContinuousControlController {
 			return false;
 
 		if (kind == undefined)
-			kind = this.selectedStepKind;
+			kind = this.stepKindController.selectedStepKind;
 
 		if (intervalMs == undefined)
 			intervalMs = this.getTimerIntervalMs(true);
@@ -110,7 +77,7 @@ export class ContinuousControlController {
 	}
 
 	private tick() {
-		this.tickHandlers.forEach(handler => handler(this.selectedStepKind));
+		this.tickHandlers.forEach(handler => handler(this.stepKindController.selectedStepKind));
 	}
 
 	private updateActiveElementDisabledState(disabled?: boolean) {
@@ -131,20 +98,6 @@ export class ContinuousControlController {
 		}
 
 		return value * 1000;
-	}
-
-	private getSelectedStepKind(): StepKind {
-		let checkedRadio = this.radioButtonWrapper.querySelector("input[type=radio]:checked") as HTMLInputElement | null;
-
-		if (checkedRadio == null)
-			throw new Error("No step kind radio button checked.");
-
-		let kind = StepKindHelper.fromString(checkedRadio.value);
-
-		if (kind == undefined)
-			throw new Error("Checked step kind radio button has invalid value");
-
-		return kind;
 	}
 
 	public addEventListenerPlay(handler: PlayEventHandler): void {

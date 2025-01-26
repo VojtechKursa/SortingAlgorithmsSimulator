@@ -57,42 +57,50 @@ select {
 	}
 }
 
-.continuous_control {
+#top_controls {
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	flex-direction: row;
 	flex-wrap: wrap;
 
+	align-items: center;
+	justify-content: center;
+
 	margin-bottom: 0.5em;
 
-	& > * {
-		width: fit-content;
-
-		@include common.pad-vertical(0.5em);
-		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
-	}
-
-	.period_container {
-		label {
-			padding-right: 0.5em;
-		}
-
-		input {
-			display: inline-block;
-			width: 4.5em;
-		}
-
-		span {
-			padding-left: 0.25em;
-		}
-	}
-
-	.radio_buttons_wrapper {
+	.continuous_control {
 		display: flex;
 		flex-direction: row;
-		flex-wrap: wrap;
-		align-content: center;
+		flex-wrap: nowrap;
+		
+		justify-content: center;
+		align-items: center;
+
+		& > * {
+			width: fit-content;
+
+			@include common.pad-vertical(0.5em);
+			@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+		}
+
+		.period_container {
+			label {
+				padding-right: 0.5em;
+			}
+
+			input {
+				display: inline-block;
+				width: 4.5em;
+			}
+
+			span {
+				padding-left: 0.25em;
+			}
+		}
+	}
+
+	#step_kind_selector {
+		@include common.pad-vertical(0.5em);
+		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 	}
 }
 
