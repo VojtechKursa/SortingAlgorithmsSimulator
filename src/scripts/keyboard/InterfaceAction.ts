@@ -8,20 +8,20 @@ export const enum InterfaceActionGroup {
 }
 
 export const enum InterfaceAction {
-	Backward_Full,
-	Backward_Sub,
-	Backward_Code,
-	Backward,
-	Forward_Full,
-	Forward_Sub,
-	Forward_Code,
-	Forward,
-	Select_Full,
-	Select_Sub,
-	Select_Code,
-	Select_Next,
-	Select_Previous,
-	PlayPause,
+	Backward_Full = "backward-full",
+	Backward_Sub = "backward-sub",
+	Backward_Code = "backward-code",
+	Backward = "backward",
+	Forward_Full = "forward-full",
+	Forward_Sub = "forward-sub",
+	Forward_Code = "forward-code",
+	Forward = "forward",
+	Select_Full = "select-full",
+	Select_Sub = "select-sub",
+	Select_Code = "select-code",
+	Select_Next = "select-next",
+	Select_Previous = "select-previous",
+	PlayPause = "play-pause",
 };
 
 export class InterfaceActionData {
@@ -47,12 +47,16 @@ export class InterfaceActionData {
 		]
 	);
 
+	public readonly machineName: string;
+
 	public constructor(
 		public readonly action: InterfaceAction,
 		public readonly group: InterfaceActionGroup,
 		public readonly displayName: string,
 		public readonly stepKind?: StepKind,
-	) { }
+	) {
+		this.machineName = action;
+	}
 
 	public static getActionInfo(action: InterfaceAction): InterfaceActionData {
 		const actionInfo = InterfaceActionData.actionInfoMap.get(action);
@@ -70,5 +74,9 @@ export class InterfaceActionData {
 
 	public static getAllActions(): Iterable<InterfaceActionData> {
 		return InterfaceActionData.actionInfoMap.values();
+	}
+
+	public static fromString(actionString: string): InterfaceActionData | undefined {
+		return this.actionInfoMap.get(actionString as InterfaceAction);
 	}
 }

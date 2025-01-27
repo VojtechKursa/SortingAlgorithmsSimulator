@@ -143,7 +143,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			callStackController,
 			settingsOpenButton,
 			darkModeHandler,
-			KeyboardSettings.getDefault()
+			KeyboardSettings.load(true)
 		);
 	}
 

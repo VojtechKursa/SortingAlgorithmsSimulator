@@ -1,8 +1,10 @@
-import { InterfaceAction } from "./InterfaceAction";
+import { InterfaceAction, InterfaceActionData } from "./InterfaceAction";
 import { KeyBind, KeyBindType } from "./KeyBind";
 import { KeyPress } from "./KeyPress";
 
 export class KeyboardSettings {
+	public static readonly localStorageKey = "keyboardSettings";
+
 	private readonly hotkeys: Map<KeyBindType, Map<string, InterfaceAction>>;
 
 	public constructor(initialHotkeys?: Iterable<readonly [KeyBind, InterfaceAction]>) {
@@ -42,6 +44,72 @@ export class KeyboardSettings {
 
 	public clear(): void {
 		this.hotkeys.clear()
+	}
+
+	public serialize(): string {
+		let array: [string, InterfaceAction][] = [];
+
+		for (const [_, bindMap] of this.hotkeys) {
+			for (const [normalizedTrigger, action] of bindMap) {
+				array.push([normalizedTrigger, action]);
+			}
+		}
+
+		return JSON.stringify(array);
+	}
+
+	public static deserialize(json: string): KeyboardSettings | null {
+		const parsed = JSON.parse(json);
+		if (!Array.isArray(parsed)) {
+			return null;
+		}
+
+		const hotkeys: [KeyBind, InterfaceAction][] = [];
+
+		for (const arrayItem of parsed) {
+			if (!Array.isArray(arrayItem) || arrayItem.length != 2) {
+				continue;
+			}
+			
+			const trigger = arrayItem[0];
+			const action = InterfaceActionData.fromString(arrayItem[1]);
+
+			if (typeof trigger !== "string" || action == undefined) {
+				continue;
+			}
+
+			hotkeys.push([new KeyBind(trigger), action.action]);
+		}
+
+		return new KeyboardSettings(hotkeys);
+	}
+
+	public save(): void {
+		localStorage.setItem(KeyboardSettings.localStorageKey, this.serialize());
+	}
+
+	public static load(saveAfterLoad: boolean = false): KeyboardSettings {
+		const localStorageData = localStorage.getItem(KeyboardSettings.localStorageKey);
+
+		let result: KeyboardSettings | undefined = undefined;
+
+		if (localStorageData != null) {
+			const deserialized = KeyboardSettings.deserialize(localStorageData);
+
+			if (deserialized != null && deserialized.hotkeys.size > 0) {
+				result = deserialized;
+			}
+		}
+
+		if (result == undefined) {
+			result = KeyboardSettings.getDefault();
+		}
+
+		if (saveAfterLoad) {
+			result.save();
+		}
+		
+		return result;
 	}
 
 	public static getDefault(): KeyboardSettings {
