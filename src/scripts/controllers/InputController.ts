@@ -1,3 +1,4 @@
+import { DialogEventListener } from "../data/DialogEventListener";
 import { FileInputMethod } from "../input/methods/FileInputMethod";
 import { InputMethod } from "../input/methods/InputMethod";
 import { ManualInputMethod } from "../input/methods/ManualInputMethod";
@@ -9,6 +10,8 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { PlayerController } from "./PlayerController";
 
 export class InputController {
+	private readonly dialogEventListeners: DialogEventListener[] = [];
+
 	private previousMethod: InputMethod;
 
 	public inputMethods: InputMethod[];
@@ -53,6 +56,8 @@ export class InputController {
 	}
 
 	public openDialog() {
+		this.dialogEventListeners.forEach(listener => listener(true));
+		
 		this.dialog.showModal();
 		this.body.classList.add("blur");
 	}
@@ -63,6 +68,20 @@ export class InputController {
 
 	private onDialogClose() {
 		this.body.classList.remove("blur");
+
+		this.dialogEventListeners.forEach(listener => listener(false));
+	}
+
+	public addDialogEventListener(listener: DialogEventListener) {
+		this.dialogEventListeners.push(listener);
+	}
+
+	public removeDialogEventListener(listener: DialogEventListener) {
+		let index = this.dialogEventListeners.indexOf(listener);
+
+		if (index != -1) {
+			this.dialogEventListeners.splice(index, 1);
+		}
 	}
 
 	public async loadInput() {

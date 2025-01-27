@@ -47,6 +47,8 @@ export class SimulatorPageController {
 			}, period);
 		});
 
+		inputController.addDialogEventListener((opening) => this.playerKeysActive = !opening);
+
 		window.addEventListener("keydown", event => {
 			if (!this.playerKeysActive)
 				return
