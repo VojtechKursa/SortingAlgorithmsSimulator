@@ -19,6 +19,7 @@ import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDe
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { initCommon } from "./common";
 import { StepKindController } from "../controllers/StepKindController";
+import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 
 
 
@@ -58,13 +59,13 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			stepKindController = new StepKindController(radioWrapper);
 		}
 
-		let continuousControlElements: ContinuousControlController;
+		let continuousControl: ContinuousControlController;
 		{
 			let periodInput = document.getElementById("player_control_period") as HTMLInputElement;
 			let pauseButton = document.getElementById("player_control_pause") as HTMLInputElement;
 			let playButton = document.getElementById("player_control_play") as HTMLInputElement;
 
-			continuousControlElements = new ContinuousControlController(periodInput, pauseButton, playButton, stepKindController);
+			continuousControl = new ContinuousControlController(periodInput, pauseButton, playButton, stepKindController);
 		}
 
 		let output = ((document.getElementById("canvas") as any) as SVGSVGElement);
@@ -89,7 +90,17 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let variableWatchVisitor = new HtmlVariableWatchDisplayVisitor(new VariableWatchController(variableWatchElement), callStackVisitor);
 		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
 
-		playerController = new PlayerController(sortingAlgorithm, playerElementContainer, debuggerElementContainer, debuggerController, continuousControlElements, debuggerVisitor, colors, reset);
+		playerController = new PlayerController(
+			sortingAlgorithm,
+			playerElementContainer,
+			debuggerElementContainer,
+			debuggerController,
+			continuousControl,
+			stepKindController,
+			debuggerVisitor,
+			colors,
+			reset
+		);
 
 		window.addEventListener("load", _ => {
 			// Ensure correct theme is selected
@@ -124,7 +135,16 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let settingsOpenButton = document.getElementById("settings_open") as HTMLButtonElement;
 
-		simulatorPageController = new SimulatorPageController(playerController, inputController, collapseWrappers, debuggerCollapseButton, callStackController, settingsOpenButton, darkModeHandler);
+		simulatorPageController = new SimulatorPageController(
+			playerController,
+			inputController,
+			collapseWrappers,
+			debuggerCollapseButton,
+			callStackController,
+			settingsOpenButton,
+			darkModeHandler,
+			KeyboardSettings.getDefault()
+		);
 	}
 
 	return simulatorPageController;

@@ -1,4 +1,6 @@
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
+import { KeyboardSettings } from "../keyboard/KeyboardSettings";
+import { KeyPress } from "../keyboard/KeyPress";
 import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/CssInterface";
 import { CallStackController } from "./CallStackController";
 import { DarkModeHandler } from "./DarkModeHandler";
@@ -12,6 +14,8 @@ export class SimulatorPageController {
 	public readonly vertical2LayoutBreakpointWithStack = 992;
 	public readonly vertical2LayoutBreakpointWithoutStack = 768;
 
+	private playerKeysActive: boolean = true;
+
 	public constructor(
 		private readonly playerController: PlayerController,
 		private readonly inputController: InputController,
@@ -19,7 +23,8 @@ export class SimulatorPageController {
 		debuggerCollapseButton: HTMLButtonElement,
 		private readonly callStackController: CallStackController,
 		private readonly settingsOpenButton: HTMLButtonElement,
-		darkModeHandler: DarkModeHandler
+		darkModeHandler: DarkModeHandler,
+		private readonly keyboardSettings: KeyboardSettings
 	) {
 		darkModeHandler.addEventHandler(dark => {
 			playerController.setDarkMode(dark);
@@ -40,6 +45,19 @@ export class SimulatorPageController {
 					clearInterval(intervalId);
 				}
 			}, period);
+		});
+
+		window.addEventListener("keydown", event => {
+			if (!this.playerKeysActive)
+				return
+			if (this.playerController.textFieldFocused)
+				return;
+
+			const action = this.keyboardSettings.getAction(KeyPress.fromEvent(event));
+			if (action != undefined) {
+				event.preventDefault();
+				this.playerController.performAction(action);
+			}
 		});
 
 		this.resizeHandler();

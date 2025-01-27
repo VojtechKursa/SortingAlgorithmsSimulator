@@ -10,11 +10,21 @@ import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { ColorSet } from "../visualization/colors/ColorSet";
 import { DebuggerController } from "./DebuggerController";
 import { StepDisplayVisitorWithColor } from "../visualization/rendering/StepDisplayVisitorWithColor";
+import { StepKindController } from "./StepKindController";
+import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
 
 export class PlayerController {
 	private currentlyDisplayedFullStep: FullStepResult | null = null;
 	private steps: StepResultCollection;
 	private currentColorSet: ColorSet;
+
+	public get playing(): boolean {
+		return this.continuousControls.playing;
+	}
+
+	public get textFieldFocused(): boolean {
+		return window.document.activeElement == this.continuousControls.periodInput;
+	}
 
 	public constructor(
 		private readonly algorithm: SortingAlgorithm,
@@ -22,6 +32,7 @@ export class PlayerController {
 		private readonly debuggerControls: DebuggerControlElements,
 		private readonly debuggerController: DebuggerController,
 		private readonly continuousControls: ContinuousControlController,
+		private readonly stepKindController: StepKindController,
 		private readonly displayVisitor: StepDisplayVisitor,
 		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
@@ -77,7 +88,7 @@ export class PlayerController {
 		currentStep.codeStepResult.redraw(this.displayVisitor);
 	}
 
-	public forward(kind: StepKind): void {
+	public forward(kind: StepKind = this.stepKindController.selectedStepKind): void {
 		if (this.steps.forward(kind))
 			this.draw();
 		else {
@@ -98,7 +109,7 @@ export class PlayerController {
 		this.updateStepControls();
 	}
 
-	public backward(kind: StepKind): void {
+	public backward(kind: StepKind = this.stepKindController.selectedStepKind): void {
 		if (this.steps.backward(kind))
 			this.draw();
 
@@ -190,9 +201,13 @@ export class PlayerController {
 		this.debuggerControls.backCodeStepButton.disabled = disabled;
 	}
 
-	public play(kind: StepKind, _?: number, triggeredByHandler: boolean = false): void {
+	public play(
+		kind: StepKind = this.stepKindController.selectedStepKind,
+		_?: number,
+		triggeredByHandler: boolean = false
+	): void {
 		if (!triggeredByHandler) {
-			this.continuousControls.play();
+			this.continuousControls.play(kind);
 			return;
 		}
 
@@ -248,6 +263,45 @@ export class PlayerController {
 			}
 
 			this.draw();
+		}
+	}
+
+	public performAction(action: InterfaceAction): void {
+		const actionInfo = InterfaceActionData.getActionInfo(action);
+
+		switch (actionInfo.group) {
+			case InterfaceActionGroup.Backward:
+				if (actionInfo.stepKind != undefined)
+					this.backward(actionInfo.stepKind);
+				else
+					this.backward();
+				break;
+			case InterfaceActionGroup.Forward:
+				if (actionInfo.stepKind != undefined)
+					this.forward(actionInfo.stepKind);
+				else
+					this.forward();
+				break;
+			case InterfaceActionGroup.Select:
+				if (actionInfo.stepKind != undefined) {
+					this.stepKindController.selectedStepKind = actionInfo.stepKind;
+				} else {
+					switch (action) {
+						case InterfaceAction.Select_Next:
+							this.stepKindController.selectNextInLine(true);
+							break;
+						case InterfaceAction.Select_Previous:
+							this.stepKindController.selectNextInLine(false);
+							break;
+					}
+				}
+				break;
+			case InterfaceActionGroup.PlayPause:
+				if (this.playing)
+					this.pause();
+				else
+					this.play();
+				break;
 		}
 	}
 }
