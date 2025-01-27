@@ -41,6 +41,8 @@ export class ContinuousControlController {
 
 		if (kind == undefined)
 			kind = this.stepKindController.selectedStepKind;
+		else
+			this.stepKindController.selectedStepKind = kind;
 
 		if (intervalMs == undefined)
 			intervalMs = this.getTimerIntervalMs(true);

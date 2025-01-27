@@ -5,6 +5,16 @@ export class StepKindController {
 		// This getter hides the method for future optimization
 		return this.getSelectedStepKind();
 	}
+	public set selectedStepKind(value: StepKind) {
+		const stepKindDescription = StepKindHelper.toString(value);
+
+		let radio = this.radioButtonWrapper.querySelector(`input[type=radio][value="${stepKindDescription.machineName}"]`) as HTMLInputElement | null;
+
+		if (radio == null)
+			throw new Error(`No radio button found for step kind ${stepKindDescription.displayName} (${stepKindDescription.machineName})`);
+
+		radio.checked = true;
+	}
 
 	public constructor(
 		private readonly radioButtonWrapper: HTMLDivElement
@@ -51,5 +61,12 @@ export class StepKindController {
 			throw new Error("Checked step kind radio button has invalid value");
 
 		return kind;
+	}
+
+	public selectNextInLine(next: boolean): void {
+		const selectedKind = this.selectedStepKind;
+		const nextKind = StepKindHelper.getRelativeKind(selectedKind, next);
+
+		this.selectedStepKind = nextKind;
 	}
 }

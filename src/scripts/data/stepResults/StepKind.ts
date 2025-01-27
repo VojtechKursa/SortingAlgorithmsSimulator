@@ -42,6 +42,15 @@ export class StepKindHelper {
 		}
 	}
 
+	public static getByHierarchicalIndex(index: number): StepKind | undefined {
+		switch (index) {
+			case 0: return StepKind.Code;
+			case 1: return StepKind.Sub;
+			case 2: return StepKind.Full;
+			default: return undefined;
+		}
+	}
+
 	public static getStepKindsStrings(): StepKindDescription[] {
 		let set = new Set<StepKind>();
 		let result = new Array<StepKindDescription>();
@@ -75,5 +84,24 @@ export class StepKindHelper {
 			throw new Error("StepKind without toString implementation");
 
 		return result;
+	}
+
+	public static getRelativeKind(referenceKind: StepKind, next: boolean): StepKind {
+		let targetIndex = this.getHierarchicalIndex(referenceKind);
+
+		if (next) {
+			targetIndex = (targetIndex + 1) % this.map.size;
+		} else {
+			targetIndex = targetIndex - 1;
+			if (targetIndex < 0) {
+				targetIndex = this.map.size - 1;
+			}
+		}
+
+		const targetKind = this.getByHierarchicalIndex(targetIndex);
+		if (targetKind == undefined)
+			throw new Error("Invalid target step kind index");
+
+		return targetKind;
 	}
 }
