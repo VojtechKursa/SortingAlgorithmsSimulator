@@ -1,23 +1,26 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 
-const path = require('path');
-const HtmlBundlerPlugin = require('html-bundler-webpack-plugin');
-const Handlebars = require('handlebars');
+import webpack from 'webpack';
+import 'webpack-dev-server';
 
-const AlgorithmsConfig = require('./src/sortsConfig');
+import path from 'path';
+import HtmlBundlerPlugin from 'html-bundler-webpack-plugin';
+import Handlebars from 'handlebars';
+
+import algorithms from './src/sortsConfig';
 
 const isProduction = process.env.NODE_ENV == 'production';
 
 
 
-const htmlBundlerPluginConfig = {
+const htmlBundlerPluginConfig: HtmlBundlerPlugin.PluginOptions = {
 	entry: {
 		// define HTML files here
-		
+
 		index: {
 			import: "src/templates/index.html",
 			data: {
-				algorithms: [ ]
+				algorithms: algorithms
 			}
 		}
 	},
@@ -31,20 +34,42 @@ const htmlBundlerPluginConfig = {
 	},
 };
 
-// Data for index template
-htmlBundlerPluginConfig.entry.index.data.algorithms = AlgorithmsConfig.algorithms;
+
 
 // Data for individual simulator pages
-AlgorithmsConfig.algorithms.forEach(algorithm => {
-	htmlBundlerPluginConfig.entry[algorithm.nameMachine] = {
-		import: 'src/templates/simulator.html',
-		data: algorithm
-	};
-});
+
+// Type conversion EntryObject if entry was previously defined otherwise
+if (htmlBundlerPluginConfig.entry == undefined)
+	htmlBundlerPluginConfig.entry = {};
+else if (typeof htmlBundlerPluginConfig.entry == "string") {
+	const originalEntry = htmlBundlerPluginConfig.entry;
+	htmlBundlerPluginConfig.entry = {};
+	htmlBundlerPluginConfig.entry[originalEntry] = { import: originalEntry };
+}
+
+// Insert data
+for (const algorithm of algorithms) {
+	const urlPath = algorithm.nameMachine;
+
+	if (htmlBundlerPluginConfig.entry instanceof Array) {
+		htmlBundlerPluginConfig.entry.push({
+			import: 'src/templates/simulator.html',
+			filename: urlPath + '.html',
+			data: algorithm
+		});
+	} else {
+		htmlBundlerPluginConfig.entry[urlPath] = {
+			import: 'src/templates/simulator.html',
+			data: algorithm
+		};
+	}
+}
 
 
 
-const config = {
+const config: webpack.Configuration = {
+	mode: isProduction ? 'production' : 'development',
+	devtool: isProduction ? undefined : 'inline-source-map',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		clean: true,
@@ -70,7 +95,7 @@ const config = {
 				test: /\.html$/,
 				loader: HtmlBundlerPlugin.loader, // HTML template loader
 				options: {
-					preprocessor: (content, {data}) => Handlebars.compile(content)(data)
+					preprocessor: (content: any, { data }: any) => Handlebars.compile(content)(data)
 				}
 			},
 			{   // TypeScript files
@@ -108,17 +133,4 @@ const config = {
 	},
 };
 
-
-
-module.exports = () => {
-	if (isProduction) {
-		config.mode = 'production';
-		
-		
-	} else {
-		config.mode = 'development';
-		config.devtool = 'inline-source-map';
-	}
-
-	return config;
-};
+export default config;
