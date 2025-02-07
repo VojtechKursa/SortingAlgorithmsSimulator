@@ -22,6 +22,17 @@
 			</div>
 		</div>
 
+		<nav id="display_mode_switch" aria-label="Display mode">
+			<ul class="pagination">
+				<li class="page-item" aria-current="page">
+					<button id="display_mode-grid" class="page-link">Grid</button>
+				</li>
+				<li class="page-item">
+					<button id="display_mode-table" class="page-link">Table</button>
+				</li>
+			</ul>
+		</nav>
+
 		<div id="card_container" class="container-fluid">
 			<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
 				{{#each sortFamilies}}
@@ -40,6 +51,10 @@
 				{{/each}}
 				{{/each}}
 			</div>
+		</div>
+
+		<div id="table_container" class="container-fluid hidden">
+			
 		</div>
 	</body>
 </html>
