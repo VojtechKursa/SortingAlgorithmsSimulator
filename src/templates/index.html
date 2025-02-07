@@ -24,18 +24,20 @@
 
 		<div id="card_container" class="container-fluid">
 			<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
-				{{#each algorithms}}
+				{{#each sortFamilies}}
+				{{#each sorts}}
 				<div class="col">
 					<div class="card h-100">
 						<div class="card-body">
 							<h5 class="card-title">{{name}}</h5>
-							<p class="card-text">{{description}}</p>
+							<p class="card-text">{{shortDescription}}</p>
 						</div>
 						<div class="card-footer">
 							<a href="{{nameMachine}}.html" class="btn btn-primary">Try</a>
 						</div>
 					</div>
 				</div>
+				{{/each}}
 				{{/each}}
 			</div>
 		</div>
