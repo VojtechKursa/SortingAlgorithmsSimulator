@@ -1,11 +1,6 @@
-import { FamilySpaceComplexity, FamilyTimeComplexity } from "./Complexity";
+import { CommonSortProperties } from "./CommonSortProperties";
 import { SortProperties } from "./SortProperties";
 
-export interface SortFamilyProperties {
-	readonly name: string;
-	readonly nameMachine: string;
-	readonly description: string;
-	readonly timeComplexity: FamilyTimeComplexity;
-	readonly spaceComplexity: FamilySpaceComplexity;
+export interface SortFamilyProperties extends CommonSortProperties {
 	readonly sorts: SortProperties[];
 };

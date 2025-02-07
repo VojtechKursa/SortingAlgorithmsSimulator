@@ -8,6 +8,8 @@ import HtmlBundlerPlugin from 'html-bundler-webpack-plugin';
 import Handlebars from 'handlebars';
 
 import sortFamilies from './src/sortsConfigs/sortFamilies';
+import { getBooleanString, getComplexityOrComplexityRangeString } from './src/sortsConfigs/definitions/ComplexityHelpers';
+
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -66,6 +68,11 @@ for (const sortFamily of sortFamilies) {
 		}
 	}
 }
+
+
+
+Handlebars.registerHelper('complexityString', getComplexityOrComplexityRangeString);
+Handlebars.registerHelper('booleanString', getBooleanString);
 
 
 

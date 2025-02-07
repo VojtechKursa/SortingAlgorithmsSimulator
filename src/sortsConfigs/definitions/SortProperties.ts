@@ -1,12 +1,7 @@
+import { CommonSortProperties } from "./CommonSortProperties";
 import { SpaceComplexity, TimeComplexity } from "./Complexity";
 
-export interface SortProperties {
-	readonly name: string;
-	readonly nameMachine: string;
-	readonly shortDescription: string;
-	readonly longDescription: string;
+export interface SortProperties extends CommonSortProperties {
 	readonly timeComplexity: TimeComplexity;
 	readonly spaceComplexity: SpaceComplexity;
-	readonly stable: boolean;
-	readonly inPlace: boolean;
 };

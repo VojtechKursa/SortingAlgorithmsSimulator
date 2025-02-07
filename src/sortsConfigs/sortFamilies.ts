@@ -11,13 +11,16 @@ const sortFamilies: SortFamilyProperties[] = [
 	{
 		name: "Bubble sort",
 		nameMachine: "bubbleSort",
-		description: "Description of Bubble sort here.",
+		shortDescription: BubbleSortProperties.shortDescription,
+		longDescription: BubbleSortProperties.longDescription,
 		timeComplexity: {
 			best: Complexity.Linear,
 			average: Complexity.Quadratic,
 			worst: Complexity.Quadratic
 		},
 		spaceComplexity: Complexity.Constant,
+		stable: true,
+		inPlace: true,
 		sorts: [
 			BubbleSortProperties,
 			BubbleSortOptimizedProperties,
@@ -26,27 +29,33 @@ const sortFamilies: SortFamilyProperties[] = [
 	{
 		name: "Selection sort",
 		nameMachine: "selectionSort",
-		description: "Description of Selection sort here.",
+		shortDescription: SelectSortProperties.shortDescription,
+		longDescription: SelectSortProperties.longDescription,
 		timeComplexity: {
 			best: Complexity.Quadratic,
 			average: Complexity.Quadratic,
 			worst: Complexity.Quadratic
 		},
 		spaceComplexity: Complexity.Constant,
+		stable: false,
+		inPlace: true,
 		sorts: [
 			SelectSortProperties
-		]
+		],
 	},
 	{
 		name: "Insertion sort",
 		nameMachine: "insertionSort",
-		description: "Description of Insertion sort here.",
+		shortDescription: InsertSortProperties.shortDescription,
+		longDescription: InsertSortProperties.longDescription,
 		timeComplexity: {
 			best: Complexity.Linear,
 			average: Complexity.Quadratic,
 			worst: Complexity.Quadratic
 		},
 		spaceComplexity: Complexity.Constant,
+		stable: true,
+		inPlace: true,
 		sorts: [
 			InsertSortProperties
 		]
@@ -54,13 +63,16 @@ const sortFamilies: SortFamilyProperties[] = [
 	{
 		name: "Quick sort",
 		nameMachine: "quickSort",
-		description: "Description of Quick sort here.",
+		shortDescription: QuickSortProperties.shortDescription,
+		longDescription: QuickSortProperties.longDescription,
 		timeComplexity: {
 			best: Complexity.Linearithmic,
 			average: Complexity.Linearithmic,
 			worst: Complexity.Quadratic
 		},
 		spaceComplexity: Complexity.Logarithmic,
+		stable: false,
+		inPlace: null,
 		sorts: [
 			QuickSortProperties
 		]
