@@ -59,53 +59,51 @@
 
 		<div id="table_container" class="container-fluid hidden">
 			<div class="table-head row">
-				<div class="col-3 algorithm-name">Family / Algorithm</div>
-				<div class="col-5">
+				<div class="col-md-3 col-5 algorithm-name">Family / Algorithm</div>
+				<div class="col-md-5 col-7 algorithm-complexity-time">
 					<div class="row">
 						<div class="col-12">Time complexity</div>
 					</div>
-					<div class="row">
+					<div class="row algorithm-complexity-time">
 						<div class="col-4 algorithm-complexity-time-best">Best</div>
 						<div class="col-4 algorithm-complexity-time-avg">Average</div>
 						<div class="col-4 algorithm-complexity-time-worst">Worst</div>
 					</div>
 				</div>
-				<div class="col-2 algorithm-complexity-space">Space complexity</div>
-				<div class="col-1 algorithm-stable">Stable</div>
-				<div class="col-1 algorithm-in_place">In place</div>
+				<div class="col-md-2 d-md-block d-none algorithm-complexity-space">Space complexity</div>
+				<div class="col-md-1 d-md-block d-none algorithm-stable">Stable</div>
+				<div class="col-md-1 d-md-block d-none algorithm-in_place">In place</div>
 			</div>
 			{{#each sortFamilies}}
 			<div class="row family" data-bs-toggle="collapse" href="#collapse-wrapper-family-{{nameMachine}}" role="button">
-				<div class="col-3 algorithm-name">{{name}}</div>
-				<div class="col-5">
-					<div class="row">
+				<div class="col-md-3 col-5 algorithm-name">{{name}}</div>
+				<div class="col-md-5 col-7 algorithm-complexity-time">
+					<div class="row algorithm-complexity-time">
 						<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
 						<div class="col-4 algorithm-complexity-time-avg">{{complexityString timeComplexity.average}}</div>
 						<div class="col-4 algorithm-complexity-time-worst">{{complexityString timeComplexity.worst}}</div>
 					</div>
 				</div>
-				<div class="col-2 algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
-				<div class="col-1 algorithm-stable">{{booleanString stable}}</div>
-				<div class="col-1 algorithm-in_place">{{booleanString inPlace}}</div>
+				<div class="col-md-2 d-md-block d-none algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
+				<div class="col-md-1 d-md-block d-none algorithm-stable">{{booleanString stable}}</div>
+				<div class="col-md-1 d-md-block d-none algorithm-in_place">{{booleanString inPlace}}</div>
 			</div>
 			<div id="collapse-wrapper-family-{{nameMachine}}" class="family_sorts_wrapper collapse">
 				{{#each sorts}}
-				<a href="{{nameMachine}}.html">
-					<div class="row algorithm">
-						<div class="col-3 algorithm-name">
-							<span>{{name}}</span>
-						</div>
-						<div class="col-5">
-							<div class="row">
-								<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
-								<div class="col-4 algorithm-complexity-time-avg">{{complexityString timeComplexity.average}}</div>
-								<div class="col-4 algorithm-complexity-time-worst">{{complexityString timeComplexity.worst}}</div>
-							</div>
-						</div>
-						<div class="col-2 algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
-						<div class="col-1 algorithm-stable">{{booleanString stable}}</div>
-						<div class="col-1 algorithm-in_place">{{booleanString inPlace}}</div>
+				<a href="{{nameMachine}}.html" class="row algorithm">
+					<div class="col-md-3 col-5 algorithm-name">
+						<div>{{name}}</div>
 					</div>
+					<div class="col-md-5 col-7 algorithm-complexity-time">
+						<div class="row algorithm-complexity-time">
+							<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
+							<div class="col-4 algorithm-complexity-time-avg">{{complexityString timeComplexity.average}}</div>
+							<div class="col-4 algorithm-complexity-time-worst">{{complexityString timeComplexity.worst}}</div>
+						</div>
+					</div>
+					<div class="col-md-2 d-md-block d-none algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
+					<div class="col-md-1 d-md-block d-none algorithm-stable">{{booleanString stable}}</div>
+					<div class="col-md-1 d-md-block d-none algorithm-in_place">{{booleanString inPlace}}</div>
 				</a>
 				{{/each}}
 			</div>
