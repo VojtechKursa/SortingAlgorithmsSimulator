@@ -2,6 +2,16 @@
 
 
 
+#display_mode_switch {
+	display: flex;
+	justify-content: flex-start;
+
+	padding: 0.5rem;
+
+	.pagination {
+		margin-bottom: 0;
+	}
+}
 
 div#card_container {
 	padding: 1rem;
