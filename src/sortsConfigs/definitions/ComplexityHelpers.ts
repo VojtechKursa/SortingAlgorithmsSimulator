@@ -16,7 +16,7 @@ export function getBooleanString(value: boolean | null | undefined): string {
 	switch (value) {
 		case true: return "Yes";
 		case false: return "No";
-		case null: return "Yes/No";
+		case null: return "Y/N";
 		case undefined: return "?";
 	}
 }
