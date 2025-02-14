@@ -36,8 +36,11 @@ const sortFamilies: SortFamilyProperties[] = [
 			average: Complexity.Quadratic,
 			worst: Complexity.Quadratic
 		},
-		spaceComplexity: Complexity.Constant,
-		stable: false,
+		spaceComplexity: {
+			min: Complexity.Constant,
+			max: Complexity.Linear
+		},
+		stable: null,
 		inPlace: true,
 		sorts: [
 			SelectSortProperties
@@ -66,7 +69,10 @@ const sortFamilies: SortFamilyProperties[] = [
 		shortDescription: QuickSortProperties.shortDescription,
 		longDescription: QuickSortProperties.longDescription,
 		timeComplexity: {
-			best: Complexity.Linearithmic,
+			best: {
+				min: Complexity.Linear,
+				max: Complexity.Linearithmic
+			},
 			average: Complexity.Linearithmic,
 			worst: Complexity.Quadratic
 		},
