@@ -1,7 +1,7 @@
 import { Complexity, ComplexityRange, getComplexityString } from "./Complexity";
 
 export function getComplexityRangeString(complexityRange: ComplexityRange): string {
-	return `O(${getComplexityString(complexityRange.min)}) - O(${getComplexityString(complexityRange.max)})`;
+	return `${getComplexityString(complexityRange.min)} - ${getComplexityString(complexityRange.max)}`;
 }
 
 export function isComplexityRange(input: Complexity | ComplexityRange): input is ComplexityRange {
