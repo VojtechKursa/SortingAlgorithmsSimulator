@@ -30,3 +30,33 @@ div#card_container {
 		}
 	}
 }
+
+div#table_container {
+	text-wrap-style: balance;
+	
+	div[class^="col-"] {
+		align-content: center;
+		text-align: center;
+	}
+
+	.table-head {
+		font-weight: bold;
+	}
+
+	div.algorithm-name {
+		text-align: left;
+	}
+
+	.family_sorts_wrapper {
+		a {
+			text-decoration: none;
+			color: inherit;
+		}
+	}
+
+	.algorithm .algorithm-name {
+		> span {
+			margin-left: 1em;
+		}
+	}
+}
