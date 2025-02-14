@@ -7,7 +7,9 @@ import path from 'path';
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin';
 import Handlebars from 'handlebars';
 
-import algorithms from './src/sortsConfig';
+import sortFamilies from './src/sortsConfigs/sortFamilies';
+import { getBooleanString, getComplexityOrComplexityRangeString } from './src/sortsConfigs/definitions/SortPropertyHelpers';
+
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -20,7 +22,7 @@ const htmlBundlerPluginConfig: HtmlBundlerPlugin.PluginOptions = {
 		index: {
 			import: "src/templates/index.html",
 			data: {
-				algorithms: algorithms
+				sortFamilies: sortFamilies
 			}
 		}
 	},
@@ -48,22 +50,29 @@ else if (typeof htmlBundlerPluginConfig.entry == "string") {
 }
 
 // Insert data
-for (const algorithm of algorithms) {
-	const urlPath = algorithm.nameMachine;
+for (const sortFamily of sortFamilies) {
+	for (const sort of sortFamily.sorts) {
+		const urlPath = sort.nameMachine;
 
-	if (htmlBundlerPluginConfig.entry instanceof Array) {
-		htmlBundlerPluginConfig.entry.push({
-			import: 'src/templates/simulator.html',
-			filename: urlPath + '.html',
-			data: algorithm
-		});
-	} else {
-		htmlBundlerPluginConfig.entry[urlPath] = {
-			import: 'src/templates/simulator.html',
-			data: algorithm
-		};
+		if (htmlBundlerPluginConfig.entry instanceof Array) {
+			htmlBundlerPluginConfig.entry.push({
+				import: 'src/templates/simulator.html',
+				filename: urlPath + '.html',
+				data: sort
+			});
+		} else {
+			htmlBundlerPluginConfig.entry[urlPath] = {
+				import: 'src/templates/simulator.html',
+				data: sort
+			};
+		}
 	}
 }
+
+
+
+Handlebars.registerHelper('complexityString', getComplexityOrComplexityRangeString);
+Handlebars.registerHelper('booleanString', getBooleanString);
 
 
 

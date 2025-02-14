@@ -2,6 +2,16 @@
 
 
 
+#display_mode_switch {
+	display: flex;
+	justify-content: flex-start;
+
+	padding: 0.5rem;
+
+	.pagination {
+		margin-bottom: 0;
+	}
+}
 
 div#card_container {
 	padding: 1rem;
@@ -24,6 +34,157 @@ div#card_container {
 
 					.btn {
 						width: 100%;
+					}
+				}
+			}
+		}
+	}
+}
+
+div#table_container {
+	text-wrap-style: balance;
+	text-align: center;
+	
+	
+	$border: 1px solid black;
+
+
+
+	.row {
+		div[class^="col-"] {
+			align-content: center;
+
+			border-bottom: $border;			
+			border-right: $border;
+
+			&:first-of-type {
+				border-left: $border;
+			}
+		}
+
+		&:first-of-type {
+			div[class^="col-"] {
+				border-top: $border;
+			}
+		}
+	}
+
+	.algorithm-complexity-time {
+		div[class^="col-"] {
+			border-top: none !important;
+			border-bottom: none;
+
+			&:first-of-type {
+				border-left: none;
+			}
+
+			&:last-of-type {
+				border-right: none;
+			}
+		}
+	}
+
+
+	.table-head {
+		font-weight: bold;
+
+		background-color: var(--bs-secondary-bg-subtle);
+
+		//TODO: Figure out border
+		//border-bottom: 2px solid black;
+
+		.row.algorithm-complexity-time {
+			border-top: $border;
+		}
+	}
+
+
+	div.algorithm-name {
+		text-align: left;
+	}
+
+	.family, .algorithm {
+		div[class^="col-"] {
+			@include common.pad-vertical(0.5rem);
+
+			&.algorithm-complexity-time {
+				@include common.pad-vertical(0);
+			}
+		}
+	}
+
+	.family.row {
+		background-color: var(--bs-secondary-bg);
+
+		&:nth-child(4n) {
+			background-color: var(--bs-secondary-bg-subtle);
+		}
+	}
+
+	.family_sorts_wrapper {
+		.algorithm.row {
+			text-decoration: none;
+			color: inherit;
+
+			div[class^="col-"] {
+				border-top: none;
+
+				--bg-color: var(--bs-info-bg-subtle);
+
+				&:not(.algorithm-name) {
+					background-color: var(--bg-color);
+				}
+
+				&.algorithm-name {
+					> div {
+						background-color: var(--bg-color);
+					}
+				}
+			}
+
+			&:nth-child(even) {
+				div[class^="col-"] {
+					--bg-color: var(--bs-primary-bg-subtle);
+				}
+			}
+
+			.algorithm-name {
+				padding-top: 0;
+				padding-bottom: 0;
+				padding-right: 0;
+
+				border-left: none;
+				border-bottom: none;
+
+				> div {
+					height: 100%;
+					align-content: center;
+
+					padding-left: calc(var(--bs-gutter-x)* 0.5);
+
+					border-left: $border;
+					border-bottom: $border;
+				}
+			}
+
+			&:last-child {
+				.algorithm-name {
+					border-bottom: $border;
+
+					> div {
+						border-bottom: none;
+					}
+				}
+			}
+		}
+
+		&:last-child {
+			.algorithm.row {
+				div.algorithm-name {
+					border-bottom: none;
+
+					> div {
+						border-bottom: $border;
 					}
 				}
 			}

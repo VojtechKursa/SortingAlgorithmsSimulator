@@ -22,14 +22,30 @@
 			</div>
 		</div>
 
+		<nav id="display_mode_switch" aria-label="Display mode">
+			<ul class="pagination">
+				<li class="page-item" aria-current="page">
+					<button id="display_mode-grid" class="page-link">
+						<i class="bi bi-grid"></i>
+					</button>
+				</li>
+				<li class="page-item">
+					<button id="display_mode-table" class="page-link">
+						<i class="bi bi-table"></i>
+					</button>
+				</li>
+			</ul>
+		</nav>
+
 		<div id="card_container" class="container-fluid">
 			<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
-				{{#each algorithms}}
+				{{#each sortFamilies}}
+				{{#each sorts}}
 				<div class="col">
 					<div class="card h-100">
 						<div class="card-body">
 							<h5 class="card-title">{{name}}</h5>
-							<p class="card-text">{{description}}</p>
+							<p class="card-text">{{shortDescription}}</p>
 						</div>
 						<div class="card-footer">
 							<a href="{{nameMachine}}.html" class="btn btn-primary">Try</a>
@@ -37,7 +53,61 @@
 					</div>
 				</div>
 				{{/each}}
+				{{/each}}
 			</div>
+		</div>
+
+		<div id="table_container" class="container-fluid hidden">
+			<div class="table-head row">
+				<div class="col-md-3 col-5 algorithm-name">Family / Algorithm</div>
+				<div class="col-md-5 col-7 algorithm-complexity-time">
+					<div class="row">
+						<div class="col-12">Time complexity</div>
+					</div>
+					<div class="row algorithm-complexity-time">
+						<div class="col-4 algorithm-complexity-time-best">Best</div>
+						<div class="col-4 algorithm-complexity-time-avg">Average</div>
+						<div class="col-4 algorithm-complexity-time-worst">Worst</div>
+					</div>
+				</div>
+				<div class="col-md-2 d-md-block d-none algorithm-complexity-space">Space complexity</div>
+				<div class="col-md-1 d-md-block d-none algorithm-stable">Stable</div>
+				<div class="col-md-1 d-md-block d-none algorithm-in_place">In place</div>
+			</div>
+			{{#each sortFamilies}}
+			<div class="row family" data-bs-toggle="collapse" href="#collapse-wrapper-family-{{nameMachine}}" role="button">
+				<div class="col-md-3 col-5 algorithm-name">{{name}}</div>
+				<div class="col-md-5 col-7 algorithm-complexity-time">
+					<div class="row algorithm-complexity-time">
+						<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
+						<div class="col-4 algorithm-complexity-time-avg">{{complexityString timeComplexity.average}}</div>
+						<div class="col-4 algorithm-complexity-time-worst">{{complexityString timeComplexity.worst}}</div>
+					</div>
+				</div>
+				<div class="col-md-2 d-md-block d-none algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
+				<div class="col-md-1 d-md-block d-none algorithm-stable">{{booleanString stable}}</div>
+				<div class="col-md-1 d-md-block d-none algorithm-in_place">{{booleanString inPlace}}</div>
+			</div>
+			<div id="collapse-wrapper-family-{{nameMachine}}" class="family_sorts_wrapper collapse">
+				{{#each sorts}}
+				<a href="{{nameMachine}}.html" class="row algorithm">
+					<div class="col-md-3 col-5 algorithm-name">
+						<div>{{name}}</div>
+					</div>
+					<div class="col-md-5 col-7 algorithm-complexity-time">
+						<div class="row algorithm-complexity-time">
+							<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
+							<div class="col-4 algorithm-complexity-time-avg">{{complexityString timeComplexity.average}}</div>
+							<div class="col-4 algorithm-complexity-time-worst">{{complexityString timeComplexity.worst}}</div>
+						</div>
+					</div>
+					<div class="col-md-2 d-md-block d-none algorithm-complexity-space">{{complexityString spaceComplexity}}</div>
+					<div class="col-md-1 d-md-block d-none algorithm-stable">{{booleanString stable}}</div>
+					<div class="col-md-1 d-md-block d-none algorithm-in_place">{{booleanString inPlace}}</div>
+				</a>
+				{{/each}}
+			</div>
+			{{/each}}
 		</div>
 	</body>
 </html>
