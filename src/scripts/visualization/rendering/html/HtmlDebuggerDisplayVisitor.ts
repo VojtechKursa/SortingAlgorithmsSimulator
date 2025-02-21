@@ -1,7 +1,7 @@
-import { DebuggerController } from "../../controllers/DebuggerController";
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "./StepDisplayVisitor";
+import { DebuggerController } from "../../../controllers/DebuggerController";
+import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepDisplayVisitor } from "../StepDisplayVisitor";
 
 export class HtmlDebuggerDisplayVisitor extends StepDisplayVisitor {
 	public constructor(

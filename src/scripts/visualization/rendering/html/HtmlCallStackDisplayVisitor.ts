@@ -1,7 +1,7 @@
-import { CallStackController } from "../../controllers/CallStackController";
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "./StepDisplayVisitor";
+import { CallStackController } from "../../../controllers/CallStackController";
+import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepDisplayVisitor } from "../StepDisplayVisitor";
 
 export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
 	public constructor(

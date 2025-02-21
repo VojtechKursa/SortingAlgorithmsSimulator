@@ -1,11 +1,12 @@
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { StepResultArray } from "../../data/stepResults/StepResultArray";
-import { ColorSet } from "../colors/ColorSet";
-import { RendererClasses, bodyVertical1LayoutClass } from "../CssInterface";
-import { SymbolicColor } from "../colors/SymbolicColor";
-import { VariableDrawInformation } from "../../data/Variable";
-import { StepDisplayVisitorWithColor } from "./StepDisplayVisitorWithColor";
+import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepResultArray } from "../../../data/stepResults/StepResultArray";
+import { ColorSet } from "../../colors/ColorSet";
+import { RendererClasses, bodyVertical1LayoutClass } from "../../CssInterface";
+import { SymbolicColor } from "../../colors/SymbolicColor";
+import { VariableDrawInformation } from "../../../data/Variable";
+import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { StepMemory } from "../../../data/StepMemory";
 
 class Point2D {
 	public constructor(
@@ -50,7 +51,7 @@ class VariableRenderSettings {
 	) { }
 }
 
-export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
+export class SvgArrayRenderer implements SvgRenderer {
 	private readonly arraySettings = new ArrayRenderSettings();
 	private readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 
@@ -66,46 +67,104 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 
 	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
 
+	private lastStep?: StepMemory<StepResultArray>;
+	private lastResult?: SvgRenderResult;
+
+	private _colorSet;
+	get colorSet(): ColorSet {
+		return this._colorSet;
+	}
+	set colorSet(value: ColorSet) {
+		this._colorSet = value;
+	}
 
 
 	public constructor(
 		colorSet: ColorSet,
-		public readonly output: SVGSVGElement,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		next: SvgArrayRenderVisitor | null = null
 	) {
-		super(colorSet, next);
+		this._colorSet = colorSet;
+	}
+
+
+	updateColors(colorSet: ColorSet): SvgRenderResult | null {
+		this.colorSet = colorSet;
+
+		if (this.lastStep != undefined) {
+			this.drawArray(this.lastStep.fullStep);
+			this.drawVariables(this.lastStep.codeStep);
+
+			if (this.lastResult == undefined)
+				throw new Error();
+
+			return this.lastResult.clone();
+		}
+
+		return null;
+	}
+
+	render(step: FullStepResult | CodeStepResult): SvgRenderResult {
+		let fullStep: StepResultArray | null;
+		let codeStep: CodeStepResult;
+
+		if (step instanceof FullStepResult) {
+			if (!(step instanceof StepResultArray)) {
+				throw new Error("This step type is not supported by this renderer.");
+			}
+
+			if (this.lastStep != null) {
+				this.lastStep.fullStep = step;
+				this.lastStep.codeStep = step.codeStepResult;
+			} else {
+				this.lastStep = new StepMemory(step, step.codeStepResult);
+			}
+
+			fullStep = step;
+			codeStep = step.codeStepResult;
+		} else {
+			if (this.lastStep == null) {
+				throw new Error("Attempted to render code step before first full step.");
+			}
+
+			this.lastStep.codeStep = step;
+
+			fullStep = null;
+			codeStep = step;
+		}
+
+		if (fullStep != null) {
+			this.drawArray(fullStep);
+		}
+
+		if (this.lastResult == undefined) {
+			throw new Error("Attempted to render code step before first full step.");
+		}
+
+		this.drawVariables(codeStep);
+
+		return this.lastResult.clone();
+	}
+
+	redraw(): SvgRenderResult | null {
+		return null;
 	}
 
 
 
-	protected override displayFullStepInternal(step: FullStepResult, redraw: boolean): void {
-		if (redraw) {
-			this.adjustMargin();
-			return;
+	private drawArray(step: StepResultArray): void {
+		if (this.lastResult == undefined) {
+			this.lastResult =
+				new SvgRenderResult(
+					document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+					new AlignmentData(AlignmentType.FromBottom, (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2, false)
+				);
 		}
 
-		if (step instanceof StepResultArray) {
-			this.drawArray(step);
-		}
-		else
-			throw new Error("Step result type not supported by this visitor.");
-	}
+		const result = this.lastResult;
+		const output = result.svg;
 
-	protected override displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		if (redraw) {
-			this.adjustMargin();
-			return;
-		}
-
-		this.drawVariables(step);
-	}
-
-	private drawArray(step: StepResultArray) {
-		const parent = this.output;
-
-		parent.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
+		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
 		this.currentArrayLength = step.array.length;
 
@@ -158,17 +217,20 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 				group.appendChild(index);
 			}
 
-			parent.appendChild(group);
+			output.appendChild(group);
 		}
 
 		this.adjustViewBox(this.defaultMinY);
-		this.adjustMargin();
 	}
 
-	private drawVariables(step: CodeStepResult) {
-		const variableRenderer = this.output;
+	private drawVariables(step: CodeStepResult): void {
+		if (this.lastResult == undefined)
+			throw new Error("Attempted to render code step before first full step.");
 
-		variableRenderer.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
+		const result = this.lastResult;
+		const output = result.svg;
+
+		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
@@ -180,7 +242,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 			const drawInformation = variable.getDrawInformation();
 
 			if (drawInformation != null) {
-				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 1);
+				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 1);
 
 				if (variableMinY != null && variableMinY < minY) {
 					minY = variableMinY;
@@ -196,7 +258,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 					const drawInformation = variable.getDrawInformation();
 
 					if (drawInformation != null) {
-						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 0.5);
+						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 0.5);
 
 						if (variableMinY != null && variableMinY < minY) {
 							minY = variableMinY;
@@ -207,7 +269,6 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		}
 
 		this.adjustViewBox(minY);
-		this.adjustMargin();
 	}
 
 	private drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1): number | null {
@@ -266,6 +327,9 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 	}
 
 	private adjustViewBox(minY: number): boolean {
+		if (this.lastResult == undefined)
+			throw new Error("Adjust view box attempted on non-existing SVG element");
+
 		if (this.currentArrayLength == undefined)
 			return false;
 
@@ -278,47 +342,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		const width = endX - startX;
 		const height = endY - startY;
 
-		this.output.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
+		this.lastResult.svg.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
 		return true;
-	}
-
-	/**
-	 * Centers the SVG inside the parent container so the array boxes are always in the same place (if possible),
-	 * even when stacking variables increase the height of the SVG element.
-	*/
-	private adjustMargin(): void {
-		if (document.body.classList.contains(bodyVertical1LayoutClass)) {
-			this.output.style.marginTop = "";
-			return;
-		}
-
-		if (this.output.parentElement == undefined)
-			return;
-
-		let currentParentHeight = this.output.parentElement.clientHeight;
-		if (currentParentHeight == undefined)
-			return;
-
-		let lastParentHeight = undefined;
-
-		while (currentParentHeight != lastParentHeight) {
-			const svgHeight = this.output.clientHeight;
-			const viewBoxHeight = this.output.viewBox.baseVal.height;
-
-			const pixelToUnitRatio = svgHeight / viewBoxHeight;
-			const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
-
-			const margin = (currentParentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
-
-			// Prevents clipping of the SVG above it's parent
-			if (margin >= 0) {
-				this.output.style.marginTop = `${margin}px`;
-			} else {
-				this.output.style.marginTop = "";
-			}
-
-			lastParentHeight = currentParentHeight;
-			currentParentHeight = this.output.parentElement.clientHeight;
-		}
 	}
 }

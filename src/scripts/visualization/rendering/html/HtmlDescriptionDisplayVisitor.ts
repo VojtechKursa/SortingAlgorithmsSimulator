@@ -1,7 +1,7 @@
-import { StepDescriptionController, StepDescriptionKind } from "../../controllers/StepDescriptionController";
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "./StepDisplayVisitor";
+import { StepDescriptionController, StepDescriptionKind } from "../../../controllers/StepDescriptionController";
+import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepDisplayVisitor } from "../StepDisplayVisitor";
 
 export class HtmlDescriptionDisplayVisitor extends StepDisplayVisitor {
 	public constructor(
