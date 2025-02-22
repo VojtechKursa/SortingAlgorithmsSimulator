@@ -6,7 +6,7 @@ import { FullStepResult } from "./FullStepResult";
 
 
 export class StepResultArray extends FullStepResult {
-	public readonly array: IndexedNumber[];
+	public readonly array: readonly IndexedNumber[];
 	public readonly highlights: Highlights | null;
 
 	public constructor(

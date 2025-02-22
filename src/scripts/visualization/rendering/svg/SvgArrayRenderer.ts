@@ -2,11 +2,12 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { ColorSet } from "../../colors/ColorSet";
-import { RendererClasses, bodyVertical1LayoutClass } from "../../CssInterface";
+import { RendererClasses } from "../../CssInterface";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
-import { StepMemory } from "../../../data/StepMemory";
+import { UnsupportedStepResult } from "../../../errors/UnsupportedStepResult";
+import { StepResult } from "../../../data/stepResults/StepResult";
 
 class Point2D {
 	public constructor(
@@ -66,17 +67,18 @@ export class SvgArrayRenderer implements SvgRenderer {
 	private currentArrayLength: number | undefined;
 
 	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
+	private minY = this.defaultMinY;
 
-	private lastStep?: StepMemory<StepResultArray>;
-	private lastResult?: SvgRenderResult;
+	private readonly resultMemory: SvgRenderResult;
 
-	private _colorSet;
-	get colorSet(): ColorSet {
+	private _colorSet: ColorSet;
+	public get colorSet(): ColorSet {
 		return this._colorSet;
 	}
-	set colorSet(value: ColorSet) {
+	public set colorSet(value: ColorSet) {
 		this._colorSet = value;
 	}
+
 
 
 	public constructor(
@@ -85,84 +87,55 @@ export class SvgArrayRenderer implements SvgRenderer {
 		public drawLastStackLevelVariables: boolean = false,
 	) {
 		this._colorSet = colorSet;
+
+		this.resultMemory = new SvgRenderResult(
+			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+			new AlignmentData(AlignmentType.FromBottom, (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2, false)
+		);
 	}
 
 
-	updateColors(colorSet: ColorSet): SvgRenderResult | null {
-		this.colorSet = colorSet;
 
-		if (this.lastStep != undefined) {
-			this.drawArray(this.lastStep.fullStep);
-			this.drawVariables(this.lastStep.codeStep);
+	public render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult {
+		let full: StepResultArray | undefined = undefined;
+		let code: CodeStepResult | undefined = undefined;
 
-			if (this.lastResult == undefined)
-				throw new Error();
+		if (fullStep != undefined) {
+			if (!(fullStep instanceof StepResultArray)) {
+				throw new UnsupportedStepResult(["StepResultArray"]);
+			}
 
-			return this.lastResult.clone();
+			full = fullStep;
+			code = fullStep.codeStepResult;
 		}
 
-		return null;
+		if (codeStep != undefined) {
+			code = codeStep;
+		}
+
+		if (full != undefined) {
+			this.drawArray(full);
+		}
+
+		if (code != undefined) {
+			this.drawVariables(code);
+		}
+
+		if (full != undefined || code != undefined) {
+			this.adjustViewBox();
+		}
+
+		return this.resultMemory.clone();
 	}
 
-	render(step: FullStepResult | CodeStepResult): SvgRenderResult {
-		let fullStep: StepResultArray | null;
-		let codeStep: CodeStepResult;
-
-		if (step instanceof FullStepResult) {
-			if (!(step instanceof StepResultArray)) {
-				throw new Error("This step type is not supported by this renderer.");
-			}
-
-			if (this.lastStep != null) {
-				this.lastStep.fullStep = step;
-				this.lastStep.codeStep = step.codeStepResult;
-			} else {
-				this.lastStep = new StepMemory(step, step.codeStepResult);
-			}
-
-			fullStep = step;
-			codeStep = step.codeStepResult;
-		} else {
-			if (this.lastStep == null) {
-				throw new Error("Attempted to render code step before first full step.");
-			}
-
-			this.lastStep.codeStep = step;
-
-			fullStep = null;
-			codeStep = step;
-		}
-
-		if (fullStep != null) {
-			this.drawArray(fullStep);
-		}
-
-		if (this.lastResult == undefined) {
-			throw new Error("Attempted to render code step before first full step.");
-		}
-
-		this.drawVariables(codeStep);
-
-		return this.lastResult.clone();
-	}
-
-	redraw(): SvgRenderResult | null {
+	public redraw(): SvgRenderResult | null {
 		return null;
 	}
 
 
 
 	private drawArray(step: StepResultArray): void {
-		if (this.lastResult == undefined) {
-			this.lastResult =
-				new SvgRenderResult(
-					document.createElementNS("http://www.w3.org/2000/svg", "svg"),
-					new AlignmentData(AlignmentType.FromBottom, (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2, false)
-				);
-		}
-
-		const result = this.lastResult;
-		const output = result.svg;
+		const output = this.resultMemory.svg;
 
 		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
@@ -219,16 +192,13 @@ export class SvgArrayRenderer implements SvgRenderer {
 
 			output.appendChild(group);
 		}
-
-		this.adjustViewBox(this.defaultMinY);
 	}
 
 	private drawVariables(step: CodeStepResult): void {
-		if (this.lastResult == undefined)
+		if (this.resultMemory == undefined)
 			throw new Error("Attempted to render code step before first full step.");
 
-		const result = this.lastResult;
-		const output = result.svg;
+		const output = this.resultMemory.svg;
 
 		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
@@ -236,7 +206,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		let minY = this.defaultMinY;
+		this.minY = this.defaultMinY;
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();
@@ -244,8 +214,8 @@ export class SvgArrayRenderer implements SvgRenderer {
 			if (drawInformation != null) {
 				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 1);
 
-				if (variableMinY != null && variableMinY < minY) {
-					minY = variableMinY;
+				if (variableMinY != null && variableMinY < this.minY) {
+					this.minY = variableMinY;
 				}
 			}
 		});
@@ -260,15 +230,13 @@ export class SvgArrayRenderer implements SvgRenderer {
 					if (drawInformation != null) {
 						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 0.5);
 
-						if (variableMinY != null && variableMinY < minY) {
-							minY = variableMinY;
+						if (variableMinY != null && variableMinY < this.minY) {
+							this.minY = variableMinY;
 						}
 					}
 				});
 			}
 		}
-
-		this.adjustViewBox(minY);
 	}
 
 	private drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1): number | null {
@@ -326,8 +294,8 @@ export class SvgArrayRenderer implements SvgRenderer {
 		return chevronBorderTop - this.variableSettings.textMarginBottom - this.variableSettings.textFont.fontSize - this.variableSettings.textMarginTop;
 	}
 
-	private adjustViewBox(minY: number): boolean {
-		if (this.lastResult == undefined)
+	private adjustViewBox(): boolean {
+		if (this.resultMemory == undefined)
 			throw new Error("Adjust view box attempted on non-existing SVG element");
 
 		if (this.currentArrayLength == undefined)
@@ -336,13 +304,13 @@ export class SvgArrayRenderer implements SvgRenderer {
 		const startX = -this.arraySettings.horizontalMargin;
 		const endX = (this.currentArrayLength * this.arraySettings.boxSize) + this.arraySettings.horizontalMargin;
 
-		const startY = minY;
+		const startY = this.minY;
 		const endY = this.arraySettings.boxSize + (this.arraySettings.borderWidth / 2);
 
 		const width = endX - startX;
 		const height = endY - startY;
 
-		this.lastResult.svg.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
+		this.resultMemory.svg.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
 		return true;
 	}
 }

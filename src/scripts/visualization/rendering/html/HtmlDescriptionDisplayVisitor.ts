@@ -1,21 +1,24 @@
 import { StepDescriptionController, StepDescriptionKind } from "../../../controllers/StepDescriptionController";
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "../StepDisplayVisitor";
+import { StepDisplayHandler } from "../StepDisplayHandler";
 
-export class HtmlDescriptionDisplayVisitor extends StepDisplayVisitor {
+export class HtmlDescriptionDisplayHandler implements StepDisplayHandler {
 	public constructor(
-		public readonly stepDescriptionController: StepDescriptionController,
-		next: StepDisplayVisitor | null
-	) {
-		super(next);
+		public readonly stepDescriptionController: StepDescriptionController
+	) { }
+
+	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
+		let code = codeStep != undefined ? codeStep : fullStep?.codeStepResult;
+
+		if (code != undefined) {
+			this.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, code.text);
+		}
+
+		if (fullStep != undefined) {
+			this.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, fullStep.text);
+		}
 	}
 
-	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void {
-		this.stepDescriptionController.setDescription(StepDescriptionKind.FullStepDescription, step.text);
-	}
-
-	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		this.stepDescriptionController.setDescription(StepDescriptionKind.CodeStepDescription, step.text);
-	}
+	public redraw(): void { }
 }

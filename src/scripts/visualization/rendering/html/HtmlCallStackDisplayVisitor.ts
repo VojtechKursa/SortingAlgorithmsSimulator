@@ -1,23 +1,21 @@
 import { CallStackController } from "../../../controllers/CallStackController";
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "../StepDisplayVisitor";
+import { StepDisplayHandler } from "../StepDisplayHandler";
 
-export class HtmlCallStackDisplayVisitor extends StepDisplayVisitor {
+export class HtmlCallStackDisplayHandler implements StepDisplayHandler {
 	public constructor(
-		public readonly callStackController: CallStackController,
-		next: StepDisplayVisitor | null
-	) {
-		super(next);
-	}
+		public readonly callStackController: CallStackController
+	) { }
 
-	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void { }
+	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
+		let code = codeStep != undefined ? codeStep : fullStep?.codeStepResult;
 
-	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		if (step.callStack != undefined && !redraw) {
+		if (code?.callStack != undefined) {
 			this.callStackController.isPresent = true;
-
-			this.callStackController.display(step.callStack, step.variables);
+			this.callStackController.display(code.callStack, code.variables);
 		}
 	}
+
+	public redraw(): void { }
 }

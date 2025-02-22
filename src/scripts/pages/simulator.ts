@@ -11,16 +11,17 @@ import { SvgArrayRenderer } from "../visualization/rendering/svg/SvgArrayRendere
 import { PageColors } from "../visualization/colors/PageColors";
 import { CallStackController } from "../controllers/CallStackController";
 import { DebuggerController } from "../controllers/DebuggerController";
-import { HtmlCallStackDisplayVisitor } from "../visualization/rendering/html/HtmlCallStackDisplayVisitor";
-import { HtmlVariableWatchDisplayVisitor } from "../visualization/rendering/html/HtmlVariableWatchDisplayVisitor";
+import { HtmlCallStackDisplayHandler } from "../visualization/rendering/html/HtmlCallStackDisplayVisitor";
+import { HtmlVariableWatchDisplayHandler } from "../visualization/rendering/html/HtmlVariableWatchDisplayVisitor";
 import { VariableWatchController } from "../controllers/VariableWatchController";
-import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/html/HtmlDebuggerDisplayVisitor";
-import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/html/HtmlDescriptionDisplayVisitor";
+import { HtmlDebuggerDisplayHandler } from "../visualization/rendering/html/HtmlDebuggerDisplayVisitor";
+import { HtmlDescriptionDisplayHandler } from "../visualization/rendering/html/HtmlDescriptionDisplayVisitor";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { initCommon } from "./common";
 import { StepKindController } from "../controllers/StepKindController";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
-import { HtmlSvgDisplayVisitor } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
+import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
+import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 
 
 
@@ -90,12 +91,14 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let renderers = [svgBoxesRenderer];
 
-		let svgDisplayVisitor = new HtmlSvgDisplayVisitor(null, svgBoxesRenderer, output);
+		let svgDisplayVisitor = new HtmlSvgDisplayHandler(svgBoxesRenderer, output);
 
-		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, null);
-		let callStackVisitor = new HtmlCallStackDisplayVisitor(callStackController, descriptionVisitor);
-		let variableWatchVisitor = new HtmlVariableWatchDisplayVisitor(new VariableWatchController(variableWatchElement), callStackVisitor);
-		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
+		let displayHandlers: StepDisplayHandler[] = [
+			new HtmlDescriptionDisplayHandler(stepDescriptionController),
+			new HtmlCallStackDisplayHandler(callStackController),
+			new HtmlVariableWatchDisplayHandler(new VariableWatchController(variableWatchElement)),
+			new HtmlDebuggerDisplayHandler(debuggerController),
+		];
 
 		playerController = new PlayerController(
 			sortingAlgorithm,
@@ -104,7 +107,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			debuggerController,
 			continuousControl,
 			stepKindController,
-			debuggerVisitor,
+			displayHandlers,
 			svgDisplayVisitor,
 			renderers,
 			colors,

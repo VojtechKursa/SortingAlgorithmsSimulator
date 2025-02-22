@@ -1,6 +1,6 @@
 import { Variable } from "../Variable";
 import { StepResult } from "./StepResult";
-import { StepDisplayVisitor } from "../../visualization/rendering/StepDisplayVisitor";
+import { StepDisplayHandler } from "../../visualization/rendering/StepDisplayHandler";
 import { Highlights } from "../../visualization/Highlights";
 import { SymbolicColor } from "../../visualization/colors/SymbolicColor";
 import { CallStack, CallStackFreezed } from "../CallStack";
@@ -25,14 +25,6 @@ export class CodeStepResult extends StepResult {
 
 	public get callStack(): CallStackFreezed | undefined {
 		return this.stack;
-	}
-
-	public display(renderer: StepDisplayVisitor): void {
-		renderer.displayCodeStep(this, false);
-	}
-
-	public redraw(renderer: StepDisplayVisitor): void {
-		renderer.displayCodeStep(this, true);
 	}
 
 	public acceptEqualStack(stack: CallStack | CallStackFreezed) {

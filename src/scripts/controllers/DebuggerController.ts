@@ -31,7 +31,7 @@ export class DebuggerController {
 		});
 	}
 
-	public addHighlightedLines(lines: Map<number, SymbolicColor>): void {
+	public addHighlightedLines(lines: ReadonlyMap<number, SymbolicColor>): void {
 		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
 		const debuggerLines = this.debuggerElement.children;
 
@@ -44,7 +44,7 @@ export class DebuggerController {
 		this.debuggerElement.querySelectorAll(`.${highlightClass}`).forEach(element => element.classList.remove(highlightClass));
 	}
 
-	public setHighlightedLines(lines: Map<number, SymbolicColor>): void {
+	public setHighlightedLines(lines: ReadonlyMap<number, SymbolicColor>): void {
 		this.clearHighlights();
 		this.addHighlightedLines(lines);
 	}

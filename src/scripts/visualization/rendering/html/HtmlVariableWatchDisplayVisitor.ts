@@ -1,20 +1,19 @@
 import { VariableWatchController } from "../../../controllers/VariableWatchController";
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
-import { StepDisplayVisitor } from "../StepDisplayVisitor";
+import { StepDisplayHandler } from "../StepDisplayHandler";
 
-export class HtmlVariableWatchDisplayVisitor extends StepDisplayVisitor {
+export class HtmlVariableWatchDisplayHandler implements StepDisplayHandler {
 	public constructor(
-		public readonly variableWatchController: VariableWatchController,
-		next: StepDisplayVisitor | null
-	) {
-		super(next);
+		public readonly variableWatchController: VariableWatchController
+	) { }
+
+	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
+		let code = codeStep != undefined ? codeStep : fullStep?.codeStepResult;
+
+		if (code != undefined)
+			this.variableWatchController.setVariables(code.variables);
 	}
 
-	protected displayFullStepInternal(step: FullStepResult, redraw: boolean): void { }
-
-	protected displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		if (!redraw)
-			this.variableWatchController.setVariables(step.variables);
-	}
+	public redraw(): void { }
 }

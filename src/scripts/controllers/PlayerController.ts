@@ -4,14 +4,14 @@ import { RendererControlElements } from "../data/collections/htmlElementCollecti
 import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlController } from "./ContinuousControlController";
-import { StepDisplayVisitor } from "../visualization/rendering/StepDisplayVisitor";
+import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 import { PageColors } from "../visualization/colors/PageColors";
 import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { ColorSet } from "../visualization/colors/ColorSet";
 import { DebuggerController } from "./DebuggerController";
 import { StepKindController } from "./StepKindController";
 import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
-import { HtmlSvgDisplayVisitor } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
+import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
 
 export class PlayerController {
@@ -34,8 +34,8 @@ export class PlayerController {
 		private readonly debuggerController: DebuggerController,
 		private readonly continuousControls: ContinuousControlController,
 		private readonly stepKindController: StepKindController,
-		private readonly htmlDisplayVisitor: StepDisplayVisitor,
-		private readonly htmlSvgVisitor: HtmlSvgDisplayVisitor,
+		private readonly htmlDisplayHandlers: readonly StepDisplayHandler[],
+		private readonly svgDisplayHandler: HtmlSvgDisplayHandler,
 		private readonly renderers: readonly SvgRenderer[],
 		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
@@ -69,14 +69,16 @@ export class PlayerController {
 		let currentState = this.steps.getCurrentStep();
 		let currentStepNumbers = currentState.stepsIndex;
 
+		let fullStep: FullStepResult | undefined = undefined;
 		if (currentState.fullStepResult != this.currentlyDisplayedFullStep) {
-			currentState.fullStepResult.display(this.htmlDisplayVisitor, false);
-			currentState.fullStepResult.display(this.htmlSvgVisitor, false);
+			fullStep = currentState.fullStepResult;
 			this.currentlyDisplayedFullStep = currentState.fullStepResult;
 		}
 
-		currentState.codeStepResult.display(this.htmlDisplayVisitor);
-		currentState.codeStepResult.display(this.htmlSvgVisitor);
+		for (const handler of this.htmlDisplayHandlers) {
+			handler.display(fullStep, currentState.codeStepResult);
+		}
+		this.svgDisplayHandler.display(fullStep, currentState.codeStepResult);
 
 		let endStepNumberFull = this.steps.getEndStepNumber(StepKind.Full);
 		let endStepNumberSub = this.steps.getEndStepNumber(StepKind.Sub);
@@ -87,13 +89,11 @@ export class PlayerController {
 	}
 
 	public redraw(): void {
-		let currentStep = this.steps.getCurrentStep();
+		for (const handler of this.htmlDisplayHandlers) {
+			handler.redraw();
+		}
 
-		currentStep.fullStepResult.redraw(this.htmlDisplayVisitor, false);
-		currentStep.fullStepResult.redraw(this.htmlSvgVisitor, false);
-
-		currentStep.codeStepResult.redraw(this.htmlDisplayVisitor);
-		currentStep.codeStepResult.redraw(this.htmlSvgVisitor);
+		this.svgDisplayHandler.redraw();
 	}
 
 	public forward(kind: StepKind = this.stepKindController.selectedStepKind): void {
@@ -260,7 +260,7 @@ export class PlayerController {
 		if (this.currentColorSet != newColorSet) {
 			this.currentColorSet = newColorSet;
 
-			this.htmlSvgVisitor.updateColorSet(newColorSet);
+			this.svgDisplayHandler.updateColorSet(newColorSet);
 		}
 	}
 

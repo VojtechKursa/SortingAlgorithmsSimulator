@@ -1,84 +1,79 @@
-import { StepMemory } from "../../../data/StepMemory";
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { ColorSet } from "../../colors/ColorSet";
 import { bodyVertical1LayoutClass } from "../../CssInterface";
-import { StepDisplayVisitor } from "../StepDisplayVisitor";
-import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { StepDisplayHandler } from "../StepDisplayHandler";
+import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 
-export class HtmlSvgDisplayVisitor extends StepDisplayVisitor {
+export class HtmlSvgDisplayHandler implements StepDisplayHandler {
+	private _renderer: SvgRenderer;
+
+	private lastRenderResult?: SvgRenderResult;
+
+
+
+	public constructor(
+		renderer: SvgRenderer,
+		public readonly svgOutput: SVGSVGElement,
+		public animate: boolean = true,
+		public animationDurationSeconds: number = 0.5
+	) {
+		this._renderer = renderer;
+	}
+
+
+
 	public get colorSet(): ColorSet {
 		return this.renderer.colorSet;
 	}
-	public get renderer(): SvgRenderer {
-		return this._renderer;
-	}
-
-	private lastStep?: StepMemory<FullStepResult>;
-	private lastRenderResult?: SvgRenderResult;
-
-	public constructor(
-		next: StepDisplayVisitor | null,
-		private _renderer: SvgRenderer,
-		public readonly svgOutput: SVGSVGElement,
-	) {
-		super(next);
-	}
 
 	public updateColorSet(newColorSet: ColorSet): void {
-		const rendered = this.renderer.updateColors(newColorSet);
+		this.renderer.colorSet = newColorSet;
 
-		if (rendered != null)
-			this.applySvgResult(rendered);
+		this.displayLastStep();
+	}
+
+	public get renderer(): SvgRenderer {
+		return this._renderer;
 	}
 
 	public updateRenderer(newRenderer: SvgRenderer): void {
 		this._renderer = newRenderer;
 
-		if (this.lastStep != null) {
-			this.renderer.render(this.lastStep.fullStep);
-
-			this.applySvgResult(this.renderer.render(this.lastStep.codeStep));
-		}
+		this.displayLastStep();
 	}
 
 
-
-	protected override displayFullStepInternal(step: FullStepResult, redraw: boolean): void {
-		if (this.lastStep == null) {
-			this.lastStep = new StepMemory(step, step.codeStepResult);
-		} else {
-			this.lastStep.fullStep = step;
-			this.lastStep.codeStep = step.codeStepResult;
+	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
+		if (codeStep == undefined) {
+			if (fullStep != undefined)
+				codeStep = fullStep.codeStepResult;
+			else
+				return;
 		}
 
-		this.display(step, redraw);
+		const rendered = this.renderer.render(fullStep, codeStep);
+
+		this.applySvgResult(rendered);
+		this.lastRenderResult = rendered;
 	}
 
-	protected override displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		if (this.lastStep == null) {
-			throw new Error("Attempted to render code step as first step.")
-		}
+	private displayLastStep(): void {
+		const rendered = this.renderer.render();
 
-		this.lastStep.codeStep = step;
-
-		this.display(step, redraw);
+		this.applySvgResult(rendered);
+		this.lastRenderResult = rendered;
 	}
 
+	public redraw(): void {
+		let rendered = this.renderer.redraw();
 
-
-	private display(step: CodeStepResult | FullStepResult, redraw: boolean): void {
-		if (redraw) {
-			let rendered = this.renderer.redraw();
-
-			if (rendered != null) {
-				this.applySvgResult(rendered);
-			} else if (this.lastRenderResult != undefined) {
-				this.adjustMargins(this.lastRenderResult);
-			}
+		if (rendered != null) {
+			this.applySvgResult(rendered);
+			this.lastRenderResult = rendered;
 		}
-		else {
-			this.applySvgResult(this.renderer.render(step));
+		else if (this.lastRenderResult != undefined) {
+			this.adjustMargins(this.lastRenderResult);
 		}
 	}
 
@@ -92,9 +87,11 @@ export class HtmlSvgDisplayVisitor extends StepDisplayVisitor {
 
 		this.svgOutput.textContent = "";
 
-		const viewBox = svg.viewBox.baseVal;
+		const viewBox = svg.getAttribute("viewBox");
 
-		this.svgOutput.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+		if (viewBox != null)
+			this.svgOutput.setAttribute("viewBox", viewBox);
+
 		this.svgOutput.innerHTML = svg.innerHTML;
 	}
 
@@ -150,7 +147,5 @@ export class HtmlSvgDisplayVisitor extends StepDisplayVisitor {
 			lastParentHeight = currentParentHeight;
 			currentParentHeight = this.svgOutput.parentElement.clientHeight;
 		}
-
-		this.lastRenderResult = svgResult;
 	}
 }

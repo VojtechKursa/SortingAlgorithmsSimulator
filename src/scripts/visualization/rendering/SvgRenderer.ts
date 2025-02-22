@@ -30,8 +30,7 @@ export interface SvgRenderer {
 	get colorSet(): ColorSet;
 	set colorSet(value: ColorSet);
 
-	updateColors(colorSet: ColorSet): SvgRenderResult | null;
+	render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult;
 
-	render(step: FullStepResult | CodeStepResult): SvgRenderResult;
 	redraw(): SvgRenderResult | null;
 }
