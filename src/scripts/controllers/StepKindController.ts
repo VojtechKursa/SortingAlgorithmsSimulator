@@ -1,10 +1,24 @@
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 
+/**
+ * Controller for managing the UI and selection of step kinds.
+ * @see StepKind
+ */
 export class StepKindController {
+	/**
+	 * Gets the currently selected step kind.
+	 * @returns The currently selected step kind.
+	 */
 	public get selectedStepKind(): StepKind {
 		// This getter hides the method for future optimization
 		return this.getSelectedStepKind();
 	}
+
+	/**
+	 * Sets the selected step kind and updates the state of the UI.
+	 * @param value - The step kind to select.
+	 * @throws Will throw an error if no UI element for representing the given step kind is found in this controller.
+	 */
 	public set selectedStepKind(value: StepKind) {
 		const stepKindDescription = StepKindHelper.toString(value);
 
@@ -16,6 +30,11 @@ export class StepKindController {
 		radio.checked = true;
 	}
 
+	/**
+	 * Creates an instance of StepKindController.
+	 * Initializes the radio buttons for each step kind and sets the default selection.
+	 * @param radioButtonWrapper - The wrapper element for containing the radio buttons for selection of step kinds.
+	 */
 	public constructor(
 		private readonly radioButtonWrapper: HTMLDivElement
 	) {
@@ -49,6 +68,12 @@ export class StepKindController {
 			defaultRadioButton.checked = true;
 	}
 
+	/**
+	 * Gets the currently selected step kind by checking for a checked radio button in the wrapper.
+	 * @returns The currently selected step kind.
+	 * @throws Will throw an error if no radio button is checked or if the checked radio button has a value not associated with any StepKind.
+	 * @see StepKind
+	 */
 	private getSelectedStepKind(): StepKind {
 		let checkedRadio = this.radioButtonWrapper.querySelector("input[type=radio]:checked") as HTMLInputElement | null;
 
@@ -63,6 +88,10 @@ export class StepKindController {
 		return kind;
 	}
 
+	/**
+	 * Selects the next or previous step kind in a step kind sequence. Wraps around.
+	 * @param next - If true, selects the next step kind. Otherwise, selects the previous step kind.
+	 */
 	public selectNextInLine(next: boolean): void {
 		const selectedKind = this.selectedStepKind;
 		const nextKind = StepKindHelper.getRelativeKind(selectedKind, next, true);

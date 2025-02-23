@@ -2,12 +2,29 @@ import { CallStack, CallStackFrozen, CallStackLevel } from "../data/CallStack";
 import { Variable } from "../data/Variable";
 import { hiddenClass } from "../visualization/css/GenericClasses";
 
+/**
+ * Controller class for managing and displaying a call stack in the simulator UI.
+ */
 export class CallStackController {
+	/**
+	 * The table body element where the call stack levels will be displayed.
+	 */
 	protected readonly tableBody: HTMLTableSectionElement;
 
+	/**
+	 * Stores the last displayed call stack data and variables.
+	 */
 	private lastDisplayData: [CallStackFrozen, Variable[]?] | undefined;
 
+	/**
+	 * The symbol used to separate variable names and values.
+	 */
 	private _variableSeparationSymbol: string;
+
+	/**
+	 * Sets a new variable separation symbol and updates the display if there is existing data.
+	 * @param newSymbol - The new symbol to use for separating variable names and values.
+	 */
 	public set variableSeparationSymbol(newSymbol: string) {
 		this._variableSeparationSymbol = newSymbol;
 
@@ -15,10 +32,21 @@ export class CallStackController {
 			this.display(this.lastDisplayData[0], this.lastDisplayData[1]);
 		}
 	}
+
+	/**
+	 * Gets the current variable separation symbol.
+	 * @returns The current symbol used for separating variable names and values.
+	 */
 	public get variableSeparationSymbol(): string {
 		return this._variableSeparationSymbol;
 	}
 
+	/**
+	 * Creates an instance of CallStackController.
+	 * @param callStackWrapper - The HTMLDivElement that wraps the call stack table.
+	 * @param variableSeparationSymbol - The symbol used to separate variable names and values. Defaults to "=".
+	 * @param visible - A boolean indicating whether the call stack is initially visible. Defaults to false.
+	 */
 	public constructor(
 		public readonly callStackWrapper: HTMLDivElement,
 		variableSeparationSymbol: string = "=",
@@ -39,9 +67,18 @@ export class CallStackController {
 		this._variableSeparationSymbol = variableSeparationSymbol;
 	}
 
+	/**
+	 * Gets whether the call stack is currently visible.
+	 * @returns True if the call stack is visible, otherwise false.
+	 */
 	public get isPresent(): boolean {
 		return !this.callStackWrapper.classList.contains(hiddenClass);
 	}
+
+	/**
+	 * Sets the visibility of the call stack.
+	 * @param isPresent - True to make the call stack visible, false to hide it.
+	 */
 	public set isPresent(isPresent: boolean) {
 		if (isPresent) {
 			this.callStackWrapper.classList.remove(hiddenClass);
@@ -51,6 +88,11 @@ export class CallStackController {
 		}
 	}
 
+	/**
+	 * Displays the given call stack and optionally the current level variables.
+	 * @param stack - The call stack to display.
+	 * @param currentLevelVariables - The variables of the current call stack level, if any.
+	 */
 	public display(stack: CallStack | CallStackFrozen, currentLevelVariables?: Variable[]): void {
 		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
 
@@ -67,6 +109,11 @@ export class CallStackController {
 		this.lastDisplayData = [localStack, currentLevelVariables];
 	}
 
+	/**
+	 * Creates a table row element for a given call stack level.
+	 * @param level - The call stack level to create a row for.
+	 * @returns The created table row element.
+	 */
 	private createStackLevelRow(level: CallStackLevel): HTMLTableRowElement {
 		const functionNameCol = document.createElement("td");
 		functionNameCol.textContent = level.functionName;
@@ -82,6 +129,11 @@ export class CallStackController {
 		return row;
 	}
 
+	/**
+	 * Creates a div element containing the variables of a call stack level.
+	 * @param variables - The variables of a call stack level to display.
+	 * @returns The created div element containing the variables of a call stack level.
+	 */
 	private createVariablesCell(variables: Variable[]): HTMLDivElement {
 		const wrapper = document.createElement("div");
 
