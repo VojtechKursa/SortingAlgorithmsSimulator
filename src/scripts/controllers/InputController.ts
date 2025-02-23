@@ -57,7 +57,7 @@ export class InputController {
 
 	public openDialog() {
 		this.dialogEventListeners.forEach(listener => listener(true));
-		
+
 		this.dialog.showModal();
 		this.body.classList.add("blur");
 	}

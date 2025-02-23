@@ -70,7 +70,7 @@ export class KeyboardSettings {
 			if (!Array.isArray(arrayItem) || arrayItem.length != 2) {
 				continue;
 			}
-			
+
 			const trigger = arrayItem[0];
 			const action = InterfaceActionData.fromString(arrayItem[1]);
 
@@ -108,7 +108,7 @@ export class KeyboardSettings {
 		if (saveAfterLoad) {
 			result.save();
 		}
-		
+
 		return result;
 	}
 
