@@ -5,10 +5,61 @@ import { bodyVertical1LayoutClass } from "../../CssInterface";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 
+type AnimatableSVGElement = SVGRectElement | SVGTextElement | SVGPolygonElement;
+
+class Difference<T> {
+	public constructor(
+		public readonly property: string,
+		public readonly originalValue: T,
+		public readonly newValue: T
+	) { }
+}
+
+class AnimatablePropertyMap {
+	private readonly map = new Map<string, string>();
+
+	public constructor(
+		element: SVGElement
+	) {
+		this.addCommonAttributes(element);
+	}
+
+	public addCommonAttributes(element: SVGElement) {
+		this.addAttribute(element, "x");
+		this.addAttribute(element, "y");
+		this.addAttribute(element, "points");
+	}
+
+	public addAttribute(element: SVGElement, attribute: string) {
+		const attr = element.getAttribute(attribute);
+		if (attr != null)
+			this.map.set(attribute, attr);
+	}
+
+	public static getDifferences(originalPropertyMap: AnimatablePropertyMap, newPropertyMap: AnimatablePropertyMap): Array<Difference<string>> | null {
+		const result = new Array<Difference<string>>();
+
+		for (const map1KeyVal of originalPropertyMap.map) {
+			const map2Val = newPropertyMap.map.get(map1KeyVal[0]);
+			if (map2Val == undefined)
+				continue;
+
+			if (map1KeyVal[1] != map2Val)
+				result.push(new Difference(map1KeyVal[0], map1KeyVal[1], map2Val));
+		}
+
+		if (result.length > 0)
+			return result;
+		else
+			return null;
+	}
+}
+
 export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	private _renderer: SvgRenderer;
 
 	private lastRenderResult?: SvgRenderResult;
+	private lastRenderMemory?: Map<string, AnimatableSVGElement>;
 
 
 
@@ -61,7 +112,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	private displayLastStep(): void {
 		const rendered = this.renderer.render();
 
-		this.applySvgResult(rendered);
+		this.applySvgResult(rendered, true);
 		this.lastRenderResult = rendered;
 	}
 
@@ -77,14 +128,80 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		}
 	}
 
-	private applySvgResult(svgResult: SvgRenderResult): void {
-		this.renderSvg(svgResult.svg);
+	private buildLastRenderMemory(): Map<string, AnimatableSVGElement> | undefined {
+		if (this.lastRenderResult == undefined)
+			return undefined;
+
+		const result = new Map<string, AnimatableSVGElement>();
+
+		for (const element of this.getAnimatableElements(this.lastRenderResult.svg)) {
+			result.set(element.id, element as AnimatableSVGElement);
+		}
+
+		return result;
+	}
+
+	private getAnimatableElements(svg: SVGSVGElement): Array<AnimatableSVGElement> {
+		return new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
+	}
+
+	private applySvgResult(svgResult: SvgRenderResult, preventAnimation: boolean = false): void {
+		let svgToRender = preventAnimation ? svgResult.svg : this.handleAnimations(svgResult.svg);
+
+		this.renderSvg(svgToRender);
 		this.adjustMargins(svgResult);
 	}
 
-	private renderSvg(svg: SVGSVGElement): void {
-		// TODO Animate (modify the svg parameter contents)
+	private handleAnimations(svg: SVGSVGElement): SVGSVGElement {
+		const animate = this.animate && this.animationDurationSeconds > 0;
 
+		if (!animate) {
+			if (this.lastRenderMemory != undefined)
+				this.lastRenderMemory = undefined;
+
+			return svg;
+		}
+
+		this.lastRenderMemory = this.buildLastRenderMemory();
+		if (this.lastRenderMemory == undefined) {
+			return svg;
+		}
+
+		const animatedSVG = svg.cloneNode(true) as SVGSVGElement;
+
+		const currentAnimatable = this.getAnimatableElements(animatedSVG);
+
+		for (const currentElement of currentAnimatable) {
+			const previousElement = this.lastRenderMemory.get(currentElement.id);
+			if (previousElement == undefined)
+				continue;
+
+			const currentElementProperties = new AnimatablePropertyMap(currentElement);
+			const previousElementProperties = new AnimatablePropertyMap(previousElement);
+			const differences = AnimatablePropertyMap.getDifferences(previousElementProperties, currentElementProperties);
+
+			if (differences == null)
+				continue;
+
+			for (const difference of differences) {
+				const animateElement = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+
+				animateElement.setAttribute("begin", "indefinite");
+				animateElement.setAttribute("dur", `${this.animationDurationSeconds}s`);
+				animateElement.setAttribute("fill", "freeze");
+
+				animateElement.setAttribute("attributeName", difference.property);
+				animateElement.setAttribute("from", difference.originalValue);
+				animateElement.setAttribute("to", difference.newValue);
+
+				currentElement.appendChild(animateElement);
+			}
+		}
+
+		return animatedSVG;
+	}
+
+	private renderSvg(svg: SVGSVGElement): void {
 		this.svgOutput.textContent = "";
 
 		const viewBox = svg.getAttribute("viewBox");
@@ -93,6 +210,8 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 			this.svgOutput.setAttribute("viewBox", viewBox);
 
 		this.svgOutput.innerHTML = svg.innerHTML;
+
+		this.svgOutput.querySelectorAll("animate").forEach(animation => animation.beginElement());
 	}
 
 	/**

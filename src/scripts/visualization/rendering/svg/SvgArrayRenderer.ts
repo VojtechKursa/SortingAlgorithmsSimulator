@@ -146,12 +146,13 @@ export class SvgArrayRenderer implements SvgRenderer {
 
 			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 			group.classList.add(RendererClasses.elementWrapperClass);
-			group.id = `elem_${i}`;
+			group.id = `elem_${item.id}`;
 
 			const rectX = i * this.arraySettings.boxSize;
 			const rectY = 0;
 
 			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+			rect.id = `${group.id}_rect`;
 			rect.setAttribute("x", rectX.toString());
 			rect.setAttribute("y", rectY.toString());
 			rect.setAttribute("height", this.arraySettings.boxSize.toString());
@@ -162,6 +163,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 			rect.classList.add(RendererClasses.elementBoxClass);
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+			text.id = `${group.id}_text`;
 			text.setAttribute("x", (rectX + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("y", (rectY + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("font-size", `${this.arraySettings.fontMain.fontSize}px`);
@@ -177,6 +179,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 
 			if (item.index != null) {
 				const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
+				index.id = `${group.id}_index`;
 				index.setAttribute("x", (rectX + this.arraySettings.boxSize - this.arraySettings.indexRightMargin).toString());
 				index.setAttribute("y", (rectY + this.arraySettings.boxSize - this.arraySettings.indexBottomMargin).toString());
 				index.setAttribute("font-size", `${this.arraySettings.fontIndex.fontSize}px`);
@@ -247,6 +250,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 			return null;
 
 		const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		group.id = `variable_${variable.variableName}`;
 		group.classList.add(RendererClasses.variableWrapperClass);
 
 		const variableIndex = variablesAboveElements[variable.drawAtIndex] ?? 0;
@@ -262,6 +266,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 		points.push(new Point2D(chevronCenterX, chevronTop + this.variableSettings.chevronHeight));
 
 		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+		chevron.id = `${group.id}_chevron`;
 		chevron.classList.add(RendererClasses.variablePointerClass);
 		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
 		chevron.setAttribute("stroke", this.colorSet.get(SymbolicColor.Simulator_Border).toString());
@@ -274,6 +279,7 @@ export class SvgArrayRenderer implements SvgRenderer {
 		const chevronBorderTop = chevronTop - (this.variableSettings.chevronStrokeWidth / 2);
 
 		const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		text.id = `${group.id}_text`;
 		text.textContent = variable.variableName;
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", chevronCenterX.toString());

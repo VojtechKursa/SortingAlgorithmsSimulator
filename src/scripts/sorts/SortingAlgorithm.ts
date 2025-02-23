@@ -5,12 +5,13 @@ import { StepResult } from "../data/stepResults/StepResult";
 
 class TemporaryIndexedNumber {
 	public constructor(
+		public readonly id: number,
 		public readonly value: number,
 		public index: number | null
 	) { }
 
 	public freeze(): IndexedNumber {
-		return new IndexedNumber(this.value, this.index);
+		return new IndexedNumber(this.id, this.value, this.index);
 	}
 };
 
@@ -52,13 +53,14 @@ export abstract class SortingAlgorithm {
 	private indexInput(input: number[]): IndexedNumber[] {
 		let indexes = new Map<number, IndexingData>();
 		let result = new Array<TemporaryIndexedNumber>();
+		let idCounter = 0;
 
 		for (const num of input) {
 			let indexData = indexes.get(num);
-			let indexedNumber;
+			let indexedNumber: TemporaryIndexedNumber;
 
 			if (indexData == undefined) {
-				indexedNumber = new TemporaryIndexedNumber(num, null);
+				indexedNumber = new TemporaryIndexedNumber(idCounter, num, null);
 				indexes.set(num, new IndexingData(1, indexedNumber));
 			} else {
 				if (indexData.lastUsedIndex == 1) {
@@ -67,10 +69,11 @@ export abstract class SortingAlgorithm {
 
 				indexData.lastUsedIndex++;
 
-				indexedNumber = new TemporaryIndexedNumber(num, indexData.lastUsedIndex);
+				indexedNumber = new TemporaryIndexedNumber(idCounter, num, indexData.lastUsedIndex);
 			}
 
 			result.push(indexedNumber);
+			idCounter++;
 		}
 
 		return result.map(value => value.freeze());
