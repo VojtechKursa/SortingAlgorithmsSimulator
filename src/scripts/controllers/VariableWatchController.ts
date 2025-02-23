@@ -1,5 +1,5 @@
 import { Variable } from "../data/Variable";
-import { VariableWatchClasses } from "../visualization/CssInterface";
+import { VariableWatchClasses } from "../visualization/css/VariableWatchClasses";
 
 export class VariableWatchController {
 	public constructor(

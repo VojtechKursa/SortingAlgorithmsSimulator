@@ -1,4 +1,5 @@
-import { inputPresetDivClass, problemInputClass, problemDescriptionDivClass, inputWrapperClass } from "../../visualization/CssInterface";
+import { problemInputClass, problemDescriptionDivClass, inputWrapperClass } from "../../visualization/css/GenericClasses";
+import { inputPresetDivClass } from "../../visualization/css/InputDialogClasses";
 import { NotMandatoryError } from "../../errors/NotMandatoryError";
 
 export const nullInputErrorMessage: string = "Attempted to get value from PresetParameter that doesn't have associated input.";

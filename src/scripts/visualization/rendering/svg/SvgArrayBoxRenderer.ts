@@ -2,7 +2,7 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { ColorSet } from "../../colors/ColorSet";
-import { RendererClasses } from "../../CssInterface";
+import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";

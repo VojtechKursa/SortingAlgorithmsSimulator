@@ -1,7 +1,7 @@
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { ColorSet } from "../../colors/ColorSet";
-import { bodyVertical1LayoutClass } from "../../CssInterface";
+import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 

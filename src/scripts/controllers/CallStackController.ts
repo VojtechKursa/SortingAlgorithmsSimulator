@@ -1,6 +1,6 @@
 import { CallStack, CallStackFrozen, CallStackLevel } from "../data/CallStack";
 import { Variable } from "../data/Variable";
-import { hiddenClass } from "../visualization/CssInterface";
+import { hiddenClass } from "../visualization/css/GenericClasses";
 
 export class CallStackController {
 	protected readonly tableBody: HTMLTableSectionElement;
