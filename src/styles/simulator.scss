@@ -201,7 +201,7 @@ body.vertical1 {
 		display: block;
 	}
 
-	#col_renderer {
+	#state_renderer {
 		height: fit-content;
 
 		border-right: none !important;
@@ -210,7 +210,7 @@ body.vertical1 {
 }
 
 body.vertical2 {
-	#col_debugger {
+	#debugger_collection {
 		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 
 		#debugger_row {
@@ -221,8 +221,8 @@ body.vertical2 {
 				width: 100%;
 			}
 
-			#variable_watch_hide_wrapper,
-			#call_stack_hide_wrapper {
+			#variable_watch-hide_wrapper,
+			#call_stack-hide_wrapper {
 				margin-top: 1em;
 
 				width: 50%;
@@ -244,10 +244,10 @@ body.vertical2 {
 				}
 			}
 
-			#variable_watch_hide_wrapper {
+			#variable_watch-hide_wrapper {
 				padding-right: 1em;
 
-				&:has(+ #call_stack_hide_wrapper.hidden) {
+				&:has(+ #call_stack-hide_wrapper.hidden) {
 					width: 100%;
 					padding-right: 0;
 				}
@@ -263,7 +263,7 @@ body.vertical2 {
 	border: $border;
 	text-align: center;
 
-	#col_renderer {
+	#state_renderer {
 		flex-grow: 1;
 
 		display: flex;
@@ -295,8 +295,8 @@ body.vertical2 {
 		}
 	}
 
-	#col_debugger_wrapper {
-		#col_debugger {
+	#debugger_collection-wrapper {
+		#debugger_collection {
 			flex-grow: 1;
 
 			padding-left: calc(var(--bs-gutter-x) / 2);
@@ -348,8 +348,8 @@ body.vertical2 {
 					}
 				}
 
-				#call_stack_wrapper,
-				#variable_watch_wrapper {
+				#call_stack-wrapper,
+				#variable_watch-wrapper {
 					@include common.pad-horizontal();
 
 					table {
@@ -382,7 +382,7 @@ body.vertical2 {
 	}
 }
 
-#row_simulator_controls {
+#simulator_controls {
 	display: flex;
 	justify-content: space-between;
 
@@ -409,8 +409,8 @@ body.vertical2 {
 	}
 }
 
-#dialog_input {
-	#dialog_input-method_area {
+#dialog-input {
+	#dialog-input-method_area {
 		@include common.margin-vertical(2em);
 
 		label {

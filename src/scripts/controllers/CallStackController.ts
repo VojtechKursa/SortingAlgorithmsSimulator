@@ -1,11 +1,11 @@
-import { CallStack, CallStackFreezed, CallStackLevel } from "../data/CallStack";
+import { CallStack, CallStackFrozen, CallStackLevel } from "../data/CallStack";
 import { Variable } from "../data/Variable";
-import { hiddenClass } from "../visualization/CssInterface";
+import { hiddenClass } from "../visualization/css/GenericClasses";
 
 export class CallStackController {
 	protected readonly tableBody: HTMLTableSectionElement;
 
-	private lastDisplayData: [CallStackFreezed, Variable[]?] | undefined;
+	private lastDisplayData: [CallStackFrozen, Variable[]?] | undefined;
 
 	private _variableSeparationSymbol: string;
 	public set variableSeparationSymbol(newSymbol: string) {
@@ -26,9 +26,9 @@ export class CallStackController {
 	) {
 		this.isPresent = visible;
 
-		const body = callStackWrapper.querySelector("tbody#call_stack_body") as HTMLTableSectionElement | null;
+		const body = callStackWrapper.querySelector("tbody#call_stack-body") as HTMLTableSectionElement | null;
 		if (body == null)
-			throw new Error("Invalid call stack wrapper, doesn't contain 'tbody' element with id 'call_stack_body'");
+			throw new Error("Invalid call stack wrapper, doesn't contain 'tbody' element with id 'call_stack-body'");
 
 		this.tableBody = body;
 
@@ -47,8 +47,8 @@ export class CallStackController {
 		}
 	}
 
-	public display(stack: CallStack | CallStackFreezed, currentLevelVariables?: Variable[]): void {
-		const localStack = stack instanceof CallStackFreezed ? stack : stack.freeze();
+	public display(stack: CallStack | CallStackFrozen, currentLevelVariables?: Variable[]): void {
+		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
 
 		this.tableBody.textContent = "";
 

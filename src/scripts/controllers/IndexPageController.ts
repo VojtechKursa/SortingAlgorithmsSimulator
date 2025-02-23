@@ -1,4 +1,4 @@
-import { hiddenClass } from "../visualization/CssInterface";
+import { hiddenClass } from "../visualization/css/GenericClasses";
 
 export class IndexPageController {
 	public constructor(

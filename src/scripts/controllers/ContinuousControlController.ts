@@ -1,4 +1,4 @@
-import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
+import { StepKind } from "../data/stepResults/StepKind";
 import { StepKindController } from "./StepKindController";
 
 export interface PlayEventHandler { (stepKind: StepKind, interval: number): void }

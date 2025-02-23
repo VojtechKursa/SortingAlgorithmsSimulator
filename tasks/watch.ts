@@ -12,6 +12,6 @@ const watching = compiler.watch({}, (err, stats) => {
 	}
 	else {
 		console.log(`${now.toTimeString()} - Compilation successful.`);
-		console.log(stats?.toString({colors: true}));
+		console.log(stats?.toString({ colors: true }));
 	}
 });

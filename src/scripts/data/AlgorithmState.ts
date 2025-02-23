@@ -1,4 +1,4 @@
-import { CallStackFreezed } from "./CallStack";
+import { CallStackFrozen } from "./CallStack";
 import { StepIndexes } from "./StepIndexes";
 import { CodeStepResult } from "./stepResults/CodeStepResult";
 import { FullStepResult } from "./stepResults/FullStepResult";
@@ -10,6 +10,6 @@ export class AlgorithmState {
 		public readonly fullStepResult: FullStepResult,
 		public readonly stepKind: StepKind,
 		public readonly stepsIndex: StepIndexes,
-		public readonly callStack?: CallStackFreezed
+		public readonly callStack?: CallStackFrozen
 	) { }
 }

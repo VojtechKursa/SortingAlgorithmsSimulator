@@ -64,8 +64,8 @@ export class CallStack implements Iterable<CallStackLevel> {
 			return undefined;
 	}
 
-	public freeze(): CallStackFreezed {
-		return new CallStackFreezed(this.array, this.currentFunctionName);
+	public freeze(): CallStackFrozen {
+		return new CallStackFrozen(this.array, this.currentFunctionName);
 	}
 
 	/**
@@ -76,7 +76,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	}
 }
 
-export class CallStackFreezed extends CallStack implements Iterable<CallStackLevel> {
+export class CallStackFrozen extends CallStack implements Iterable<CallStackLevel> {
 	public constructor(
 		stack: Array<CallStackLevel>,
 		currentFunctionName?: string
@@ -96,7 +96,7 @@ export class CallStackFreezed extends CallStack implements Iterable<CallStackLev
 		return this.array.length;
 	}
 
-	public copy(): CallStackFreezed {
+	public copy(): CallStackFrozen {
 		return this.freeze();
 	}
 
@@ -108,7 +108,7 @@ export class CallStackFreezed extends CallStack implements Iterable<CallStackLev
 		return new ReverseArrayIterator(this.copy().array);
 	}
 
-	public static equalSimple(callStack1?: CallStackFreezed, callStack2?: CallStackFreezed): boolean {
+	public static equalSimple(callStack1?: CallStackFrozen, callStack2?: CallStackFrozen): boolean {
 		if (callStack1 == undefined || callStack2 == undefined) {
 			return callStack1 == undefined && callStack2 == undefined;
 		}
@@ -116,7 +116,7 @@ export class CallStackFreezed extends CallStack implements Iterable<CallStackLev
 		return callStack1.depth === callStack2.depth && callStack1.currentFunctionName === callStack2.currentFunctionName;
 	}
 
-	public static equal(callStack1?: CallStackFreezed, callStack2?: CallStackFreezed): boolean {
+	public static equal(callStack1?: CallStackFrozen, callStack2?: CallStackFrozen): boolean {
 		if (callStack1 == undefined || callStack2 == undefined) {
 			return callStack1 == undefined && callStack2 == undefined;
 		}

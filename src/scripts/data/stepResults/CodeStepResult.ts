@@ -3,34 +3,34 @@ import { StepResult } from "./StepResult";
 import { StepDisplayHandler } from "../../visualization/rendering/StepDisplayHandler";
 import { Highlights } from "../../visualization/Highlights";
 import { SymbolicColor } from "../../visualization/colors/SymbolicColor";
-import { CallStack, CallStackFreezed } from "../CallStack";
+import { CallStack, CallStackFrozen } from "../CallStack";
 
 
 
 export class CodeStepResult extends StepResult {
-	protected stack: CallStackFreezed | undefined;
+	protected stack: CallStackFrozen | undefined;
 
 	public constructor(
 		text: string = "",
 		public readonly highlightedLines: Highlights = new Map<number, SymbolicColor>(),
 		public readonly variables: Variable[] = [],
-		stack: CallStack | CallStackFreezed | undefined = undefined
+		stack: CallStack | CallStackFrozen | undefined = undefined
 	) {
 		super(text);
 
 		if (stack != undefined) {
-			this.stack = stack instanceof CallStackFreezed ? stack : stack.freeze();
+			this.stack = stack instanceof CallStackFrozen ? stack : stack.freeze();
 		}
 	}
 
-	public get callStack(): CallStackFreezed | undefined {
+	public get callStack(): CallStackFrozen | undefined {
 		return this.stack;
 	}
 
-	public acceptEqualStack(stack: CallStack | CallStackFreezed) {
-		const localStack = stack instanceof CallStackFreezed ? stack : stack.freeze();
+	public acceptEqualStack(stack: CallStack | CallStackFrozen) {
+		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
 
-		if (CallStackFreezed.equal(this.stack, localStack))
+		if (CallStackFrozen.equal(this.stack, localStack))
 			this.stack = localStack;
 	}
 }

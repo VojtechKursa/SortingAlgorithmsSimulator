@@ -1,7 +1,7 @@
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { KeyPress } from "../keyboard/KeyPress";
-import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/CssInterface";
+import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/css/LayoutClasses";
 import { CallStackController } from "./CallStackController";
 import { DarkModeHandler } from "./DarkModeHandler";
 import { InputController } from "./InputController";

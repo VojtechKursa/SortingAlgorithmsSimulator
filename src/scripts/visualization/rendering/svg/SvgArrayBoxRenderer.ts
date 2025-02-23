@@ -2,7 +2,7 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { ColorSet } from "../../colors/ColorSet";
-import { RendererClasses } from "../../CssInterface";
+import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
@@ -52,7 +52,7 @@ class VariableRenderSettings {
 	) { }
 }
 
-export class SvgArrayRenderer implements SvgRenderer {
+export class SvgArrayBoxRenderer implements SvgRenderer {
 	private readonly arraySettings = new ArrayRenderSettings();
 	private readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 
