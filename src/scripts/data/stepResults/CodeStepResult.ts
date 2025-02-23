@@ -1,6 +1,5 @@
 import { Variable } from "../Variable";
 import { StepResult } from "./StepResult";
-import { StepDisplayHandler } from "../../visualization/rendering/StepDisplayHandler";
 import { Highlights } from "../../visualization/Highlights";
 import { SymbolicColor } from "../../visualization/colors/SymbolicColor";
 import { CallStack, CallStackFrozen } from "../CallStack";

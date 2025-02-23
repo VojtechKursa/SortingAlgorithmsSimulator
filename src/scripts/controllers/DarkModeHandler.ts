@@ -28,7 +28,7 @@ export class DarkModeHandler {
 		let darkMode = this.load();
 
 		if (darkMode == undefined) {
-			this.darkMode = false
+			this.darkMode = false;
 			this.save();
 		} else {
 			this.darkMode = darkMode;
@@ -72,7 +72,7 @@ export class DarkModeHandler {
 	}
 
 	private save(): void {
-		localStorage.setItem(this.localStorageVariable, JSON.stringify(this.darkMode))
+		localStorage.setItem(this.localStorageVariable, JSON.stringify(this.darkMode));
 	}
 
 	public addEventHandler(handler: DarkModeChangedEventHandler): void {
