@@ -11,16 +11,16 @@ import { SvgArrayRenderer } from "../visualization/rendering/svg/SvgArrayRendere
 import { PageColors } from "../visualization/colors/PageColors";
 import { CallStackController } from "../controllers/CallStackController";
 import { DebuggerController } from "../controllers/DebuggerController";
-import { HtmlCallStackDisplayHandler } from "../visualization/rendering/html/HtmlCallStackDisplayVisitor";
-import { HtmlVariableWatchDisplayHandler } from "../visualization/rendering/html/HtmlVariableWatchDisplayVisitor";
+import { HtmlCallStackDisplayHandler } from "../visualization/rendering/html/HtmlCallStackDisplayHandler";
+import { HtmlVariableWatchDisplayHandler } from "../visualization/rendering/html/HtmlVariableWatchDisplayHandler";
 import { VariableWatchController } from "../controllers/VariableWatchController";
-import { HtmlDebuggerDisplayHandler } from "../visualization/rendering/html/HtmlDebuggerDisplayVisitor";
-import { HtmlDescriptionDisplayHandler } from "../visualization/rendering/html/HtmlDescriptionDisplayVisitor";
+import { HtmlDebuggerDisplayHandler } from "../visualization/rendering/html/HtmlDebuggerDisplayHandler";
+import { HtmlDescriptionDisplayHandler } from "../visualization/rendering/html/HtmlDescriptionDisplayHandler";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { initCommon } from "./common";
 import { StepKindController } from "../controllers/StepKindController";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
-import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
+import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 
 

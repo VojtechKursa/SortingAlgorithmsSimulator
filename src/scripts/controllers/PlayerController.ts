@@ -11,7 +11,7 @@ import { ColorSet } from "../visualization/colors/ColorSet";
 import { DebuggerController } from "./DebuggerController";
 import { StepKindController } from "./StepKindController";
 import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
-import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayVisitor";
+import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
 
 export class PlayerController {
