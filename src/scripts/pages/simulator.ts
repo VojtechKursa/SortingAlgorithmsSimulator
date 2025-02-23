@@ -7,19 +7,21 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { ContinuousControlController } from "../controllers/ContinuousControlController";
-import { SvgArrayRenderVisitor } from "../visualization/rendering/SvgArrayRenderVisitor";
+import { SvgArrayRenderer } from "../visualization/rendering/svg/SvgArrayRenderer";
 import { PageColors } from "../visualization/colors/PageColors";
 import { CallStackController } from "../controllers/CallStackController";
 import { DebuggerController } from "../controllers/DebuggerController";
-import { HtmlCallStackDisplayVisitor } from "../visualization/rendering/HtmlCallStackDisplayVisitor";
-import { HtmlVariableWatchDisplayVisitor } from "../visualization/rendering/HtmlVariableWatchDisplayVisitor";
+import { HtmlCallStackDisplayHandler } from "../visualization/rendering/html/HtmlCallStackDisplayHandler";
+import { HtmlVariableWatchDisplayHandler } from "../visualization/rendering/html/HtmlVariableWatchDisplayHandler";
 import { VariableWatchController } from "../controllers/VariableWatchController";
-import { HtmlDebuggerDisplayVisitor } from "../visualization/rendering/HtmlDebuggerDisplayVisitor";
-import { HtmlDescriptionDisplayVisitor } from "../visualization/rendering/HtmlDescriptionDisplayVisitor";
+import { HtmlDebuggerDisplayHandler } from "../visualization/rendering/html/HtmlDebuggerDisplayHandler";
+import { HtmlDescriptionDisplayHandler } from "../visualization/rendering/html/HtmlDescriptionDisplayHandler";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { initCommon } from "./common";
 import { StepKindController } from "../controllers/StepKindController";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
+import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
+import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 
 
 
@@ -84,11 +86,19 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackWrapper = document.getElementById("call_stack_hide_wrapper") as HTMLDivElement;
 		callStackController = new CallStackController(callStackWrapper);
 
-		let svgRenderingVisitor = new SvgArrayRenderVisitor(colors.currentColorSet, output, false, false, null);
-		let descriptionVisitor = new HtmlDescriptionDisplayVisitor(stepDescriptionController, svgRenderingVisitor);
-		let callStackVisitor = new HtmlCallStackDisplayVisitor(callStackController, descriptionVisitor);
-		let variableWatchVisitor = new HtmlVariableWatchDisplayVisitor(new VariableWatchController(variableWatchElement), callStackVisitor);
-		let debuggerVisitor = new HtmlDebuggerDisplayVisitor(debuggerController, variableWatchVisitor);
+
+		let svgBoxesRenderer = new SvgArrayRenderer(colors.currentColorSet, false, false);
+
+		let renderers = [svgBoxesRenderer];
+
+		let svgDisplayVisitor = new HtmlSvgDisplayHandler(svgBoxesRenderer, output);
+
+		let displayHandlers: StepDisplayHandler[] = [
+			new HtmlDescriptionDisplayHandler(stepDescriptionController),
+			new HtmlCallStackDisplayHandler(callStackController),
+			new HtmlVariableWatchDisplayHandler(new VariableWatchController(variableWatchElement)),
+			new HtmlDebuggerDisplayHandler(debuggerController),
+		];
 
 		playerController = new PlayerController(
 			sortingAlgorithm,
@@ -97,7 +107,9 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			debuggerController,
 			continuousControl,
 			stepKindController,
-			debuggerVisitor,
+			displayHandlers,
+			svgDisplayVisitor,
+			renderers,
 			colors,
 			reset
 		);

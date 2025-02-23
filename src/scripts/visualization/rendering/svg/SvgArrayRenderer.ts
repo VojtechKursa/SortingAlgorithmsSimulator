@@ -1,11 +1,13 @@
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
-import { StepResultArray } from "../../data/stepResults/StepResultArray";
-import { ColorSet } from "../colors/ColorSet";
-import { RendererClasses, bodyVertical1LayoutClass } from "../CssInterface";
-import { SymbolicColor } from "../colors/SymbolicColor";
-import { VariableDrawInformation } from "../../data/Variable";
-import { StepDisplayVisitorWithColor } from "./StepDisplayVisitorWithColor";
+import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
+import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepResultArray } from "../../../data/stepResults/StepResultArray";
+import { ColorSet } from "../../colors/ColorSet";
+import { RendererClasses } from "../../CssInterface";
+import { SymbolicColor } from "../../colors/SymbolicColor";
+import { VariableDrawInformation } from "../../../data/Variable";
+import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { UnsupportedStepResult } from "../../../errors/UnsupportedStepResult";
+import { StepResult } from "../../../data/stepResults/StepResult";
 
 class Point2D {
 	public constructor(
@@ -50,7 +52,7 @@ class VariableRenderSettings {
 	) { }
 }
 
-export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
+export class SvgArrayRenderer implements SvgRenderer {
 	private readonly arraySettings = new ArrayRenderSettings();
 	private readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 
@@ -65,47 +67,77 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 	private currentArrayLength: number | undefined;
 
 	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
+	private minY = this.defaultMinY;
+
+	private readonly resultMemory: SvgRenderResult;
+
+	private _colorSet: ColorSet;
+	public get colorSet(): ColorSet {
+		return this._colorSet;
+	}
+	public set colorSet(value: ColorSet) {
+		this._colorSet = value;
+	}
 
 
 
 	public constructor(
 		colorSet: ColorSet,
-		public readonly output: SVGSVGElement,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		next: SvgArrayRenderVisitor | null = null
 	) {
-		super(colorSet, next);
+		this._colorSet = colorSet;
+
+		this.resultMemory = new SvgRenderResult(
+			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+			new AlignmentData(AlignmentType.FromBottom, (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2, false)
+		);
 	}
 
 
 
-	protected override displayFullStepInternal(step: FullStepResult, redraw: boolean): void {
-		if (redraw) {
-			this.adjustMargin();
-			return;
+	public render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult {
+		let full: StepResultArray | undefined = undefined;
+		let code: CodeStepResult | undefined = undefined;
+
+		if (fullStep != undefined) {
+			if (!(fullStep instanceof StepResultArray)) {
+				throw new UnsupportedStepResult(["StepResultArray"]);
+			}
+
+			full = fullStep;
+			code = fullStep.codeStepResult;
 		}
 
-		if (step instanceof StepResultArray) {
-			this.drawArray(step);
+		if (codeStep != undefined) {
+			code = codeStep;
 		}
-		else
-			throw new Error("Step result type not supported by this visitor.");
+
+		if (full != undefined) {
+			this.drawArray(full);
+		}
+
+		if (code != undefined) {
+			this.drawVariables(code);
+		}
+
+		if (full != undefined || code != undefined) {
+			this.adjustViewBox();
+		}
+
+		return this.resultMemory.clone();
 	}
 
-	protected override displayCodeStepInternal(step: CodeStepResult, redraw: boolean): void {
-		if (redraw) {
-			this.adjustMargin();
-			return;
-		}
-
-		this.drawVariables(step);
+	public redraw(): SvgRenderResult | null {
+		return null;
 	}
 
-	private drawArray(step: StepResultArray) {
-		const parent = this.output;
 
-		parent.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
+
+	private drawArray(step: StepResultArray): void {
+		const output = this.resultMemory.svg;
+
+		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
 		this.currentArrayLength = step.array.length;
 
@@ -114,12 +146,13 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 
 			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 			group.classList.add(RendererClasses.elementWrapperClass);
-			group.id = `elem_${i}`;
+			group.id = `elem_${item.id}`;
 
 			const rectX = i * this.arraySettings.boxSize;
 			const rectY = 0;
 
 			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+			rect.id = `${group.id}_rect`;
 			rect.setAttribute("x", rectX.toString());
 			rect.setAttribute("y", rectY.toString());
 			rect.setAttribute("height", this.arraySettings.boxSize.toString());
@@ -130,6 +163,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 			rect.classList.add(RendererClasses.elementBoxClass);
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+			text.id = `${group.id}_text`;
 			text.setAttribute("x", (rectX + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("y", (rectY + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("font-size", `${this.arraySettings.fontMain.fontSize}px`);
@@ -145,6 +179,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 
 			if (item.index != null) {
 				const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
+				index.id = `${group.id}_index`;
 				index.setAttribute("x", (rectX + this.arraySettings.boxSize - this.arraySettings.indexRightMargin).toString());
 				index.setAttribute("y", (rectY + this.arraySettings.boxSize - this.arraySettings.indexBottomMargin).toString());
 				index.setAttribute("font-size", `${this.arraySettings.fontIndex.fontSize}px`);
@@ -158,32 +193,32 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 				group.appendChild(index);
 			}
 
-			parent.appendChild(group);
+			output.appendChild(group);
 		}
-
-		this.adjustViewBox(this.defaultMinY);
-		this.adjustMargin();
 	}
 
-	private drawVariables(step: CodeStepResult) {
-		const variableRenderer = this.output;
+	private drawVariables(step: CodeStepResult): void {
+		if (this.resultMemory == undefined)
+			throw new Error("Attempted to render code step before first full step.");
 
-		variableRenderer.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
+		const output = this.resultMemory.svg;
+
+		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		let minY = this.defaultMinY;
+		this.minY = this.defaultMinY;
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();
 
 			if (drawInformation != null) {
-				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 1);
+				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 1);
 
-				if (variableMinY != null && variableMinY < minY) {
-					minY = variableMinY;
+				if (variableMinY != null && variableMinY < this.minY) {
+					this.minY = variableMinY;
 				}
 			}
 		});
@@ -196,18 +231,15 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 					const drawInformation = variable.getDrawInformation();
 
 					if (drawInformation != null) {
-						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, variableRenderer, 0.5);
+						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 0.5);
 
-						if (variableMinY != null && variableMinY < minY) {
-							minY = variableMinY;
+						if (variableMinY != null && variableMinY < this.minY) {
+							this.minY = variableMinY;
 						}
 					}
 				});
 			}
 		}
-
-		this.adjustViewBox(minY);
-		this.adjustMargin();
 	}
 
 	private drawVariable(variable: VariableDrawInformation, variablesAboveElements: number[], output: SVGSVGElement, alphaFactor: number = 1): number | null {
@@ -218,6 +250,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 			return null;
 
 		const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		group.id = `variable_${variable.variableName}`;
 		group.classList.add(RendererClasses.variableWrapperClass);
 
 		const variableIndex = variablesAboveElements[variable.drawAtIndex] ?? 0;
@@ -233,6 +266,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		points.push(new Point2D(chevronCenterX, chevronTop + this.variableSettings.chevronHeight));
 
 		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+		chevron.id = `${group.id}_chevron`;
 		chevron.classList.add(RendererClasses.variablePointerClass);
 		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
 		chevron.setAttribute("stroke", this.colorSet.get(SymbolicColor.Simulator_Border).toString());
@@ -245,6 +279,7 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		const chevronBorderTop = chevronTop - (this.variableSettings.chevronStrokeWidth / 2);
 
 		const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		text.id = `${group.id}_text`;
 		text.textContent = variable.variableName;
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", chevronCenterX.toString());
@@ -265,60 +300,23 @@ export class SvgArrayRenderVisitor extends StepDisplayVisitorWithColor {
 		return chevronBorderTop - this.variableSettings.textMarginBottom - this.variableSettings.textFont.fontSize - this.variableSettings.textMarginTop;
 	}
 
-	private adjustViewBox(minY: number): boolean {
+	private adjustViewBox(): boolean {
+		if (this.resultMemory == undefined)
+			throw new Error("Adjust view box attempted on non-existing SVG element");
+
 		if (this.currentArrayLength == undefined)
 			return false;
 
 		const startX = -this.arraySettings.horizontalMargin;
 		const endX = (this.currentArrayLength * this.arraySettings.boxSize) + this.arraySettings.horizontalMargin;
 
-		const startY = minY;
+		const startY = this.minY;
 		const endY = this.arraySettings.boxSize + (this.arraySettings.borderWidth / 2);
 
 		const width = endX - startX;
 		const height = endY - startY;
 
-		this.output.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
+		this.resultMemory.svg.setAttribute("viewBox", `${startX} ${startY} ${width} ${height}`);
 		return true;
-	}
-
-	/**
-	 * Centers the SVG inside the parent container so the array boxes are always in the same place (if possible),
-	 * even when stacking variables increase the height of the SVG element.
-	*/
-	private adjustMargin(): void {
-		if (document.body.classList.contains(bodyVertical1LayoutClass)) {
-			this.output.style.marginTop = "";
-			return;
-		}
-
-		if (this.output.parentElement == undefined)
-			return;
-
-		let currentParentHeight = this.output.parentElement.clientHeight;
-		if (currentParentHeight == undefined)
-			return;
-
-		let lastParentHeight = undefined;
-
-		while (currentParentHeight != lastParentHeight) {
-			const svgHeight = this.output.clientHeight;
-			const viewBoxHeight = this.output.viewBox.baseVal.height;
-
-			const pixelToUnitRatio = svgHeight / viewBoxHeight;
-			const targetLine = (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2;
-
-			const margin = (currentParentHeight / 2) - svgHeight + (targetLine * pixelToUnitRatio);
-
-			// Prevents clipping of the SVG above it's parent
-			if (margin >= 0) {
-				this.output.style.marginTop = `${margin}px`;
-			} else {
-				this.output.style.marginTop = "";
-			}
-
-			lastParentHeight = currentParentHeight;
-			currentParentHeight = this.output.parentElement.clientHeight;
-		}
 	}
 }
