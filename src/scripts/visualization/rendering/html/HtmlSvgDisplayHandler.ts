@@ -1,3 +1,4 @@
+import { StepMemory } from "../../../data/StepMemory";
 import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { ColorSet } from "../../colors/ColorSet";
@@ -58,6 +59,7 @@ class AnimatablePropertyMap {
 export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	private _renderer: SvgRenderer;
 
+	private readonly lastStep = new StepMemory<FullStepResult>();
 	private lastRenderResult?: SvgRenderResult;
 	private lastRenderMemory?: Map<string, AnimatableSVGElement>;
 
@@ -106,11 +108,20 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		const rendered = this.renderer.render(fullStep, codeStep);
 
 		this.applySvgResult(rendered);
+
+		if (fullStep != undefined) {
+			this.lastStep.fullStep = fullStep;
+		}
+		this.lastStep.codeStep = codeStep;
+
 		this.lastRenderResult = rendered;
 	}
 
 	private displayLastStep(): void {
-		const rendered = this.renderer.render();
+		if (this.lastStep.fullStep == undefined || this.lastStep.codeStep == undefined)
+			return;
+
+		const rendered = this.renderer.render(this.lastStep.fullStep, this.lastStep.codeStep);
 
 		this.applySvgResult(rendered, true);
 		this.lastRenderResult = rendered;
