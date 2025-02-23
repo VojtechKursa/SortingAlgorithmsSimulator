@@ -15,7 +15,7 @@ export class StepKindDescription {
 }
 
 export class StepKindHelper {
-	private static readonly map = new Map<StepKind, StepKindDescription>([
+	private static readonly stepKindsMap = new Map<StepKind, StepKindDescription>([
 		[StepKind.Code, new StepKindDescription("code", "Code step")],
 		[StepKind.Sub, new StepKindDescription("sub", "Sub-step")],
 		[StepKind.Full, new StepKindDescription("full", "Full step")]
@@ -55,7 +55,7 @@ export class StepKindHelper {
 		let set = new Set<StepKind>();
 		let result = new Array<StepKindDescription>();
 
-		for (const keyPair of this.map) {
+		for (const keyPair of this.stepKindsMap) {
 			if (!set.has(keyPair[0])) {
 				set.add(keyPair[0]);
 				result.push(keyPair[1]);
@@ -69,7 +69,7 @@ export class StepKindHelper {
 		if (text == null || text == undefined)
 			return undefined;
 
-		for (const keyPair of this.map) {
+		for (const keyPair of this.stepKindsMap) {
 			if (keyPair[1].machineName == text)
 				return keyPair[0];
 		}
@@ -78,7 +78,7 @@ export class StepKindHelper {
 	}
 
 	public static toString(kind: StepKind): StepKindDescription {
-		let result = this.map.get(kind);
+		let result = this.stepKindsMap.get(kind);
 
 		if (result == undefined)
 			throw new Error("StepKind without toString implementation");
@@ -86,22 +86,28 @@ export class StepKindHelper {
 		return result;
 	}
 
-	public static getRelativeKind(referenceKind: StepKind, next: boolean): StepKind {
-		let targetIndex = this.getHierarchicalIndex(referenceKind);
+	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: true): StepKind;
+	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: false): StepKind | null;
+	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: boolean): StepKind | null {
+		let targetIndex = this.getHierarchicalIndex(referenceKind) + (next ? 1 : -1);
 
-		if (next) {
-			targetIndex = (targetIndex + 1) % this.map.size;
-		} else {
-			targetIndex = targetIndex - 1;
-			if (targetIndex < 0) {
-				targetIndex = this.map.size - 1;
+		if (wrapAround) {
+			if (next)
+				targetIndex = targetIndex % this.stepKindsMap.size;
+			else {
+				if (targetIndex < 0)
+					targetIndex = this.stepKindsMap.size - 1;
 			}
+
+			const result = this.getByHierarchicalIndex(targetIndex);
+			if (result == undefined)
+				throw new Error("StepKindHelper has invalid map");
+
+			return result;
+		} else {
+			const result = this.getByHierarchicalIndex(targetIndex);
+
+			return result ?? null;
 		}
-
-		const targetKind = this.getByHierarchicalIndex(targetIndex);
-		if (targetKind == undefined)
-			throw new Error("Invalid target step kind index");
-
-		return targetKind;
 	}
 }

@@ -52,7 +52,7 @@ class VariableRenderSettings {
 	) { }
 }
 
-export class SvgArrayRenderer implements SvgRenderer {
+export class SvgArrayBoxRenderer implements SvgRenderer {
 	private readonly arraySettings = new ArrayRenderSettings();
 	private readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 

@@ -1,5 +1,5 @@
 import { AlgorithmState } from "../AlgorithmState";
-import { CallStackFreezed } from "../CallStack";
+import { CallStackFrozen } from "../CallStack";
 import { StepIndexes } from "../StepIndexes";
 import { CodeStepResult } from "../stepResults/CodeStepResult";
 import { FullStepResult } from "../stepResults/FullStepResult";
@@ -154,7 +154,7 @@ export class StepResultCollection {
 
 		let fullStep: FullStepResult;
 		let codeStep: CodeStepResult;
-		let stack: CallStackFreezed | undefined;
+		let stack: CallStackFrozen | undefined;
 
 		if (stepResult instanceof CodeStepResult) {
 			codeStep = stepResult;
@@ -176,7 +176,7 @@ export class StepResultCollection {
 		stack = codeStep.callStack;
 		const lastStack = this.states.lastStep.callStack;
 
-		if (lastStack != undefined && CallStackFreezed.equalSimple(this.states.lastStep.callStack, stack)) {
+		if (lastStack != undefined && CallStackFrozen.equalSimple(this.states.lastStep.callStack, stack)) {
 			codeStep.acceptEqualStack(lastStack);
 		}
 

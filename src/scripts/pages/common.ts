@@ -7,7 +7,7 @@ export class InitCommonResult {
 }
 
 export function initCommon(): InitCommonResult {
-	let darkModeButton = document.getElementById("dark_mode") as HTMLButtonElement;
+	let darkModeButton = document.getElementById("dark_mode-toggle") as HTMLButtonElement;
 	let darkModeHandler = new DarkModeHandler(darkModeButton);
 
 	return new InitCommonResult(darkModeHandler);

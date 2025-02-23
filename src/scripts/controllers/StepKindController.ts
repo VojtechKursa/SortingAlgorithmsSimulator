@@ -65,7 +65,7 @@ export class StepKindController {
 
 	public selectNextInLine(next: boolean): void {
 		const selectedKind = this.selectedStepKind;
-		const nextKind = StepKindHelper.getRelativeKind(selectedKind, next);
+		const nextKind = StepKindHelper.getRelativeKind(selectedKind, next, true);
 
 		this.selectedStepKind = nextKind;
 	}
