@@ -26,9 +26,13 @@ export class CallStackController {
 	) {
 		this.isPresent = visible;
 
-		const body = callStackWrapper.querySelector("tbody#call_stack-body") as HTMLTableSectionElement | null;
-		if (body == null)
-			throw new Error("Invalid call stack wrapper, doesn't contain 'tbody' element with id 'call_stack-body'");
+		let body = callStackWrapper.querySelector("tbody#call_stack-body") as HTMLTableSectionElement | null;
+
+		if (body == null) {
+			body = document.createElement("tbody");
+			body.id = "call_stack-body";
+			callStackWrapper.appendChild(body);
+		}
 
 		this.tableBody = body;
 
