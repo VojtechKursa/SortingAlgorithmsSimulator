@@ -10,7 +10,8 @@
     "start": "tsx tasks/serve",
     "build:dev": "tsx tasks/build development",
     "build:prod": "tsx tasks/build production",
-    "serve": "tsx tasks/serve"
+    "serve": "tsx tasks/serve",
+    "docs": "typedoc --cleanOutputDir --out docs --entryPointStrategy expand src"
   },
   "keywords": [],
   "author": "Vojtěch Kursa",
@@ -28,6 +29,7 @@
     "style-loader": "^3.3.3",
     "ts-loader": "^9.5.0",
     "tsx": "^4.19.3",
+    "typedoc": "^0.27.9",
     "typescript": "^5.7.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
