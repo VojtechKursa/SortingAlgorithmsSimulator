@@ -56,15 +56,43 @@ class AnimatablePropertyMap {
 	}
 }
 
+/**
+ * A StepDisplayHandler responsible for rendering an SVG representation of an algorithm's state in the UI.
+ *
+ * This class is also responsible for animation of changes between steps.
+ */
 export class HtmlSvgDisplayHandler implements StepDisplayHandler {
+	/**
+	 * The currently selected renderer for rendering the state of the algorithm as an SVG image.
+	 */
 	private _renderer: SvgRenderer;
 
+	/**
+	 * The last step that was displayed.
+	 */
 	private readonly lastStep = new StepMemory<FullStepResult>();
+
+	/**
+	 * The last render returned by the renderer.
+	 */
 	private lastRenderResult?: SvgRenderResult;
+
+	/**
+	 * A map of the elements in the last rendered SVG, used for animating changes between steps.
+	 * Map is indexed by the elements' IDs.
+	 */
 	private lastRenderMemory?: Map<string, AnimatableSVGElement>;
 
 
 
+	/**
+	 * @param renderer - The initial renderer to use for rendering the algorithm's state as an SVG image.
+	 * @param svgOutput - The SVG element to display the rendered SVG in.
+	 * @param animate - Whether to animate changes between steps. Defaults to true.
+	 * @param animationDurationSeconds - The duration of the transition animations in seconds. Defaults to 0.5.
+	 *
+	 * @see SvgRenderer
+	 */
 	public constructor(
 		renderer: SvgRenderer,
 		public readonly svgOutput: SVGSVGElement,
@@ -76,20 +104,38 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 
 
 
+	/**
+	 * The color set used by the renderer.
+	 */
 	public get colorSet(): ColorSet {
 		return this.renderer.colorSet;
 	}
 
+	/**
+	 * Updates the color set used by the renderer and immediately re-renders the SVG image using the new color set.
+	 *
+	 * @param newColorSet - The new color set to use.
+	 *
+	 * @see SvgRenderer.colorSet
+	 */
 	public updateColorSet(newColorSet: ColorSet): void {
 		this.renderer.colorSet = newColorSet;
 
 		this.displayLastStep();
 	}
 
+	/**
+	 * The renderer used to render the algorithm's state as an SVG image.
+	 */
 	public get renderer(): SvgRenderer {
 		return this._renderer;
 	}
 
+	/**
+	 * Updates the renderer used to render the algorithm's state and immediately re-renders the SVG image using the new renderer.
+	 *
+	 * @param newRenderer - The new SvgRenderer to use.
+	 */
 	public updateRenderer(newRenderer: SvgRenderer): void {
 		this._renderer = newRenderer;
 
@@ -117,6 +163,9 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		this.lastRenderResult = rendered;
 	}
 
+	/**
+	 * Displays the last step displayed step, used for updates after changing .
+	 */
 	private displayLastStep(): void {
 		if (this.lastStep.fullStep == undefined || this.lastStep.codeStep == undefined)
 			return;
@@ -139,6 +188,11 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		}
 	}
 
+	/**
+	 * Builds a map of the elements in the last rendered SVG, that can be used for animating changes between steps.
+	 *
+	 * @returns The map of the elements in the last rendered SVG, indexed by their IDs.
+	 */
 	private buildLastRenderMemory(): Map<string, AnimatableSVGElement> | undefined {
 		if (this.lastRenderResult == undefined)
 			return undefined;
@@ -152,10 +206,25 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		return result;
 	}
 
+	/**
+	 * Retrieves all supported animatable elements from an SVG element.
+	 *
+	 * @param svg - The SVG element to retrieve the animatable elements from.
+	 *
+	 * @returns An array of all supported animatable elements in the provided SVG element.
+	 */
 	private getAnimatableElements(svg: SVGSVGElement): Array<AnimatableSVGElement> {
 		return new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
 	}
 
+	/**
+	 * Applies the SVG render result from a renderer to the SVG output element.
+	 * If animation is enabled, the changes between the last render and the new render are animated.
+	 * Margin adjustments are also applied to center the SVG inside the parent container according to the parameters in the render result.
+	 *
+	 * @param svgResult - The new SVG render result to display.
+	 * @param preventAnimation - Whether to prevent animation of changes. Defaults to false.
+	 */
 	private applySvgResult(svgResult: SvgRenderResult, preventAnimation: boolean = false): void {
 		let svgToRender = preventAnimation ? svgResult.svg : this.handleAnimations(svgResult.svg);
 
@@ -163,6 +232,16 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		this.adjustMargins(svgResult);
 	}
 
+	/**
+	 * Animates changes between the last rendered SVG and a provided SVG.
+	 *
+	 * @param svg - The new SVG element to animate.
+	 *
+	 * @returns The provided SVG element with animations added.
+	 * 	The provided element is not modified, a deep copy of the provided SVG element is created instead,
+	 * 	except in situations where animations are impossible by state of the handler
+	 * 	(animations disabled or this is the first step).
+	 */
 	private handleAnimations(svg: SVGSVGElement): SVGSVGElement {
 		const animate = this.animate && this.animationDurationSeconds > 0;
 
@@ -212,6 +291,11 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		return animatedSVG;
 	}
 
+	/**
+	 * Renders an SVG element to the SVG output element and triggers all contained animations.
+	 *
+	 * @param svg - The SVG element to render.
+	 */
 	private renderSvg(svg: SVGSVGElement): void {
 		this.svgOutput.textContent = "";
 
@@ -226,8 +310,12 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	}
 
 	/**
-	 * Centers the SVG inside the parent container so the array boxes are always in the same place (if possible),
-	 * even when stacking variables increase the height of the SVG element.
+	 * Centers the SVG inside the parent container using margins so the important elements in the SVG are always in the same place (if possible),
+	 * even when stacking variables increase the size of the SVG element.
+	 *
+	 * @param svgResult - The SVG render result to adjust the margins for.
+	 *
+	 * @see SvgRenderResult.alignment
 	*/
 	private adjustMargins(svgResult: SvgRenderResult): void {
 		if (svgResult.alignment == undefined)

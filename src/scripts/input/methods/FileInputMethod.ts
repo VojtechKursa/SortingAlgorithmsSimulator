@@ -1,11 +1,21 @@
 import { InputMethod } from "./InputMethod";
 import { ManualInputMethod } from "./ManualInputMethod";
 
+/**
+ * An input method for loading simulator input from a local file.
+ */
 export class FileInputMethod implements InputMethod {
 	public readonly name: string = "File input";
 	public readonly loadButtonText: string = "Load";
 
+	/**
+	 * Reference to the load button.
+	 */
 	protected loadButton: HTMLButtonElement | undefined;
+
+	/**
+	 * Reference to the input element.
+	 */
 	protected inputElement: HTMLInputElement | undefined;
 
 	public createForm(methodArea: HTMLDivElement, loadButton: HTMLButtonElement): void {

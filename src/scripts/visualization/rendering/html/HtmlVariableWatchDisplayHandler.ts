@@ -3,6 +3,9 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 
+/**
+ * A StepDisplayHandler responsible for rendering algorithm's local variables in the UI.
+ */
 export class HtmlVariableWatchDisplayHandler implements StepDisplayHandler {
 	public constructor(
 		public readonly variableWatchController: VariableWatchController

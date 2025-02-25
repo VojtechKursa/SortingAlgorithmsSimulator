@@ -1,5 +1,10 @@
 import { InputFunction } from "./InputFunction";
 
+/**
+ * An input generating function for generating an array of numbers in descending order.
+ *
+ * The numbers are generated as [length, length - 1, ..., 1].
+ */
 export class InputFunctionReversed extends InputFunction {
 	public constructor() {
 		super("Reversed");

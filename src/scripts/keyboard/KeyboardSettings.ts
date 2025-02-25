@@ -2,11 +2,30 @@ import { InterfaceAction, InterfaceActionData } from "./InterfaceAction";
 import { KeyBind, KeyBindType } from "./KeyBind";
 import { KeyPress } from "./KeyPress";
 
+/**
+ * A class representing keyboard settings of an application.
+ */
 export class KeyboardSettings {
+	/**
+	 * The key under which the keyboard settings should be stored in the local storage.
+	 */
 	public static readonly localStorageKey = "keyboardSettings";
 
+	/**
+	 * A map containing all hotkeys and their mapping to InterfaceActions,
+	 * grouped by KeyBindType and resolved by a normalized trigger of a KeyBind.
+	 *
+	 * @see KeyBind
+	 * @see KeyBindType
+	 * @see InterfaceAction
+	 */
 	private readonly hotkeys: Map<KeyBindType, Map<string, InterfaceAction>>;
 
+	/**
+	 * Creates an instance of KeyboardSettings.
+	 *
+	 * @param initialHotkeys - Initial keyboard settings.
+	 */
 	public constructor(initialHotkeys?: Iterable<readonly [KeyBind, InterfaceAction]>) {
 		this.hotkeys = new Map();
 
@@ -17,6 +36,12 @@ export class KeyboardSettings {
 		}
 	}
 
+	/**
+	 * Returns the action associated with the given KeyPress.
+	 *
+	 * @param pressedKey - The pressed key.
+	 * @returns The action associated with the given pressed key, if any.
+	 */
 	public getAction(pressedKey: KeyPress): InterfaceAction | undefined {
 		for (const keyBind of pressedKey.matchingKeyBinds) {
 			const result = this.hotkeys.get(keyBind.type)?.get(keyBind.normalizedTrigger);
@@ -26,6 +51,19 @@ export class KeyboardSettings {
 		}
 	}
 
+	/**
+	 * Adds a key bind to the keyboard settings.
+	 * (Sets the action associated with the given key bind.)
+	 *
+	 * @param keyBind The key bind to add.
+	 * @param action The action to associate with the key bind.
+	 * @param overwrite Whether to overwrite any existing action associated with the key bind.
+	 *
+	 * @returns True if the key bind was added successfully, false if the key bind already exists and overwrite is false.
+	 *
+	 * @see KeyBind
+	 * @see InterfaceAction
+	 */
 	public setBind(keyBind: KeyBind, action: InterfaceAction, overwrite: boolean): boolean {
 		const selectedMap = this.hotkeys.get(keyBind.type);
 
@@ -42,10 +80,18 @@ export class KeyboardSettings {
 		return true;
 	}
 
+	/**
+	 * Clears all key binds from the keyboard settings.
+	 */
 	public clear(): void {
 		this.hotkeys.clear()
 	}
 
+	/**
+	 * Serializes the keyboard settings into a JSON string.
+	 *
+	 * @returns The serialized keyboard settings in a JSON format.
+	 */
 	public serialize(): string {
 		let array: [string, InterfaceAction][] = [];
 
@@ -58,6 +104,12 @@ export class KeyboardSettings {
 		return JSON.stringify(array);
 	}
 
+	/**
+	 * Deserializes the keyboard settings from a JSON string.
+	 *
+	 * @param json - The JSON string to deserialize.
+	 * @returns The deserialized keyboard settings, or null if the JSON string is invalid.
+	 */
 	public static deserialize(json: string): KeyboardSettings | null {
 		const parsed = JSON.parse(json);
 		if (!Array.isArray(parsed)) {
@@ -84,10 +136,23 @@ export class KeyboardSettings {
 		return new KeyboardSettings(hotkeys);
 	}
 
+	/**
+	 * Saves the keyboard settings to the local storage under the specified localStorageKey.
+	 */
 	public save(): void {
 		localStorage.setItem(KeyboardSettings.localStorageKey, this.serialize());
 	}
 
+	/**
+	 * Loads the keyboard settings from the local storage, from the specified localStorageKey.
+	 *
+	 * @param saveAfterLoad - Whether to save the settings after loading. Defaults to false.
+	 * 							Use this to remove any inconsistencies from the saved data or save the initial keyboard settings.
+	 *
+	 * @returns The loaded keyboard settings, or a default set of keyboard settings if:
+	 * 	- The local storage does not contain any settings
+	 * 	- The data in the local storage are invalid (deserialization failed).
+	 */
 	public static load(saveAfterLoad: boolean = false): KeyboardSettings {
 		const localStorageData = localStorage.getItem(KeyboardSettings.localStorageKey);
 
@@ -112,6 +177,11 @@ export class KeyboardSettings {
 		return result;
 	}
 
+	/**
+	 * Returns the default set of keyboard settings.
+	 *
+	 * @returns The default set of keyboard settings.
+	 */
 	public static getDefault(): KeyboardSettings {
 		return new KeyboardSettings([
 			[new KeyBind("D"), InterfaceAction.Forward],

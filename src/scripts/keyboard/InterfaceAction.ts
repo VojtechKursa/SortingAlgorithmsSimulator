@@ -1,5 +1,10 @@
 import { StepKind } from "../data/stepResults/StepKind";
 
+/**
+ * Enum representing all available groups of interface actions.
+ *
+ * @see InterfaceAction
+ */
 export const enum InterfaceActionGroup {
 	Backward,
 	Forward,
@@ -7,6 +12,9 @@ export const enum InterfaceActionGroup {
 	PlayPause,
 }
 
+/**
+ * Enum representing all available interface actions.
+ */
 export const enum InterfaceAction {
 	Backward_Full = "backward-full",
 	Backward_Sub = "backward-sub",
@@ -24,7 +32,13 @@ export const enum InterfaceAction {
 	PlayPause = "play-pause",
 };
 
+/**
+ * A class containing information about interface actions.
+ */
 export class InterfaceActionData {
+	/**
+	 * A map containing information about all available interface actions.
+	 */
 	private static readonly actionInfoMap = new Map<InterfaceAction, InterfaceActionData>(
 		[
 			[InterfaceAction.Backward_Full, new InterfaceActionData(InterfaceAction.Backward_Full, InterfaceActionGroup.Backward, "Backward full step", StepKind.Full)],
@@ -47,8 +61,23 @@ export class InterfaceActionData {
 		]
 	);
 
+	/**
+	 * The machine name of the action.
+	 */
 	public readonly machineName: string;
 
+	/**
+	 * Creates an instance of InterfaceActionData.
+	 *
+	 * @param action - The interface action that is described by this object.
+	 * @param group - The group into which the action belongs.
+	 * @param displayName - The human-readable name of the interface action.
+	 * @param stepKind - The kind of step associated with the action, if any.
+	 *
+	 * @see InterfaceAction
+	 * @see InterfaceActionGroup
+	 * @see StepKind
+	 */
 	public constructor(
 		public readonly action: InterfaceAction,
 		public readonly group: InterfaceActionGroup,
@@ -58,6 +87,16 @@ export class InterfaceActionData {
 		this.machineName = action;
 	}
 
+	/**
+	 * Returns the information about the given action.
+	 *
+	 * @param action - The action to get information about.
+	 * @returns The information about the given action.
+	 * @throws An error if information about the given action is not defined.
+	 *
+	 * @see InterfaceAction
+	 * @see InterfaceActionData
+	 */
 	public static getActionInfo(action: InterfaceAction): InterfaceActionData {
 		const actionInfo = InterfaceActionData.actionInfoMap.get(action);
 
@@ -68,14 +107,38 @@ export class InterfaceActionData {
 		return actionInfo;
 	}
 
+	/**
+	 * Returns a map containing all available interface actions and the InterfaceActionData associated with them.
+	 *
+	 * @returns A read-only map, mapping all available interface actions to their InterfaceActionData.
+	 *
+	 * @see InterfaceAction
+	 * @see InterfaceActionData
+	 */
 	public static getMap(): ReadonlyMap<InterfaceAction, InterfaceActionData> {
 		return InterfaceActionData.actionInfoMap;
 	}
 
+	/**
+	 * Returns an iterable containing information about all available interface actions.
+	 *
+	 * @returns An iterable containing information about all available interface actions.
+	 *
+	 * @see InterfaceActionData
+	 */
 	public static getAllActions(): Iterable<InterfaceActionData> {
 		return InterfaceActionData.actionInfoMap.values();
 	}
 
+	/**
+	 * Returns information about the given action.
+	 *
+	 * @param actionString - The machine name of the action to get information about.
+	 * @returns The information about the action identified by the actionString parameter,
+	 * 			or undefined if the action is not recognized based on the actions string.
+	 *
+	 * @see InterfaceAction
+	 */
 	public static fromString(actionString: string): InterfaceActionData | undefined {
 		return this.actionInfoMap.get(actionString as InterfaceAction);
 	}
