@@ -4,6 +4,9 @@ import { CodeStepResult } from "./stepResults/CodeStepResult";
 import { FullStepResult } from "./stepResults/FullStepResult";
 import { StepKind } from "./stepResults/StepKind";
 
+/**
+ * Represents the state of an algorithm at a specific point in time.
+ */
 export class AlgorithmState {
 	public constructor(
 		public readonly codeStepResult: CodeStepResult,

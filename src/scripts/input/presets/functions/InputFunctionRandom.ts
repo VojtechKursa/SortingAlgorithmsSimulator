@@ -1,9 +1,19 @@
 import { InputParameter } from "../../parameters/InputParameter";
-import { NumberParameter, RoundBehavior } from "../../parameters/NumberParameter";
+import { NumberParameter } from "../../parameters/NumberParameter";
 import { InputFunction } from "./InputFunction";
 
+/**
+ * An input generating function for generating an array of random numbers.
+ */
 export class InputFunctionRandom extends InputFunction {
+	/**
+	 * The minimum value of the randomly generated numbers.
+	 */
 	protected readonly minParameter: NumberParameter;
+
+	/**
+	 * The maximum value of the randomly generated numbers.
+	 */
 	protected readonly maxParameter: NumberParameter;
 
 	public constructor() {
@@ -19,6 +29,14 @@ export class InputFunctionRandom extends InputFunction {
 		this.parameters.push(this.maxParameter);
 	}
 
+	/**
+	 * A method to be used as an InputCorrectnessListener that verifies that the minimum and maximum value for the function are valid.
+	 *
+	 * @param event - The event that triggered the check.
+	 * @param parameter - The input parameter that triggered the check.
+	 *
+	 * @see {@link InputCorrectnessListener}
+	 */
 	private minMaxCorrectnessEnsurer(event: Event, parameter: InputParameter): void {
 		const min = this.minParameter.getValueNumber();
 		const max = this.maxParameter.getValueNumber();

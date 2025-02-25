@@ -3,6 +3,9 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 
+/**
+ * A StepDisplayHandler responsible for rendering a debugger UI.
+ */
 export class HtmlDebuggerDisplayHandler implements StepDisplayHandler {
 	public constructor(
 		public readonly debuggerController: DebuggerController

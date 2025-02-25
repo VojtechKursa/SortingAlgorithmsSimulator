@@ -7,15 +7,45 @@ import { DarkModeHandler } from "./DarkModeHandler";
 import { InputController } from "./InputController";
 import { PlayerController } from "./PlayerController";
 
+/**
+ * Controller class for managing the simulator page.
+ */
 export class SimulatorPageController {
+	/**
+	 * The breakpoint width for the vertical layout 1 for a simulator with a call stack.
+	 */
 	public readonly vertical1LayoutBreakpointWithStack = 1400;
+
+	/**
+	 * The breakpoint width for the vertical layout 1 for a simulator without a call stack.
+	 */
 	public readonly vertical1LayoutBreakpointWithoutStack = 1200;
 
+	/**
+	 * The breakpoint width for the vertical layout 2 for a simulator with a call stack.
+	 */
 	public readonly vertical2LayoutBreakpointWithStack = 992;
+
+	/**
+	 * The breakpoint width for the vertical layout 2 for a simulator without a call stack.
+	 */
 	public readonly vertical2LayoutBreakpointWithoutStack = 768;
 
+	/**
+	 * A boolean indicating whether the keys configured for controlling the sorting algorithm should be captured.
+	 */
 	private playerKeysActive: boolean = true;
 
+	/**
+	 * @param playerController - The player controller for the simulator.
+	 * @param inputController - The input dialog controller for the simulator.
+	 * @param collapseWrappers - The wrappers for the collapsible elements in the simulator.
+	 * @param debuggerCollapseButton - The button element used to collapse the debugger.
+	 * @param callStackController - The call stack controller for the simulator.
+	 * @param settingsOpenButton - The button element used to open the settings dialog.
+	 * @param darkModeHandler - The dark mode handler for the simulator.
+	 * @param keyboardSettings - The current keyboard settings used to control the simulator.
+	 */
 	public constructor(
 		private readonly playerController: PlayerController,
 		private readonly inputController: InputController,
@@ -65,6 +95,9 @@ export class SimulatorPageController {
 		this.resizeHandler();
 	}
 
+	/**
+	 * Handles the resize event of the window.
+	 */
 	private resizeHandler() {
 		const horizontalCollapseClass = "collapse-horizontal";
 

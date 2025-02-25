@@ -1,12 +1,18 @@
 import { FullStepResult } from "./FullStepResult";
 import { StepResult } from "./StepResult";
 
+/**
+ * Represents a kind of a step in a sorting algorithm.
+ */
 export const enum StepKind {
 	Full,
 	Sub,
 	Code
 }
 
+/**
+ * Represents a description of a kind of a step in a sorting algorithm.
+ */
 export class StepKindDescription {
 	public constructor(
 		public readonly machineName: string,
@@ -14,13 +20,25 @@ export class StepKindDescription {
 	) { }
 }
 
+/**
+ * Provides helper methods for working with StepKind.
+ * @see {@link StepKind}
+ */
 export class StepKindHelper {
+	/**
+	 * A map of StepKinds and the corresponding StepKindDescriptions.
+	 */
 	private static readonly stepKindsMap = new Map<StepKind, StepKindDescription>([
 		[StepKind.Code, new StepKindDescription("code", "Code step")],
 		[StepKind.Sub, new StepKindDescription("sub", "Sub-step")],
 		[StepKind.Full, new StepKindDescription("full", "Full step")]
 	]);
 
+	/**
+	 * Gets the kind of a given step.
+	 * @param step - The step to get the kind of.
+	 * @returns The kind of the given step.
+	 */
 	public static getStepKind(step: StepResult): StepKind {
 		if (step instanceof FullStepResult) {
 			if (step.isLastSubstep)
@@ -32,6 +50,13 @@ export class StepKindHelper {
 		}
 	}
 
+	/**
+	 * Gets the hierarchical index of a given step kind.
+	 * If StepResult is passed, the StepKindHelper.getStepKind method is used to determine the step kind of the step.
+	 * @see {@link StepKindHelper.getStepKind}
+	 * @param value - The step or step kind to get the hierarchical index of.
+	 * @returns The hierarchical index of the given step or step kind
+	 */
 	public static getHierarchicalIndex(value: StepKind | StepResult): number {
 		let kind = value instanceof StepResult ? this.getStepKind(value) : value;
 
@@ -42,6 +67,11 @@ export class StepKindHelper {
 		}
 	}
 
+	/**
+	 * Gets a step kind by its hierarchical index.
+	 * @param index - The hierarchical index of the step kind to get.
+	 * @returns The step kind with the given hierarchical index or undefined if no step kind with the given index exists.
+	 */
 	public static getByHierarchicalIndex(index: number): StepKind | undefined {
 		switch (index) {
 			case 0: return StepKind.Code;
@@ -51,6 +81,11 @@ export class StepKindHelper {
 		}
 	}
 
+	/**
+	 * Gets an array of descriptions of all step kinds.
+	 * @returns An array of descriptions of all step kinds.
+	 * @see {@link StepKindDescription}
+	 */
 	public static getStepKindsStrings(): StepKindDescription[] {
 		let set = new Set<StepKind>();
 		let result = new Array<StepKindDescription>();
@@ -65,6 +100,12 @@ export class StepKindHelper {
 		return result;
 	}
 
+	/**
+	 * Gets a step kind corresponding to a given machine name.
+	 * @param text - The machine name of the step kind to get.
+	 * @returns The step kind which corresponds to the given machine name or undefined if no step kind corresponding to the given machine name exists.
+	 * @see {@link StepKindDescription.machineName}
+	 */
 	public static fromString(text: string | null | undefined): StepKind | undefined {
 		if (text == null || text == undefined)
 			return undefined;
@@ -77,6 +118,12 @@ export class StepKindHelper {
 		return undefined;
 	}
 
+	/**
+	 * Gets a description corresponding to a given step kind.
+	 * @param kind - The step kind whose description to get.
+	 * @returns The description of the given step kind.
+	 * @see {@link StepKindDescription}
+	 */
 	public static toString(kind: StepKind): StepKindDescription {
 		let result = this.stepKindsMap.get(kind);
 
@@ -86,6 +133,18 @@ export class StepKindHelper {
 		return result;
 	}
 
+	/**
+	 * Gets the step kind that is next or previous in relation to the step kind given by the referenceKind parameter.
+	 * Which step kind is considered next or previous is determined by the step kind's hierarchical index.
+	 * @see {@link StepKindHelper.getHierarchicalIndex}
+	 *
+	 * @param referenceKind - The step kind to use as a reference for the operation.
+	 * @param next - Whether to get the next step kind or the previous step kind relative to the reference kind.
+	 * @param wrapAround - Whether to wrap around the step kinds if requesting the previous kind relative to the first one or the next kind relative to the last one.
+	 * @returns The step kind that is relatively next or previous to the given referenceKind.
+	 * 			Null if wrapAround is set to false and requesting previous step kind of the first step kind or next step kind of the last step kind.
+	 * @throws Error if StepKindHelper has an invalid map and a wrapAround is requested. (in case wrap around is set to false, the method will return null instead)
+	 */
 	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: true): StepKind;
 	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: false): StepKind | null;
 	public static getRelativeKind(referenceKind: StepKind, next: boolean, wrapAround: boolean): StepKind | null {

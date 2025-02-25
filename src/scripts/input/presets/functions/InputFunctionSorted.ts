@@ -1,5 +1,10 @@
 import { InputFunction } from "./InputFunction";
 
+/**
+ * An input generating function for generating an array of numbers in ascending order.
+ *
+ * The numbers are generated as [1, 2, ..., length].
+ */
 export class InputFunctionSorted extends InputFunction {
 	public constructor() {
 		super("Sorted");

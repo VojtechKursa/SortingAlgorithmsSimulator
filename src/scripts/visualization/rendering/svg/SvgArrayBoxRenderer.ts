@@ -7,7 +7,6 @@ import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { UnsupportedStepResult } from "../../../errors/UnsupportedStepResult";
-import { StepResult } from "../../../data/stepResults/StepResult";
 
 class Point2D {
 	public constructor(

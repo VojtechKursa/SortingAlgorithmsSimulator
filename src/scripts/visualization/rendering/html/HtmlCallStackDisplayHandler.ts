@@ -3,7 +3,13 @@ import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
 import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 
+/**
+ * A StepDisplayHandler responsible for rendering a call stack of an algorithm.
+ */
 export class HtmlCallStackDisplayHandler implements StepDisplayHandler {
+	/**
+	 * @param callStackController - The controller associated with the call stack display handler.
+	 */
 	public constructor(
 		public readonly callStackController: CallStackController
 	) { }
