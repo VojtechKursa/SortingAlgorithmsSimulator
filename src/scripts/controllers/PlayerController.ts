@@ -290,11 +290,11 @@ export class PlayerController {
 	 */
 	public play(
 		kind: StepKind = this.stepKindController.selectedStepKind,
-		_?: number,
+		intervalMs?: number,
 		triggeredByHandler: boolean = false
 	): void {
 		if (!triggeredByHandler) {
-			this.continuousControls.play(kind);
+			this.continuousControls.play(kind, intervalMs);
 			return;
 		}
 
