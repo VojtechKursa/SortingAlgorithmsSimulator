@@ -35,7 +35,7 @@ export class InputFunctionRandom extends InputFunction {
 	 * @param event - The event that triggered the check.
 	 * @param parameter - The input parameter that triggered the check.
 	 *
-	 * @see InputCorrectnessListener
+	 * @see {@link InputCorrectnessListener}
 	 */
 	private minMaxCorrectnessEnsurer(event: Event, parameter: InputParameter): void {
 		const min = this.minParameter.getValueNumber();

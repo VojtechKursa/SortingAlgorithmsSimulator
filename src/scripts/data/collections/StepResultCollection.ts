@@ -16,7 +16,6 @@ class StepCounter {
 	private _previousFullWasLastSubstep: boolean;
 
 	/**
-	 * Creates an instance of StepCounter.
 	 * @param code - The initial count of code steps.
 	 * @param sub - The initial count of sub-steps.
 	 * @param full - The initial count of full steps.
@@ -108,7 +107,6 @@ class AlgorithmStateCollection {
 	private fullSteps = new Array<Array<AlgorithmState>>();
 
 	/**
-	 * Creates an instance of AlgorithmStateCollection.
 	 * @param initialState - The initial state of the algorithm.
 	 */
 	public constructor(initialState: AlgorithmState) {
@@ -214,7 +212,6 @@ export class StepResultCollection {
 	private endFullStep: number | null = null;
 
 	/**
-	 * Initializes a new instance of the StepResultCollection class.
 	 * @param initialStep The initial step result, representing the initial state of the algorithm.
 	 */
 	public constructor(initialStep: FullStepResult) {

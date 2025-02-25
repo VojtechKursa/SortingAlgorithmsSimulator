@@ -22,7 +22,7 @@ export class StepKindDescription {
 
 /**
  * Provides helper methods for working with StepKind.
- * @see StepKind
+ * @see {@link StepKind}
  */
 export class StepKindHelper {
 	/**
@@ -53,7 +53,7 @@ export class StepKindHelper {
 	/**
 	 * Gets the hierarchical index of a given step kind.
 	 * If StepResult is passed, the StepKindHelper.getStepKind method is used to determine the step kind of the step.
-	 * @see StepKindHelper.getStepKind
+	 * @see {@link StepKindHelper.getStepKind}
 	 * @param value - The step or step kind to get the hierarchical index of.
 	 * @returns The hierarchical index of the given step or step kind
 	 */
@@ -84,7 +84,7 @@ export class StepKindHelper {
 	/**
 	 * Gets an array of descriptions of all step kinds.
 	 * @returns An array of descriptions of all step kinds.
-	 * @see StepKindDescription
+	 * @see {@link StepKindDescription}
 	 */
 	public static getStepKindsStrings(): StepKindDescription[] {
 		let set = new Set<StepKind>();
@@ -104,7 +104,7 @@ export class StepKindHelper {
 	 * Gets a step kind corresponding to a given machine name.
 	 * @param text - The machine name of the step kind to get.
 	 * @returns The step kind which corresponds to the given machine name or undefined if no step kind corresponding to the given machine name exists.
-	 * @see StepKindDescription.machineName
+	 * @see {@link StepKindDescription.machineName}
 	 */
 	public static fromString(text: string | null | undefined): StepKind | undefined {
 		if (text == null || text == undefined)
@@ -122,7 +122,7 @@ export class StepKindHelper {
 	 * Gets a description corresponding to a given step kind.
 	 * @param kind - The step kind whose description to get.
 	 * @returns The description of the given step kind.
-	 * @see StepKindDescription
+	 * @see {@link StepKindDescription}
 	 */
 	public static toString(kind: StepKind): StepKindDescription {
 		let result = this.stepKindsMap.get(kind);
@@ -136,7 +136,7 @@ export class StepKindHelper {
 	/**
 	 * Gets the step kind that is next or previous in relation to the step kind given by the referenceKind parameter.
 	 * Which step kind is considered next or previous is determined by the step kind's hierarchical index.
-	 * @see StepKindHelper.getHierarchicalIndex
+	 * @see {@link StepKindHelper.getHierarchicalIndex}
 	 *
 	 * @param referenceKind - The step kind to use as a reference for the operation.
 	 * @param next - Whether to get the next step kind or the previous step kind relative to the reference kind.

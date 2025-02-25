@@ -91,7 +91,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * @param animate - Whether to animate changes between steps. Defaults to true.
 	 * @param animationDurationSeconds - The duration of the transition animations in seconds. Defaults to 0.5.
 	 *
-	 * @see SvgRenderer
+	 * @see {@link SvgRenderer}
 	 */
 	public constructor(
 		renderer: SvgRenderer,
@@ -116,7 +116,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 *
 	 * @param newColorSet - The new color set to use.
 	 *
-	 * @see SvgRenderer.colorSet
+	 * @see {@link SvgRenderer.colorSet}
 	 */
 	public updateColorSet(newColorSet: ColorSet): void {
 		this.renderer.colorSet = newColorSet;
@@ -315,7 +315,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 *
 	 * @param svgResult - The SVG render result to adjust the margins for.
 	 *
-	 * @see SvgRenderResult.alignment
+	 * @see {@link SvgRenderResult.alignment}
 	*/
 	private adjustMargins(svgResult: SvgRenderResult): void {
 		if (svgResult.alignment == undefined)

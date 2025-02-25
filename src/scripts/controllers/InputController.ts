@@ -29,7 +29,6 @@ export class InputController {
 	public inputMethods: InputMethod[];
 
 	/**
-	 * Creates an instance of InputController.
 	 * @param playerController - The player controller instance responsible for managing the simulator to which this InputController is attached.
 	 * @param body - The HTML body element (to blur when the input dialog is opened).
 	 * @param dialog - The dialog element which represents the input dialog.
@@ -107,7 +106,7 @@ export class InputController {
 
 	/**
 	 * Adds a DialogEventListener that listens to events on the input dialog.
-	 * @see DialogEventListener
+	 * @see {@link DialogEventListener}
 	 * @param listener - The listener to add
 	 */
 	public addDialogEventListener(listener: DialogEventListener) {
@@ -116,7 +115,7 @@ export class InputController {
 
 	/**
 	 * Removes a previously registered DialogEventListener from the list of notified listeners.
-	 * @see DialogEventListener
+	 * @see {@link DialogEventListener}
 	 * @param listener - The listener to remove
 	 */
 	public removeDialogEventListener(listener: DialogEventListener) {
@@ -176,7 +175,7 @@ export class InputController {
 	/**
 	 * Creates an array of available input methods.
 	 * @param inputPresets - The input presets to use for the PresetInputMethod.
-	 * @see PresetInputMethod
+	 * @see {@link PresetInputMethod}
 	 * @returns An array of available input methods
 	 */
 	private createInputMethods(inputPresets: InputPreset[]): InputMethod[] {
@@ -189,7 +188,7 @@ export class InputController {
 
 	/**
 	 * Gets the default input presets for the PresetInputMethod.
-	 * @see PresetInputMethod
+	 * @see {@link PresetInputMethod}
 	 * @returns An array of default input presets
 	 */
 	private static getDefaultPresets(): InputPreset[] {

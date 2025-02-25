@@ -15,7 +15,6 @@ export class CallStackLevel {
 	private readonly array: Variable[];
 
 	/**
-	 * Creates an instance of CallStackLevel.
 	 * @param functionName - The name of the function at the given call stack level.
 	 * @param variables - The variables local to the given call stack level.
 	 */
@@ -51,7 +50,7 @@ export class CallStackLevel {
 export class CallStack implements Iterable<CallStackLevel> {
 	/**
 	 * The array of all the call stack levels in the call stack.
-	 * @see CallStackLevel
+	 * @see {@link CallStackLevel}
 	 */
 	protected readonly array = new Array<CallStackLevel>();
 
@@ -73,7 +72,6 @@ export class CallStack implements Iterable<CallStackLevel> {
 	}
 
 	/**
-	 * Creates an instance of CallStack.
 	 * @param initialFunctionName - The name of the function that initially at the top of the call stack.
 	 */
 	public constructor(initialFunctionName?: string) {
@@ -109,7 +107,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	/**
 	 * Gets the top level of the call stack (the current function).
 	 * See description of the CallStack class for explanation why variables have to be passed to this method.
-	 * @see CallStack
+	 * @see {@link CallStack}
 	 * @param variables - The variables local to the top level.
 	 * @returns The top level of the call stack.
 	 */
@@ -123,7 +121,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	/**
 	 * Gets the second-to-top level of the call stack (the first level that is stored as a CallStackLevel).
 	 * See description of the CallStack class for explanation why the second-to-top level is the first level stored as a CallStackLevel.
-	 * @see CallStack
+	 * @see {@link CallStack}
 	 * @returns The second-to-top level of the call stack or undefined, if the stack is shallower than 2 level.
 	 */
 	public secondToTop(): CallStackLevel | undefined {
@@ -158,7 +156,6 @@ export class CallStack implements Iterable<CallStackLevel> {
  */
 export class CallStackFrozen extends CallStack implements Iterable<CallStackLevel> {
 	/**
-	 * Creates an instance of CallStackFrozen.
 	 * @param stack - The array of all the call stack levels in the call stack.
 	 * @param currentFunctionName - The name of the current function (that is virtually at the top of the call stack).
 	 */
@@ -219,7 +216,7 @@ export class CallStackFrozen extends CallStack implements Iterable<CallStackLeve
 	 *
 	 * !!! Doesn't guarantee equality if used for purposes other than monitoring for changes!
 	 *
-	 * @see CallStackFrozen.equal
+	 * @see {@link CallStackFrozen.equal}
 	 *
 	 * @param callStack1 - The first call stack to compare.
 	 * @param callStack2 - The second call stack to compare.
@@ -290,7 +287,6 @@ class ReverseArrayIterator<T> implements Iterator<T, T> {
 	private index: number;
 
 	/**
-	 * Creates an instance of ReverseArrayIterator.
 	 * @param array - The array to iterate over.
 	 */
 	public constructor(private readonly array: Array<T>) {

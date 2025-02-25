@@ -2,7 +2,7 @@ import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 
 /**
  * Controller for managing the UI and selection of step kinds.
- * @see StepKind
+ * @see {@link StepKind}
  */
 export class StepKindController {
 	/**
@@ -31,7 +31,6 @@ export class StepKindController {
 	}
 
 	/**
-	 * Creates an instance of StepKindController.
 	 * Initializes the radio buttons for each step kind and sets the default selection.
 	 * @param radioButtonWrapper - The wrapper element for containing the radio buttons for selection of step kinds.
 	 */
@@ -72,7 +71,7 @@ export class StepKindController {
 	 * Gets the currently selected step kind by checking for a checked radio button in the wrapper.
 	 * @returns The currently selected step kind.
 	 * @throws Will throw an error if no radio button is checked or if the checked radio button has a value not associated with any StepKind.
-	 * @see StepKind
+	 * @see {@link StepKind}
 	 */
 	private getSelectedStepKind(): StepKind {
 		let checkedRadio = this.radioButtonWrapper.querySelector("input[type=radio]:checked") as HTMLInputElement | null;

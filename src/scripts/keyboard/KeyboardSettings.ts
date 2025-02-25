@@ -15,15 +15,13 @@ export class KeyboardSettings {
 	 * A map containing all hotkeys and their mapping to InterfaceActions,
 	 * grouped by KeyBindType and resolved by a normalized trigger of a KeyBind.
 	 *
-	 * @see KeyBind
-	 * @see KeyBindType
-	 * @see InterfaceAction
+	 * @see {@link KeyBind}
+	 * @see {@link KeyBindType}
+	 * @see {@link InterfaceAction}
 	 */
 	private readonly hotkeys: Map<KeyBindType, Map<string, InterfaceAction>>;
 
 	/**
-	 * Creates an instance of KeyboardSettings.
-	 *
 	 * @param initialHotkeys - Initial keyboard settings.
 	 */
 	public constructor(initialHotkeys?: Iterable<readonly [KeyBind, InterfaceAction]>) {
@@ -61,8 +59,8 @@ export class KeyboardSettings {
 	 *
 	 * @returns True if the key bind was added successfully, false if the key bind already exists and overwrite is false.
 	 *
-	 * @see KeyBind
-	 * @see InterfaceAction
+	 * @see {@link KeyBind}
+	 * @see {@link InterfaceAction}
 	 */
 	public setBind(keyBind: KeyBind, action: InterfaceAction, overwrite: boolean): boolean {
 		const selectedMap = this.hotkeys.get(keyBind.type);

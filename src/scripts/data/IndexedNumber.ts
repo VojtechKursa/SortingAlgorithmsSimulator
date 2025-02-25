@@ -3,7 +3,6 @@
  */
 export class IndexedNumber {
 	/**
-	 * Creates an instance of IndexedNumber.
 	 * @param id - The unique identifier of the number, usually it's index in the INPUT array.
 	 * @param value - The value of the number.
 	 * @param index - The order of the number among numbers of the same value in the INPUT array. Useful for showing algorithm's stability.

@@ -12,16 +12,14 @@ export const enum KeyBindType {
 export class KeyBind {
 	/**
 	 * The type of the key bind.
-	 * @see KeyBindType
+	 * @see {@link KeyBindType}
 	 */
 	public readonly type: KeyBindType;
 
 	/**
-	 * Creates an instance of KeyBind.
-	 *
 	 * @param trigger - The key bind.
 	 * @param type - The type of the key bind.
-	 * 					Defaults to KeyBindType.Key for single-character triggers and KeyBindType.Code for multi-character triggers.
+	 * 					Defaults to {@link KeyBindType.Key} for single-character triggers and {@link KeyBindType.Code} for multi-character triggers.
 	 */
 	public constructor(
 		public readonly trigger: string,

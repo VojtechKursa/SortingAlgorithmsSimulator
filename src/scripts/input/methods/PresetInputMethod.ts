@@ -5,8 +5,8 @@ import { InputMethod } from "./InputMethod";
  * An input method for loading a simulator input from a preset.
  * A preset can be either a function generating an input or a fixed array.
  *
- * @see InputPreset
- * @see InputFunction
+ * @see {@link InputPreset}
+ * @see {@link InputFunction}
  */
 export class PresetInputMethod implements InputMethod {
 	public readonly name: string = "Preset";
@@ -33,8 +33,6 @@ export class PresetInputMethod implements InputMethod {
 	private previousPreset: InputPreset;
 
 	/**
-	 * Creates an instance of PresetInputMethod.
-	 *
 	 * @param presets - An array of available presets.
 	 */
 	public constructor(
@@ -115,7 +113,7 @@ export class PresetInputMethod implements InputMethod {
 	 * @returns The currently selected preset.
 	 * @throws An error if this preset method isn't active (the select field is undefined).
 	 *
-	 * @see InputPreset
+	 * @see {@link InputPreset}
 	 */
 	public getCurrentPreset(): InputPreset {
 		if (this.select == undefined)

@@ -52,7 +52,6 @@ export class PlayerController {
 	}
 
 	/**
-	 * Constructs a new PlayerController.
 	 * @param algorithm - The sorting algorithm to be controlled.
 	 * @param playerControls - The control elements for controlling the sorting algorithm's steps.
 	 * @param debuggerControls - The control elements for the debugger, controlling the sorting algorithm's code steps.
@@ -65,12 +64,12 @@ export class PlayerController {
 	 * @param colors - The color settings for the page.
 	 * @param resetButton - The button element for resetting the state of the sorting algorithm.
 	 *
-	 * @see ContinuousControlController
-	 * @see StepKind
-	 * @see StepKindController
-	 * @see StepDisplayHandler
-	 * @see SvgRenderer
-	 * @see PageColors
+	 * @see {@link ContinuousControlController}
+	 * @see {@link StepKind}
+	 * @see {@link StepKindController}
+	 * @see {@link StepDisplayHandler}
+	 * @see {@link SvgRenderer}
+	 * @see {@link PageColors}
 	 */
 	public constructor(
 		private readonly algorithm: SortingAlgorithm,
@@ -150,7 +149,7 @@ export class PlayerController {
 	/**
 	 * Advances the sorting process by one step.
 	 * @param kind - The kind of step to advance (defaults to the step kind currently selected by the stepKindController passed to the constructor).
-	 * @see StepKindController
+	 * @see {@link StepKindController}
 	 */
 	public forward(kind: StepKind = this.stepKindController.selectedStepKind): void {
 		if (this.steps.forward(kind))
@@ -176,7 +175,7 @@ export class PlayerController {
 	/**
 	 * Moves the sorting process backward by one step.
 	 * @param kind - The kind of step to move backward (defaults to the step kind currently selected by the stepKindController passed to the constructor).
-	 * @see StepKindController
+	 * @see {@link StepKindController}
 	 */
 	public backward(kind: StepKind = this.stepKindController.selectedStepKind): void {
 		if (this.steps.backward(kind))

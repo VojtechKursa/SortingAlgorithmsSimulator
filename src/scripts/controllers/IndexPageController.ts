@@ -5,7 +5,6 @@ import { hiddenClass } from "../visualization/css/GenericClasses";
  */
 export class IndexPageController {
 	/**
-	 * Constructs a new IndexPageController.
 	 * @param tableModeButton - The button element used to switch to table mode.
 	 * @param tableWrapper - The div element that wraps the table mode content.
 	 * @param gridModeButton - The button element used to switch to grid mode.

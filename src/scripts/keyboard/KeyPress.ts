@@ -7,7 +7,7 @@ export class KeyPress {
 	/**
 	 * A cache of all key binds that match this key press event.
 	 *
-	 * @see KeyBind
+	 * @see {@link KeyBind}
 	 */
 	private readonly matchingKeyBindsCache: KeyBind[];
 
@@ -22,8 +22,6 @@ export class KeyPress {
 	public readonly code?: KeyBind;
 
 	/**
-	 * Creates an instance of KeyPress.
-	 *
 	 * @param key - The key parameter of the KeyPress event.
 	 * @param code - The code parameter of the KeyPress event.
 	 */
@@ -52,8 +50,6 @@ export class KeyPress {
 	}
 
 	/**
-	 * Creates a KeyPress instance from a KeyboardEvent.
-	 *
 	 * @param event - The KeyboardEvent to create the KeyPress instance from.
 	 * @returns The KeyPress instance created based on the KeyboardEvent.
 	 */

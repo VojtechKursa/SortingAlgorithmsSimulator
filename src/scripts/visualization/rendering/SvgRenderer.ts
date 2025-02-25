@@ -77,9 +77,9 @@ export interface SvgRenderer {
 	 *
 	 * @returns The rendered SVG and it's associated alignment information.
 	 *
-	 * @see FullStepResult
-	 * @see CodeStepResult
-	 * @see SvgRenderResult
+	 * @see {@link FullStepResult}
+	 * @see {@link CodeStepResult}
+	 * @see {@link SvgRenderResult}
 	 */
 	render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult;
 

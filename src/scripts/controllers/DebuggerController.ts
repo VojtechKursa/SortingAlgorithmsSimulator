@@ -6,7 +6,6 @@ import { SymbolicColorHelper } from "../visualization/colors/SymbolicColorHelper
 */
 export class DebuggerController {
 	/**
-	 * Constructs a new DebuggerController.
 	 * @param debuggerElement - The div element into which the debugger's code lines will be displayed.
 	 */
 	public constructor(
@@ -45,7 +44,7 @@ export class DebuggerController {
 	/**
 	 * Adds line highlights to the selected lines in the debugger.
 	 * @param lines - A map, mapping the line index to highlight to a SymbolicColor that should be used for the highlight.
-	 * @see SymbolicColor
+	 * @see {@link SymbolicColor}
 	 */
 	public addHighlightedLines(lines: ReadonlyMap<number, SymbolicColor>): void {
 		const highlightClass = SymbolicColorHelper.getCssClass(SymbolicColor.Code_ActiveLine);
@@ -66,7 +65,7 @@ export class DebuggerController {
 	/**
 	 * Sets the highlighted lines in the debugger.
 	 * @param lines - A map, mapping the line index to highlight to a SymbolicColor that should be used for the highlight.
-	 * @see SymbolicColor
+	 * @see {@link SymbolicColor}
 	 */
 	public setHighlightedLines(lines: ReadonlyMap<number, SymbolicColor>): void {
 		this.clearHighlights();

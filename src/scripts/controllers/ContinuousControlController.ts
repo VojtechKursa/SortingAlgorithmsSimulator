@@ -74,7 +74,6 @@ export class ContinuousControlController {
 	}
 
 	/**
-	 * Constructs a new ContinuousControlController.
 	 * @param periodInput - The input element for the tick interval.
 	 * @param pauseButton - The button element for pausing.
 	 * @param playButton - The button element for playing.

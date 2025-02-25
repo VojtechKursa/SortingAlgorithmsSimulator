@@ -14,7 +14,7 @@ export const nullInputErrorMessage: string = "Attempted to get value from Preset
  * @param event - The event that triggered the check.
  * @param parameter - The input parameter associated with the check. Used as a callback to the parameter for adding validation problems.
  *
- * @see InputParameter
+ * @see {@link InputParameter}
  */
 export type InputCorrectnessListener = (inputElement: HTMLInputElement, event: Event, parameter: InputParameter) => void;
 
@@ -68,8 +68,6 @@ export class InputParameter {
 	private problemCheckOngoing: boolean = false;
 
 	/**
-	 * Creates an instance of InputParameter.
-	 *
 	 * @param machineName - The machine name of the parameter.
 	 * @param readableName - The human-readable name of the parameter.
 	 * @param initialValue - The initial value of the parameter.
@@ -177,7 +175,7 @@ export class InputParameter {
 	/**
 	 * An InputCorrectnessListener that checks whether an input marked as mandatory is non-empty and if not, adds a problem to the input parameter.
 	 *
-	 * @see InputCorrectnessListener - for definition of the method's parameters.
+	 * @see {@link InputCorrectnessListener} - for definition of the method's parameters.
 	 */
 	private mandatoryEnsurer(input: HTMLInputElement, _: Event, parameter: InputParameter): void {
 		if (this.mandatory) {

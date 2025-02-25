@@ -3,7 +3,7 @@ import { StepKind } from "../data/stepResults/StepKind";
 /**
  * Enum representing all available groups of interface actions.
  *
- * @see InterfaceAction
+ * @see {@link InterfaceAction}
  */
 export const enum InterfaceActionGroup {
 	Backward,
@@ -67,16 +67,14 @@ export class InterfaceActionData {
 	public readonly machineName: string;
 
 	/**
-	 * Creates an instance of InterfaceActionData.
-	 *
 	 * @param action - The interface action that is described by this object.
 	 * @param group - The group into which the action belongs.
 	 * @param displayName - The human-readable name of the interface action.
 	 * @param stepKind - The kind of step associated with the action, if any.
 	 *
-	 * @see InterfaceAction
-	 * @see InterfaceActionGroup
-	 * @see StepKind
+	 * @see {@link InterfaceAction}
+	 * @see {@link InterfaceActionGroup}
+	 * @see {@link StepKind}
 	 */
 	public constructor(
 		public readonly action: InterfaceAction,
@@ -94,8 +92,8 @@ export class InterfaceActionData {
 	 * @returns The information about the given action.
 	 * @throws An error if information about the given action is not defined.
 	 *
-	 * @see InterfaceAction
-	 * @see InterfaceActionData
+	 * @see {@link InterfaceAction}
+	 * @see {@link InterfaceActionData}
 	 */
 	public static getActionInfo(action: InterfaceAction): InterfaceActionData {
 		const actionInfo = InterfaceActionData.actionInfoMap.get(action);
@@ -112,8 +110,8 @@ export class InterfaceActionData {
 	 *
 	 * @returns A read-only map, mapping all available interface actions to their InterfaceActionData.
 	 *
-	 * @see InterfaceAction
-	 * @see InterfaceActionData
+	 * @see {@link InterfaceAction}
+	 * @see {@link InterfaceActionData}
 	 */
 	public static getMap(): ReadonlyMap<InterfaceAction, InterfaceActionData> {
 		return InterfaceActionData.actionInfoMap;
@@ -124,7 +122,7 @@ export class InterfaceActionData {
 	 *
 	 * @returns An iterable containing information about all available interface actions.
 	 *
-	 * @see InterfaceActionData
+	 * @see {@link InterfaceActionData}
 	 */
 	public static getAllActions(): Iterable<InterfaceActionData> {
 		return InterfaceActionData.actionInfoMap.values();
@@ -137,7 +135,7 @@ export class InterfaceActionData {
 	 * @returns The information about the action identified by the actionString parameter,
 	 * 			or undefined if the action is not recognized based on the actions string.
 	 *
-	 * @see InterfaceAction
+	 * @see {@link InterfaceAction}
 	 */
 	public static fromString(actionString: string): InterfaceActionData | undefined {
 		return this.actionInfoMap.get(actionString as InterfaceAction);

@@ -12,12 +12,11 @@ export const enum StepDescriptionKind {
 export class StepDescriptionController {
 	/**
 	 * A map storing descriptions based on their kind.
-	 * @see StepDescriptionKind
+	 * @see {@link StepDescriptionKind}
 	 */
 	public descriptions = new Map<StepDescriptionKind, string>();
 
 	/**
-	 * Creates an instance of StepDescriptionController.
 	 * @param stepDescriptionElement - The div element in which the step descriptions are to be displayed.
 	 */
 	public constructor(

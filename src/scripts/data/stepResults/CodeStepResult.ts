@@ -16,7 +16,6 @@ export class CodeStepResult extends StepResult {
 	protected stack: CallStackFrozen | undefined;
 
 	/**
-	 * Creates an instance of CodeStepResult.
 	 * @param text - The textual description of the step.
 	 * @param highlightedLines - The lines of code to highlight in the debugger.
 	 * @param variables - The state of variables in the algorithm.
@@ -46,7 +45,7 @@ export class CodeStepResult extends StepResult {
 	 * Accepts an equal call stack into itself.
 	 * Can be used for the purposes of saving memory by reusing a call stack already returned by a previous step result.
 	 * @param stack The call stack to accept. The stack will be accepted only if it's equal to the call stack currently in the step result.
-	 * @see CallStackFrozen.equal
+	 * @see {@link CallStackFrozen.equal}
 	 */
 	public acceptEqualStack(stack: CallStack | CallStackFrozen) {
 		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();

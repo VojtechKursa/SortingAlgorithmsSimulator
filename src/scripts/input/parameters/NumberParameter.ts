@@ -29,7 +29,7 @@ export const enum RoundBehavior {
 /**
  * A class representing a numeric input parameter.
  *
- * @see InputParameter
+ * @see {@link InputParameter}
  */
 export class NumberParameter extends InputParameter {
 	/**
@@ -43,8 +43,6 @@ export class NumberParameter extends InputParameter {
 	public readonly roundBehavior: RoundBehavior;
 
 	/**
-	 * Creates an instance of NumberParameter.
-	 *
 	 * @param machineName - The machine name of the parameter.
 	 * @param readableName - The human-readable name of the parameter.
 	 * @param initialValue - The initial value of the parameter. Defaults to 0.
@@ -55,7 +53,7 @@ export class NumberParameter extends InputParameter {
 	 * @param roundBehavior - The behavior of rounding a decimal number to an integer selected for this parameter. Defaults to RoundBehavior.Round.
 	 * 							Set to RoundBehavior.AllowDecimals to allow decimal numbers.
 	 *
-	 * @see RoundBehavior
+	 * @see {@link RoundBehavior}
 	 */
 	public constructor(
 		machineName: string,

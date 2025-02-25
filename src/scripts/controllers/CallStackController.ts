@@ -42,7 +42,6 @@ export class CallStackController {
 	}
 
 	/**
-	 * Creates an instance of CallStackController.
 	 * @param callStackWrapper - The HTMLDivElement that wraps the call stack table.
 	 * @param variableSeparationSymbol - The symbol used to separate variable names and values. Defaults to "=".
 	 * @param visible - A boolean indicating whether the call stack is initially visible. Defaults to false.

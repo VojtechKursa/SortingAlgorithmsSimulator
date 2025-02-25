@@ -3,7 +3,6 @@
  */
 export class NotMandatoryError extends Error {
 	/**
-	 * Creates an instance of NotMandatoryError.
 	 * @param parameterName - The name of the parameter that was requested as mandatory, but isn't.
 	 */
 	public constructor(public readonly parameterName: string) {

@@ -64,7 +64,6 @@ export class DarkModeHandler {
 	private readonly lightModeIcon = "bi-sun-fill";
 
 	/**
-	 * Constructs a new DarkModeHandler.
 	 * @param darkModeSwitchButton - The button element used to toggle dark mode.
 	 */
 	public constructor(darkModeSwitchButton: HTMLButtonElement | undefined | null) {

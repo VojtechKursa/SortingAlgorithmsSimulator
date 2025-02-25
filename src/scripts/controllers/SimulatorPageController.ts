@@ -37,7 +37,6 @@ export class SimulatorPageController {
 	private playerKeysActive: boolean = true;
 
 	/**
-	 * Constructs a new SimulatorPageController.
 	 * @param playerController - The player controller for the simulator.
 	 * @param inputController - The input dialog controller for the simulator.
 	 * @param collapseWrappers - The wrappers for the collapsible elements in the simulator.

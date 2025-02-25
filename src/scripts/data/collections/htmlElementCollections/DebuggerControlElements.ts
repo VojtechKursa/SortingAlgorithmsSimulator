@@ -4,7 +4,6 @@
  */
 export class DebuggerControlElements {
 	/**
-	 * Creates an instance of DebuggerControlElements.
 	 * @param backCodeStepButton - The button to step back a code step.
 	 * @param forwardCodeStepButton - The button to step forward a code step.
 	 * @param stepOutput - The element to display the current code step.

@@ -10,7 +10,6 @@ export class Variable {
 	public readonly drawAtIndex: number | null;
 
 	/**
-	 * Creates an instance of Variable.
 	 * @param name - The name of the variable.
 	 * @param value - The value of the variable.
 	 * @param color - The color to use when drawing the variable graphically. Null to forbid drawing.
@@ -55,11 +54,10 @@ export class Variable {
 
 /**
  * Represents the information needed to draw a variable graphically.
- * @see Variable
+ * @see {@link Variable}
  */
 export class VariableDrawInformation {
 	/**
-	 * Creates an instance of VariableDrawInformation.
 	 * @param variableName - The name of the variable.
 	 * @param drawAtIndex - The index at which the variable should be drawn.
 	 * @param color - The color to use when drawing the variable graphically.

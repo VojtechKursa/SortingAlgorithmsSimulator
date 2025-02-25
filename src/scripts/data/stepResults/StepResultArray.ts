@@ -20,7 +20,6 @@ export class StepResultArray extends FullStepResult {
 	public readonly highlights: Highlights | null;
 
 	/**
-	 * Creates an instance of StepResultArray.
 	 * @param final - Whether the step is the final step of the algorithm.
 	 * @param text - The textual description of the step.
 	 * @param isLastSubstep - Whether the step is the last sub-step of a full step of the algorithm.

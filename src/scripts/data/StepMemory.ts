@@ -7,7 +7,6 @@ import { FullStepResult } from "./stepResults/FullStepResult";
  */
 export class StepMemory<T extends FullStepResult> {
 	/**
-	 * Creates an instance of StepMemory.
 	 * @param fullStep - The initial full step stored in the memory.
 	 * @param codeStep - The initial code step stored in the memory.
 	 */

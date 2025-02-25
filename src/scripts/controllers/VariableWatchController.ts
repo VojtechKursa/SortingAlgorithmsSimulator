@@ -6,7 +6,6 @@ import { VariableWatchClasses } from "../visualization/css/VariableWatchClasses"
  */
 export class VariableWatchController {
 	/**
-	 * Creates an instance of VariableWatchController.
 	 * @param variableWatch - The element into which the variables will be written.
 	 */
 	public constructor(
@@ -17,7 +16,7 @@ export class VariableWatchController {
 	 * Sets the variables to be displayed in the variable watch.
 	 * Clears any existing content in the variable watch and populates it with the provided variables.
 	 * @param variables - An array of Variable objects to be displayed.
-	 * @see Variable
+	 * @see {@link Variable}
 	 */
 	public setVariables(variables: Variable[]) {
 		this.variableWatch.innerText = "";
