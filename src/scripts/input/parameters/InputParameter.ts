@@ -33,7 +33,7 @@ export class InputParameter {
 
 		if (value) {
 			if (this.input?.value == "") {
-				this.setProblem(`${this.readableName} is mandatory.`);
+				this.setProblemDescription(`${this.readableName} is mandatory.`);
 			}
 		} else {
 			if (this.wrapper?.classList.contains(problemInputClass)) {
@@ -101,14 +101,21 @@ export class InputParameter {
 		}
 	}
 
-	public addProblem(problem: string) {
+	public addProblem(problem: string): void {
 		if (!this.problems.includes(problem))
 			this.problems.push(problem);
 	}
 
-	public resolveProblemCheck() {
+	public startProblemCheck(event: Event): void {
+		if (!this.problemCheckOngoing) {
+			this.problemCheckOngoing = true;
+			this.correctnessEnsurer(event);
+		}
+	}
+
+	private resolveProblemCheck(): void {
 		if (this.problems.length > 0) {
-			this.setProblem(this.problems.join("<br />"));
+			this.setProblemDescription(this.problems.join("<br />"));
 			this.problems = [];
 		}
 		else {
@@ -118,14 +125,7 @@ export class InputParameter {
 		this.problemCheckOngoing = false;
 	}
 
-	public startProblemCheck(event: Event) {
-		if (!this.problemCheckOngoing) {
-			this.problemCheckOngoing = true;
-			this.correctnessEnsurer(event);
-		}
-	}
-
-	private setProblem(problem: string): void {
+	private setProblemDescription(problem: string): void {
 		if (this.wrapper != undefined)
 			this.wrapper.classList.add(problemInputClass);
 

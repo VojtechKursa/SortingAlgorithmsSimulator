@@ -158,7 +158,7 @@ export class InputController {
 			this.previousMethod.onClear();
 			this.dialog_methodArea.innerHTML = "";
 
-			this.dialog_okButton.textContent = newMethod.loadButtonName;
+			this.dialog_okButton.textContent = newMethod.loadButtonText;
 			newMethod.createForm(this.dialog_methodArea, this.dialog_okButton);
 
 			this.previousMethod = newMethod;

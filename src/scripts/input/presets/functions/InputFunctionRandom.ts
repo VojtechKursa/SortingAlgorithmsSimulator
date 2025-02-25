@@ -1,5 +1,5 @@
 import { InputParameter } from "../../parameters/InputParameter";
-import { NumberParameter, RoundBehavior } from "../../parameters/NumberParameter";
+import { NumberParameter } from "../../parameters/NumberParameter";
 import { InputFunction } from "./InputFunction";
 
 export class InputFunctionRandom extends InputFunction {

@@ -5,7 +5,7 @@ import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { Variable } from "../data/Variable";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
-import { CallStack, CallStackLevel } from "../data/CallStack";
+import { CallStack } from "../data/CallStack";
 import { CodeStepResult } from "../data/stepResults/CodeStepResult";
 
 class PartitionResult {

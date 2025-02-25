@@ -3,7 +3,7 @@ import { InputMethod } from "./InputMethod";
 
 export class ManualInputMethod implements InputMethod {
 	public readonly name: string = "Manual input";
-	public readonly loadButtonName: string = "Set";
+	public readonly loadButtonText: string = "Set";
 
 	protected loadButton: HTMLButtonElement | undefined;
 	protected readonly input: InputParameter;
@@ -28,7 +28,7 @@ export class ManualInputMethod implements InputMethod {
 		this.loadButton = undefined;
 	}
 
-	private formatTestEvent(input: InputParameter) {
+	private formatTestEvent(input: InputParameter): void {
 		const text = input.getValue();
 
 		if (text == "")

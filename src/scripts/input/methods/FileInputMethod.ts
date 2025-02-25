@@ -3,7 +3,7 @@ import { ManualInputMethod } from "./ManualInputMethod";
 
 export class FileInputMethod implements InputMethod {
 	public readonly name: string = "File input";
-	public readonly loadButtonName: string = "Load";
+	public readonly loadButtonText: string = "Load";
 
 	protected loadButton: HTMLButtonElement | undefined;
 	protected inputElement: HTMLInputElement | undefined;

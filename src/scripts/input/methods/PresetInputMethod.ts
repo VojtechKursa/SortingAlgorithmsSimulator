@@ -3,7 +3,7 @@ import { InputMethod } from "./InputMethod";
 
 export class PresetInputMethod implements InputMethod {
 	public readonly name: string = "Preset";
-	public readonly loadButtonName: string = "Load";
+	public readonly loadButtonText: string = "Load";
 
 	private select: HTMLSelectElement | undefined;
 	private parametersDiv: HTMLDivElement | undefined;
