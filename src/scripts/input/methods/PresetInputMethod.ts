@@ -1,4 +1,5 @@
 import { InputPreset } from "../presets/InputPreset";
+import { InputFunction } from "../presets/functions/InputFunction";	// Included only for documentation links.
 import { InputMethod } from "./InputMethod";
 
 /**

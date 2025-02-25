@@ -250,8 +250,6 @@ export abstract class SortingAlgorithm {
 	 * @returns A generator for generating the steps of the algorithm.
 	 *
 	 * @see {@link StepResult}
-	 * @see {@link FullStepResult}
-	 * @see {@link CodeStepResult}
 	 */
 	protected abstract stepForwardInternal(): Generator<StepResult>;
 
