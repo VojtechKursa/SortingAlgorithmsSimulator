@@ -59,7 +59,7 @@ export class StepKindController {
 				firstRadioButton = radio;
 		}
 
-		let defaultRadioButton = radioButtonWrapper.querySelector(`input[type="radio"][value="${StepKindHelper.toString(StepKind.Sub).machineName}"]`) as HTMLInputElement | null;
+		let defaultRadioButton = radioButtonWrapper.querySelector(`input[type="radio"][value="${StepKindHelper.toString(StepKind.Significant).machineName}"]`) as HTMLInputElement | null;
 		if (defaultRadioButton == null)
 			defaultRadioButton = firstRadioButton;
 

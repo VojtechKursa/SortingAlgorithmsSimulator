@@ -1,6 +1,5 @@
 import { CallStackController } from "../../../controllers/CallStackController";
-import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepResult } from "../../../data/stepResults/StepResult";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 
 /**
@@ -14,12 +13,10 @@ export class HtmlCallStackDisplayHandler implements StepDisplayHandler {
 		public readonly callStackController: CallStackController
 	) { }
 
-	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
-		let code = codeStep != undefined ? codeStep : fullStep?.codeStepResult;
-
-		if (code?.callStack != undefined) {
+	public display(step?: StepResult): void {
+		if (step?.callStack != undefined) {
 			this.callStackController.isPresent = true;
-			this.callStackController.display(code.callStack, code.variables);
+			this.callStackController.display(step.callStack, step.variables);
 		}
 	}
 

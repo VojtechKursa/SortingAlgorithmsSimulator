@@ -1,6 +1,5 @@
 import { DebuggerController } from "../../../controllers/DebuggerController";
-import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepResult } from "../../../data/stepResults/StepResult";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 
 /**
@@ -11,11 +10,9 @@ export class HtmlDebuggerDisplayHandler implements StepDisplayHandler {
 		public readonly debuggerController: DebuggerController
 	) { }
 
-	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
-		let code = codeStep != undefined ? codeStep : fullStep?.codeStepResult;
-
-		if (code != undefined) {
-			this.debuggerController.setHighlightedLines(code.highlightedLines);
+	public display(step?: StepResult): void {
+		if (step != undefined) {
+			this.debuggerController.setHighlightedLines(step.highlightedCodeLines);
 		}
 	}
 

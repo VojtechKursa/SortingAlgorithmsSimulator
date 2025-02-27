@@ -1,14 +1,13 @@
-import { StepResult } from "../data/stepResults/StepResult";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { HighlightState, SortingAlgorithm } from "./SortingAlgorithm";
-import { CodeStepResult } from "../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { HighlightState } from "./SortingAlgorithm";
 import { Variable } from "../data/Variable";
 import { IndexedNumber } from "../data/IndexedNumber";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
+import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
+import { StepKind } from "../data/stepResults/StepKind";
 
-export class InsertionSort extends SortingAlgorithm {
+export class InsertionSort extends SortingAlgorithmArray {
 	protected i?: number;
 	protected x?: number;
 	protected j?: number;
@@ -17,12 +16,15 @@ export class InsertionSort extends SortingAlgorithm {
 		super(input);
 	}
 
-	protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, additionalHighlights?: Highlights): StepResult {
+	protected makeFullStepResult(
+		stepKind: StepKind.Algorithmic | StepKind.Significant,
+		description: string,
+		highlightState: HighlightState | undefined,
+		highlightedLines: number[] | number,
+		final: boolean = false,
+		additionalHighlights?: Highlights
+	): StepResultArray {
 		let highlights: Highlights = new Map<number, SymbolicColor>();
-
-		if (typeof highlightedLines == "number") {
-			highlightedLines = [highlightedLines];
-		}
 
 		if (final) {
 			for (let i = 0; i < this.current.length; i++) {
@@ -55,28 +57,14 @@ export class InsertionSort extends SortingAlgorithm {
 			}
 		}
 
-		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, undefined), this.current, highlights);
+		return new StepResultArray(stepKind, this.current, highlights, description, highlightedLines, this.getVariables(), final);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
-		if (typeof highlightedLines == "number")
-			highlightedLines = [highlightedLines];
-
-		let highlights = new Map<number, SymbolicColor>();
-		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
-
-		let variables = new Array<Variable>();
-		if (this.i != undefined)
-			variables.push(new Variable("i", this.i, SymbolicColor.Variable_1));
-		if (this.x != undefined)
-			variables.push(new Variable("x", this.x, undefined));
-		if (this.j != undefined)
-			variables.push(new Variable("j", this.j, SymbolicColor.Variable_2));
-
-		return new CodeStepResult(text != undefined ? text : "", highlights, variables);
+	protected override makeCodeStepResult(highlightedLines: number[] | number, description: string | undefined = undefined): StepResultArray {
+		return super.makeCodeStepResult(highlightedLines, description, this.getVariables());
 	}
 
-	protected * stepForwardInternal(): Generator<StepResult> {
+	protected override * stepForwardArray(): Generator<StepResultArray> {
 		let xIndexed: IndexedNumber;
 		let enteredOuterWhile = false;
 
@@ -99,17 +87,17 @@ export class InsertionSort extends SortingAlgorithm {
 			yield this.makeCodeStepResult(4);
 
 			if (!(this.j > 0 && this.current[this.j - 1].value > this.x))
-				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
+				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
 
 			let enteredInnerWhile = false;
 
 			while (this.j > 0 && this.current[this.j - 1].value > this.x) {
 				enteredInnerWhile = true;
 
-				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
+				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
 
 				this.swapCurrent(this.j, this.j - 1);
-				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}: Order is incorrect, swap them`, true, HighlightState.OrderSwapped, 6);
+				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is incorrect, swap them`, HighlightState.OrderSwapped, 6);
 
 				this.j--;
 				yield this.makeCodeStepResult(7);
@@ -117,12 +105,12 @@ export class InsertionSort extends SortingAlgorithm {
 
 			if (this.j > 0) {
 				if (enteredInnerWhile)
-					yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}`, false, HighlightState.Selected, 5);
+					yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
 
-				yield this.makeFullStepResult(false, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, true, HighlightState.OrderCorrect, 8);
+				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, HighlightState.OrderCorrect, 8);
 			}
 			else {
-				yield this.makeFullStepResult(false, `Reached the beginning of the list`, true, HighlightState.OrderCorrect, 5);
+				yield this.makeFullStepResult(StepKind.Algorithmic, `Reached the beginning of the list`, HighlightState.OrderCorrect, 5);
 				yield this.makeCodeStepResult(8);
 			}
 
@@ -140,7 +128,7 @@ export class InsertionSort extends SortingAlgorithm {
 
 		yield this.makeCodeStepResult(12);
 
-		yield this.makeFullStepResult(true, "Array is sorted.", true, undefined, [this.getPseudocode().length - 1]);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted.", undefined, [this.getPseudocode().length - 1], true);
 	}
 
 	protected resetInternal(): void {
@@ -149,8 +137,21 @@ export class InsertionSort extends SortingAlgorithm {
 		this.x = undefined;
 	}
 
-	public getInitialStepResult(): FullStepResult {
-		return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult(), this.current, null);
+	protected getVariables(): Array<Variable> {
+		let variables = new Array<Variable>();
+
+		if (this.i != undefined)
+			variables.push(new Variable("i", this.i, SymbolicColor.Variable_1));
+		if (this.x != undefined)
+			variables.push(new Variable("x", this.x, undefined));
+		if (this.j != undefined)
+			variables.push(new Variable("j", this.j, SymbolicColor.Variable_2));
+
+		return variables;
+	}
+
+	public override getInitialStepResultArray(): StepResultArray {
+		return new StepResultArray(StepKind.Algorithmic, this.current, null, undefined, undefined, undefined, this.current.length <= 1);
 	}
 
 	public getPseudocode(): string[] {

@@ -1,4 +1,5 @@
-import { StepResult } from "../data/stepResults/StepResult";
+import { StepKind } from "../data/stepResults/StepKind";
+import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { BubbleSort } from "./BubbleSort";
 
 export class BubbleSortOptimized extends BubbleSort {
@@ -12,7 +13,7 @@ export class BubbleSortOptimized extends BubbleSort {
 		this.l = this.current.length;
 	}
 
-	protected override * stepForwardInternal(): Generator<StepResult> {
+	protected override * stepForwardInternal(): Generator<StepResultArray> {
 		let next_l = this.current.length;
 
 		while (next_l >= 2) {
@@ -25,11 +26,11 @@ export class BubbleSortOptimized extends BubbleSort {
 					next_l = this.k + 1;
 				}
 
-				yield this.makeFullStepResult(false, "", true, undefined, [], this.l);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "", undefined, [], false, this.l);
 			}
 		}
 
-		yield this.makeFullStepResult(true, "", true, undefined, []);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "", undefined, [], true, this.l);
 	}
 
 	protected override resetInternal(): void {

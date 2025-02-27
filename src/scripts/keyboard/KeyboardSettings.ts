@@ -188,8 +188,8 @@ export class KeyboardSettings {
 			[new KeyBind("Q"), InterfaceAction.Select_Previous],
 			[new KeyBind(" "), InterfaceAction.PlayPause],
 			[new KeyBind("Digit1"), InterfaceAction.Select_Code],
-			[new KeyBind("Digit2"), InterfaceAction.Select_Sub],
-			[new KeyBind("Digit3"), InterfaceAction.Select_Full],
+			[new KeyBind("Digit2"), InterfaceAction.Select_Significant],
+			[new KeyBind("Digit3"), InterfaceAction.Select_Algorithmic],
 		]);
 	}
 }

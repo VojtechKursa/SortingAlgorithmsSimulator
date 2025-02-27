@@ -1,12 +1,11 @@
-import { StepResult } from "../data/stepResults/StepResult";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { HighlightState, SortingAlgorithm } from "./SortingAlgorithm";
-import { FullStepResult } from "../data/stepResults/FullStepResult";
+import { HighlightState } from "./SortingAlgorithm";
 import { Variable } from "../data/Variable";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { CallStack } from "../data/CallStack";
-import { CodeStepResult } from "../data/stepResults/CodeStepResult";
+import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
+import { StepKind } from "../data/stepResults/StepKind";
 
 class PartitionResult {
 	public p?: number;
@@ -19,7 +18,7 @@ class Pivot {
 	) { }
 }
 
-export class QuickSort extends SortingAlgorithm {
+export class QuickSort extends SortingAlgorithmArray {
 	protected callStack: CallStack = new CallStack();
 	protected l?: number;
 	protected r?: number;
@@ -34,12 +33,16 @@ export class QuickSort extends SortingAlgorithm {
 		super(input);
 	}
 
-	protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, pivotSwap: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, codeResultText?: string, additionalHighlights?: Highlights): StepResult {
+	protected makeFullStepResult(
+		stepKind: StepKind.Algorithmic | StepKind.Significant,
+		description: string,
+		pivotSwap: boolean,
+		highlightState: HighlightState | undefined,
+		highlightedLines: number[] | number,
+		final: boolean = false,
+		additionalHighlights?: Highlights
+	): StepResultArray {
 		let highlights: Highlights = new Map<number, SymbolicColor>();
-
-		if (typeof highlightedLines == "number") {
-			highlightedLines = [highlightedLines];
-		}
 
 		if (final) {
 			for (let i = 0; i < this.current.length; i++) {
@@ -94,20 +97,15 @@ export class QuickSort extends SortingAlgorithm {
 			}
 		}
 
-		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines, codeResultText), this.current, highlights);
+		return new StepResultArray(stepKind, this.current, highlights, description, highlightedLines, this.getVariables(), final, this.callStack);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
-		if (typeof highlightedLines == "number")
-			highlightedLines = [highlightedLines];
-
-		let highlights = new Map<number, SymbolicColor>();
-		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
-
-		return new CodeStepResult(text != undefined ? text : "", highlights, this.getVariables(), this.callStack);
+	protected override makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): StepResultArray {
+		return super.makeCodeStepResult(highlightedLines, text, this.getVariables(), this.callStack);
 	}
 
-	protected * stepForwardInternal(): Generator<StepResult> {
+
+	protected override * stepForwardArray(): Generator<StepResultArray> {
 		this.callStack.currentFunctionName = "quickSort";
 		yield this.makeCodeStepResult(0, "Enter the facade function");
 
@@ -121,10 +119,10 @@ export class QuickSort extends SortingAlgorithm {
 
 		yield this.makeCodeStepResult(1, "Return from initial recursive call");
 
-		yield this.makeFullStepResult(true, "Array is sorted", true, false, undefined, 2);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted", false, undefined, 2, true);
 	}
 
-	protected * quickSortRecursive(): Generator<StepResult> {
+	protected * quickSortRecursive(): Generator<StepResultArray> {
 		if (this.l == undefined || this.r == undefined)
 			throw new Error("Invalid quickSortRecursive call");
 
@@ -133,12 +131,12 @@ export class QuickSort extends SortingAlgorithm {
 		yield this.makeCodeStepResult(5, "Check recursion end condition");
 
 		if (this.l >= this.r || this.l < 0) {
-			yield this.makeFullStepResult(false, "End recursion", false, false, undefined, 6);
+			yield this.makeFullStepResult(StepKind.Significant, "End recursion", false, undefined, 6);
 			return;
 		}
 
 		yield this.makeCodeStepResult(7);
-		yield this.makeFullStepResult(false, "Partition the list", false, false, undefined, 8);
+		yield this.makeFullStepResult(StepKind.Significant, "Partition the list", false, undefined, 8);
 
 		const partitionResult = new PartitionResult();
 		this.beforeCall("partition", this.l, this.r)
@@ -152,9 +150,9 @@ export class QuickSort extends SortingAlgorithm {
 
 		this.p = partitionResult.p;
 
-		yield this.makeFullStepResult(false, "Assign the result of partition function to p", false, false, undefined, 8);
+		yield this.makeFullStepResult(StepKind.Significant, "Assign the result of partition function to p", false, undefined, 8);
 
-		yield this.makeFullStepResult(false, "Recursively call quicksort on the left part of the list", false, false, undefined, 9);
+		yield this.makeFullStepResult(StepKind.Significant, "Recursively call quicksort on the left part of the list", false, undefined, 9);
 
 		this.beforeCall("quickSortR", this.l, this.p - 1);
 		for (const result of this.quickSortRecursive()) {
@@ -166,9 +164,9 @@ export class QuickSort extends SortingAlgorithm {
 			this.sorted.add(i);
 		}
 
-		yield this.makeFullStepResult(false, "Return from recursive call on the left part of the list", false, false, undefined, 9);
+		yield this.makeFullStepResult(StepKind.Significant, "Return from recursive call on the left part of the list", false, undefined, 9);
 
-		yield this.makeFullStepResult(false, "Recursively call quicksort on the right part of the list", false, false, undefined, 10);
+		yield this.makeFullStepResult(StepKind.Significant, "Recursively call quicksort on the right part of the list", false, undefined, 10);
 
 		this.beforeCall("quickSortR", this.p + 1, this.r);
 		for (const result of this.quickSortRecursive()) {
@@ -180,12 +178,12 @@ export class QuickSort extends SortingAlgorithm {
 			this.sorted.add(i);
 		}
 
-		yield this.makeFullStepResult(false, "Return from recursive call on the right part of the list", false, false, undefined, 10);
+		yield this.makeFullStepResult(StepKind.Significant, "Return from recursive call on the right part of the list", false, undefined, 10);
 
 		yield this.makeCodeStepResult(11);
 	}
 
-	protected * partition(result: PartitionResult): Generator<StepResult> {
+	protected * partition(result: PartitionResult): Generator<StepResultArray> {
 		if (this.l == undefined || this.r == undefined)
 			throw new Error("Invalid partition call");
 
@@ -211,14 +209,13 @@ export class QuickSort extends SortingAlgorithm {
 			enteredWhile = true;
 			yield this.makeCodeStepResult(18, whileCheckText);
 
-			yield this.makeFullStepResult(false, "Check if the current element is lower or equal to pivot", false, false, HighlightState.Selected, 19);
+			yield this.makeFullStepResult(StepKind.Significant, "Check if the current element is lower or equal to pivot", false, HighlightState.Selected, 19);
 
 			if (this.current[this.j].value <= this.pivot.value) {
 				this.swapCurrent(this.i, this.j);
 				yield this.makeFullStepResult(
-					false,
+					StepKind.Algorithmic,
 					"Check if the current element is lower or equal to pivot: Element is lower or equal, swap it to the end of the lower section",
-					true,
 					false,
 					HighlightState.OrderSwapped,
 					20
@@ -230,9 +227,8 @@ export class QuickSort extends SortingAlgorithm {
 			}
 			else {
 				yield this.makeFullStepResult(
-					false,
+					StepKind.Algorithmic,
 					"Check if the current element is lower or equal to pivot: Element is higher, don't swap.",
-					true,
 					false,
 					HighlightState.OrderCorrect,
 					22
@@ -248,9 +244,9 @@ export class QuickSort extends SortingAlgorithm {
 
 		yield this.makeCodeStepResult(24, "Went through the entire assigned section");
 
-		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", false, true, HighlightState.Selected, 26);
+		yield this.makeFullStepResult(StepKind.Significant, "Swap the pivot to the end of the lower section", true, HighlightState.Selected, 26);
 		this.swapCurrent(this.i, this.pivot.index);
-		yield this.makeFullStepResult(false, "Swap the pivot to the end of the lower section", true, true, HighlightState.OrderSwapped, 26);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Swap the pivot to the end of the lower section", true, HighlightState.OrderSwapped, 26);
 
 		result.p = this.i;
 		this.sorted.add(this.i);
@@ -323,8 +319,8 @@ export class QuickSort extends SortingAlgorithm {
 		});
 	}
 
-	public getInitialStepResult(): FullStepResult {
-		return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult(undefined, undefined, undefined, this.callStack), this.current, null);
+	public override getInitialStepResultArray(): StepResultArray {
+		return new StepResultArray(StepKind.Algorithmic, this.current, null, undefined, undefined, undefined, this.current.length <= 1, this.callStack);
 	}
 
 	public getPseudocode(): string[] {

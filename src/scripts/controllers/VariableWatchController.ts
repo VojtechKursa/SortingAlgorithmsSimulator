@@ -18,7 +18,7 @@ export class VariableWatchController {
 	 * @param variables - An array of Variable objects to be displayed.
 	 * @see {@link Variable}
 	 */
-	public setVariables(variables: Variable[]) {
+	public setVariables(variables: readonly Variable[]) {
 		this.variableWatch.innerText = "";
 
 		variables.forEach(variable => {

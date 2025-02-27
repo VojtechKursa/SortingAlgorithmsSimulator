@@ -1,43 +1,104 @@
-import { Highlights } from "../../visualization/Highlights";
+import { ReadOnlyHighlights } from "../../visualization/Highlights";
+import { CallStack, CallStackFrozen } from "../CallStack";
 import { IndexedNumber } from "../IndexedNumber";
-import { CodeStepResult } from "./CodeStepResult";
-import { FullStepResult } from "./FullStepResult";
+import { Variable } from "../Variable";
+import { StepKind } from "./StepKind";
+import { StepResult } from "./StepResult";
 
 
 
 /**
- * Represents a FullStepResult of a sorting algorithm that uses an array of numbers as it's internal data structure.
+ * Represents a StepResult of a sorting algorithm that uses a single array of numbers as it's internal data structure.
  */
-export class StepResultArray extends FullStepResult {
+export class StepResultArray extends StepResult {
 	/**
 	 * The array of numbers that represents the state of the internal data structure of the sorting algorithm at the time of this step.
 	 */
-	public readonly array: readonly IndexedNumber[];
+	private _array: readonly IndexedNumber[];
 
 	/**
-	 * The highlighted elements of the array.
+	 * The highlighted elements in the array.
 	 */
-	public readonly highlights: Highlights | null;
+	private _arrayHighlights: ReadOnlyHighlights | null;
 
 	/**
-	 * @param final - Whether the step is the final step of the algorithm.
-	 * @param text - The textual description of the step.
-	 * @param isLastSubstep - Whether the step is the last sub-step of a full step of the algorithm.
-	 * @param codeStepResult - The code step result that corresponds to the full step.
+	 * @param stepKind - The kind of the step.
 	 * @param array - The array of numbers that represents the state of the internal data structure of the sorting algorithm at the time of this step.
-	 * @param highlights - The highlighted elements of the array.
+	 * @param arrayHighlights - The highlighted elements of the array.
+	 * @param description - The textual description of the step.
+	 * @param highlightedCodeLines - The lines of code to highlight in the debugger.
+	 * @param variables - The state of variables in the algorithm.
+	 * @param final - Whether the step is the final step of the algorithm.
+	 * @param stack - A call stack of the algorithm, if any.
 	 */
 	public constructor(
-		final: boolean,
-		text: string,
-		isLastSubstep: boolean,
-		codeStepResult: CodeStepResult,
+		stepKind: StepKind,
 		array: IndexedNumber[],
-		highlights: Highlights | null
+		arrayHighlights: ReadOnlyHighlights | null = null,
+		description: string = "",
+		highlightedCodeLines?: ReadOnlyHighlights | number | number[],
+		variables?: Variable[],
+		final?: boolean,
+		stack?: CallStack | CallStackFrozen,
 	) {
-		super(final, text, isLastSubstep, codeStepResult);
+		super(stepKind, final, description, highlightedCodeLines, variables, stack);
 
-		this.array = array.slice();
-		this.highlights = highlights;
+		this._array = array.slice();
+		this._arrayHighlights = arrayHighlights;
+	}
+
+	/**
+	 * The array of numbers that represents the state of the internal data structure of the sorting algorithm at the time of this step.
+	 */
+	public get array(): readonly IndexedNumber[] {
+		return this._array;
+	}
+	protected set array(value: readonly IndexedNumber[]) {
+		this._array = value;
+	}
+
+	/**
+	 * The highlighted elements in the array.
+	 */
+	public get arrayHighlights(): ReadOnlyHighlights | null {
+		return this._arrayHighlights;
+	}
+	protected set arrayHighlights(value: ReadOnlyHighlights | null) {
+		this._arrayHighlights = value;
+	}
+
+	protected override acceptEqual(step: StepResult): void {
+		if (step instanceof StepResultArray) {
+			let arrayEquals = true;
+
+			if (step.array.length == this.array.length) {
+				for (let i = 0; i < step.array.length; i++) {
+					if (!IndexedNumber.equals(step.array[i], this.array[i])) {
+						arrayEquals = false;
+						break;
+					}
+				}
+
+				if (arrayEquals) {
+					this.array = step.array;
+				}
+			}
+
+			if (arrayEquals && step.arrayHighlights != null && this.arrayHighlights != null && step.arrayHighlights.size == this.arrayHighlights.size) {
+				let highlightsEqual = true;
+
+				for (const highlight of this.arrayHighlights) {
+					const remoteValue = step.arrayHighlights.get(highlight[0]);
+					if (remoteValue !== highlight[1]) {
+						highlightsEqual = false;
+						break;
+					}
+				}
+
+				if (highlightsEqual) {
+					this.arrayHighlights = step.arrayHighlights;
+				}
+			}
+		}
 	}
 }

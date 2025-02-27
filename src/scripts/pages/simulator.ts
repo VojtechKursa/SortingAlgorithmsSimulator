@@ -34,15 +34,15 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 	{
 		let playerElementContainer: RendererControlElements;
 		{
-			let back = document.getElementById("step-back") as HTMLButtonElement;
-			let backSub = document.getElementById("step-back-sub") as HTMLButtonElement;
+			let backAlgorithmic = document.getElementById("step-back-algorithmic") as HTMLButtonElement;
+			let backSignificant = document.getElementById("step-back-significant") as HTMLButtonElement;
 			let step = document.getElementById("step_id") as HTMLDivElement;
-			let nextSub = document.getElementById("step-next-sub") as HTMLButtonElement;
-			let next = document.getElementById("step-next") as HTMLButtonElement;
+			let nextSignificant = document.getElementById("step-next-significant") as HTMLButtonElement;
+			let nextAlgorithmic = document.getElementById("step-next-algorithmic") as HTMLButtonElement;
 			let beginning = document.getElementById("step-beginning") as HTMLButtonElement;
 			let end = document.getElementById("step-end") as HTMLButtonElement;
 
-			playerElementContainer = new RendererControlElements(back, next, backSub, nextSub, beginning, end, step);
+			playerElementContainer = new RendererControlElements(backAlgorithmic, nextAlgorithmic, backSignificant, nextSignificant, beginning, end, step);
 		}
 
 		let debuggerElementContainer: DebuggerControlElements;

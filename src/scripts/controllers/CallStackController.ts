@@ -14,7 +14,7 @@ export class CallStackController {
 	/**
 	 * Stores the last displayed call stack data and variables.
 	 */
-	private lastDisplayData: [CallStackFrozen, Variable[]?] | undefined;
+	private lastDisplayData: [CallStackFrozen, (readonly Variable[])?] | undefined;
 
 	/**
 	 * The symbol used to separate variable names and values.
@@ -92,7 +92,7 @@ export class CallStackController {
 	 * @param stack - The call stack to display.
 	 * @param currentLevelVariables - The variables of the current call stack level, if any.
 	 */
-	public display(stack: CallStack | CallStackFrozen, currentLevelVariables?: Variable[]): void {
+	public display(stack: CallStack | CallStackFrozen, currentLevelVariables?: readonly Variable[]): void {
 		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
 
 		this.tableBody.textContent = "";

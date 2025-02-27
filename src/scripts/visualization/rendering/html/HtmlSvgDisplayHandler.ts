@@ -1,6 +1,4 @@
-import { StepMemory } from "../../../data/StepMemory";
-import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../../data/stepResults/FullStepResult";
+import { StepResult } from "../../../data/stepResults/StepResult";
 import { ColorSet } from "../../colors/ColorSet";
 import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
@@ -70,7 +68,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	/**
 	 * The last step that was displayed.
 	 */
-	private readonly lastStep = new StepMemory<FullStepResult>();
+	private lastStep: StepResult | undefined;
 
 	/**
 	 * The last render returned by the renderer.
@@ -143,23 +141,15 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	}
 
 
-	public display(fullStep?: FullStepResult, codeStep?: CodeStepResult): void {
-		if (codeStep == undefined) {
-			if (fullStep != undefined)
-				codeStep = fullStep.codeStepResult;
-			else
-				return;
-		}
+	public display(step?: StepResult): void {
+		if (step == undefined)
+			return;
 
-		const rendered = this.renderer.render(fullStep, codeStep);
+		const rendered = this.renderer.render(step);
 
 		this.applySvgResult(rendered);
 
-		if (fullStep != undefined) {
-			this.lastStep.fullStep = fullStep;
-		}
-		this.lastStep.codeStep = codeStep;
-
+		this.lastStep = step;
 		this.lastRenderResult = rendered;
 	}
 
@@ -167,10 +157,10 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * Displays the last step displayed step, used for updates after changing .
 	 */
 	private displayLastStep(): void {
-		if (this.lastStep.fullStep == undefined || this.lastStep.codeStep == undefined)
+		if (this.lastStep == undefined)
 			return;
 
-		const rendered = this.renderer.render(this.lastStep.fullStep, this.lastStep.codeStep);
+		const rendered = this.renderer.render(this.lastStep);
 
 		this.applySvgResult(rendered, true);
 		this.lastRenderResult = rendered;

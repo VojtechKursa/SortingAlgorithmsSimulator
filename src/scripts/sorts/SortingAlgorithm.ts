@@ -1,5 +1,4 @@
 import { IndexedNumber } from "../data/IndexedNumber";
-import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 import { StepResult } from "../data/stepResults/StepResult";
 
@@ -67,17 +66,23 @@ export abstract class SortingAlgorithm {
 	/**
 	 * The input array of the algorithm.
 	 */
-	private input: Array<IndexedNumber>;
+	protected _input: readonly IndexedNumber[];
 
 	/**
-	 * The current working version of the input array of the algorithm.
+	 * The input array of the algorithm.
 	 */
-	protected current: Array<IndexedNumber>;
+	protected get input(): readonly IndexedNumber[] {
+		return this._input;
+	}
+	private set input(value: readonly IndexedNumber[]) {
+		this._input = value;
+	}
+
 
 	/**
 	 * The final step result of the algorithm.
 	 */
-	private finalStepResult: FullStepResult | null;
+	private finalStepResult: StepResult | null;
 
 	/**
 	 * The generator for generating the algorithm's steps.
@@ -88,8 +93,7 @@ export abstract class SortingAlgorithm {
 	 * @param input - The input array for the algorithm.
 	 */
 	protected constructor(input: number[]) {
-		this.input = this.indexInput(input);
-		this.current = this.input.slice();
+		this._input = this.indexInput(input);
 		this.finalStepResult = null;
 
 		this.generator = this.stepForwardInternal();
@@ -149,8 +153,7 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @returns The initial step of the algorithm.
 	 */
-	public reset(): FullStepResult {
-		this.current = this.input.slice();
+	public reset(): StepResult {
 		this.finalStepResult = null;
 
 		this.resetInternal();
@@ -183,7 +186,7 @@ export abstract class SortingAlgorithm {
 	 */
 	public stepForward(kind: StepKind.Code): StepResult;
 	/**
-	 * Steps the algorithm forward by one full step or one sub-step.
+	 * Steps the algorithm forward by one algorithmic or significant step.
 	 *
 	 * @param kind - The kind of step to take.
 	 *
@@ -191,7 +194,7 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @see {@link StepKind}
 	 */
-	public stepForward(kind: StepKind.Sub | StepKind.Full): StepResult[];
+	public stepForward(kind: StepKind.Significant | StepKind.Algorithmic): StepResult[];
 	/**
 	 * Steps the algorithm forward by one step.
 	 *
@@ -209,15 +212,27 @@ export abstract class SortingAlgorithm {
 
 		let targetIndex = StepKindHelper.getHierarchicalIndex(kind);
 		let results = new Array<StepResult>();
-		let lastResult: StepResult;
+		let lastResult: StepResult | undefined;
+		let generatorResult: IteratorResult<StepResult, any>;
 
 		do {
-			lastResult = this.generator.next().value as StepResult;
+			generatorResult = this.generator.next();
+			if (generatorResult.value instanceof StepResult)
+				lastResult = generatorResult.value;
+
+			if (lastResult == undefined) {
+				if (generatorResult.done ?? false) {
+					throw new Error("Step generation ended before final result.");
+				} else {
+					throw new Error("Step generator returned invalid result");
+				}
+			}
+
 			results.push(lastResult);
 		} while (StepKindHelper.getHierarchicalIndex(lastResult) < targetIndex);
 
-		if (lastResult instanceof FullStepResult && lastResult.final)
-			this.finalStepResult = lastResult as FullStepResult;
+		if (lastResult.final)
+			this.finalStepResult = lastResult;
 
 		if (kind == StepKind.Code) {
 			if (results.length > 1)
@@ -227,18 +242,6 @@ export abstract class SortingAlgorithm {
 		}
 
 		return results;
-	}
-
-	/**
-	 * Swaps two elements in the current array.
-	 *
-	 * @param indexA - The index of the first element to swap.
-	 * @param indexB - The index of the second element to swap.
-	 */
-	protected swapCurrent(indexA: number, indexB: number): void {
-		let tmp = this.current[indexA];
-		this.current[indexA] = this.current[indexB];
-		this.current[indexB] = tmp;
 	}
 
 
@@ -266,7 +269,7 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @returns The initial step result of the algorithm.
 	 */
-	public abstract getInitialStepResult(): FullStepResult;
+	public abstract getInitialStepResult(): StepResult;
 
 	/**
 	 * Retrieves the pseudocode of the algorithm.
