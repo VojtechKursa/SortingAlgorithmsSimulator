@@ -1,13 +1,12 @@
-import { StepResult } from "../data/stepResults/StepResult";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { HighlightState, SortingAlgorithm } from "./SortingAlgorithm";
+import { HighlightState } from "./SortingAlgorithm";
 import { Highlights } from "../visualization/Highlights";
-import { CodeStepResult } from "../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../data/stepResults/FullStepResult";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { Variable } from "../data/Variable";
+import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
+import { StepKind } from "../data/stepResults/StepKind";
 
-export class BubbleSort extends SortingAlgorithm {
+export class BubbleSort extends SortingAlgorithmArray {
 	protected k: number;
 	protected swapped: boolean;
 
@@ -18,12 +17,16 @@ export class BubbleSort extends SortingAlgorithm {
 		this.swapped = false;
 	}
 
-	protected makeFullStepResult(final: boolean, text: string, lastSubstep: boolean, highlightState: HighlightState | undefined, highlightedLines: number[] | number, l?: number, additionalHighlights?: Highlights): StepResult {
+	protected makeFullStepResult(
+		stepKind: StepKind.Algorithmic | StepKind.Significant,
+		description: string,
+		highlightState: HighlightState | undefined,
+		highlightedLines: number[] | number,
+		final: boolean = false,
+		l?: number,
+		additionalHighlights?: Highlights
+	): StepResultArray {
 		let highlights: Highlights = new Map<number, SymbolicColor>();
-
-		if (typeof highlightedLines == "number") {
-			highlightedLines = [highlightedLines];
-		}
 
 		if (final) {
 			for (let i = 0; i < this.current.length; i++) {
@@ -60,20 +63,14 @@ export class BubbleSort extends SortingAlgorithm {
 			}
 		}
 
-		return new StepResultArray(final, text, lastSubstep, this.makeCodeStepResult(highlightedLines), this.current, highlights);
+		return new StepResultArray(stepKind, this.current, highlights, description, highlightedLines, this.getVariables(), final);
 	}
 
-	protected makeCodeStepResult(highlightedLines: number[] | number, text: string | undefined = undefined): CodeStepResult {
-		if (typeof highlightedLines == "number")
-			highlightedLines = [highlightedLines];
-
-		let highlights = new Map<number, SymbolicColor>();
-		highlightedLines.forEach(line => highlights.set(line, SymbolicColor.Code_ActiveLine));
-
-		return new CodeStepResult(text != undefined ? text : "", highlights, [new Variable("k", this.k, SymbolicColor.Variable_1), new Variable("swapped", this.swapped)])
+	protected override makeCodeStepResult(highlightedLines: number[] | number, description: string | undefined = undefined): StepResultArray {
+		return super.makeCodeStepResult(highlightedLines, description, this.getVariables())
 	}
 
-	protected * stepForwardInternal(): Generator<StepResult> {
+	protected override * stepForwardArray(): Generator<StepResultArray> {
 		yield this.makeCodeStepResult(1);
 
 		do {
@@ -84,18 +81,18 @@ export class BubbleSort extends SortingAlgorithm {
 			yield this.makeCodeStepResult(4);
 
 			for (this.k = 0; this.k < this.current.length - 1; this.k++) {
-				yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}`, false, HighlightState.Selected, 5)
+				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.k} and ${this.k + 1}`, HighlightState.Selected, 5);
 
 				if (this.current[this.k] > this.current[this.k + 1]) {
 					this.swapCurrent(this.k, this.k + 1);
 					this.swapped = true;
 
-					yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger, elements will be swapped.`, true, HighlightState.OrderSwapped, [6, 7]);
+					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.k} and ${this.k + 1}: Element on index ${this.k} is larger, elements will be swapped.`, HighlightState.OrderSwapped, [6, 7]);
 
 					yield this.makeCodeStepResult(8);
 				}
 				else {
-					yield this.makeFullStepResult(false, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, true, HighlightState.OrderCorrect, 8);
+					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.k} and ${this.k + 1}: Elements are in correct order.`, HighlightState.OrderCorrect, 8);
 				}
 
 				yield this.makeCodeStepResult(4);
@@ -105,7 +102,7 @@ export class BubbleSort extends SortingAlgorithm {
 			yield this.makeCodeStepResult(10);
 		} while (this.swapped)
 
-		yield this.makeFullStepResult(true, "Array is sorted.", true, undefined, [this.getPseudocode().length - 1]);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted.", undefined, [this.getPseudocode().length - 1], true);
 	}
 
 	protected resetInternal(): void {
@@ -113,8 +110,15 @@ export class BubbleSort extends SortingAlgorithm {
 		this.swapped = false;
 	}
 
-	public getInitialStepResult(): FullStepResult {
-		return new StepResultArray(this.current.length <= 1, "", true, new CodeStepResult("", new Map<number, SymbolicColor>(), new Array<Variable>()), this.current, null);
+	protected getVariables(): Array<Variable> {
+		return [
+			new Variable("k", this.k, SymbolicColor.Variable_1),
+			new Variable("swapped", this.swapped)
+		]
+	}
+
+	public override getInitialStepResultArray(): StepResultArray {
+		return new StepResultArray(StepKind.Algorithmic, this.current, null, undefined, undefined, undefined, this.current.length <= 1);
 	}
 
 	public getPseudocode(): string[] {

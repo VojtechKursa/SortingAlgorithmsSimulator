@@ -12,4 +12,13 @@ export class IndexedNumber {
 		public readonly value: number,
 		public readonly index: number | null
 	) { }
+
+	public static equals(number1: IndexedNumber, number2: IndexedNumber): boolean {
+		return number1.id === number2.id && number1.value === number2.value && number1.index === number2.index;
+	}
+
+	// Simplifies comparisons ("IndexedNumber > IndexedNumber" instead of "IndexedNumber.value > IndexedNumber.value")
+	public valueOf(): number {
+		return this.value;
+	}
 }

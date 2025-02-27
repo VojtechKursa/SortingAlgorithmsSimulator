@@ -1,5 +1,4 @@
-import { CodeStepResult } from "../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../data/stepResults/FullStepResult";
+import { StepResult } from "../../data/stepResults/StepResult";
 import { ColorSet } from "../colors/ColorSet";
 
 /**
@@ -72,16 +71,14 @@ export interface SvgRenderer {
 	/**
 	 * Renders the state of an algorithm represented by the given step results.
 	 *
-	 * @param fullStep - The full step to render.
-	 * @param codeStep - The code step to render.
+	 * @param step - The step to render.
 	 *
 	 * @returns The rendered SVG and it's associated alignment information.
 	 *
-	 * @see {@link FullStepResult}
-	 * @see {@link CodeStepResult}
+	 * @see {@link StepResult}
 	 * @see {@link SvgRenderResult}
 	 */
-	render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult;
+	render(step: StepResult): SvgRenderResult;
 
 	/**
 	 * Redraws the last rendered state of an algorithm after changes in the displayed viewport's size.

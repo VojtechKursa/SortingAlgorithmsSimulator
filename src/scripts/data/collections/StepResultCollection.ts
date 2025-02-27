@@ -1,8 +1,5 @@
 import { AlgorithmState } from "../AlgorithmState";
-import { CallStackFrozen } from "../CallStack";
 import { StepIndexes } from "../StepIndexes";
-import { CodeStepResult } from "../stepResults/CodeStepResult";
-import { FullStepResult } from "../stepResults/FullStepResult";
 import { StepKind, StepKindHelper } from "../stepResults/StepKind";
 import { StepResult } from "../stepResults/StepResult";
 
@@ -11,38 +8,15 @@ import { StepResult } from "../stepResults/StepResult";
  */
 class StepCounter {
 	/**
-	 * Indicates if the previous step was the last sub-step of a full step.
-	 */
-	private _previousFullWasLastSubstep: boolean;
-
-	/**
 	 * @param code - The initial count of code steps.
-	 * @param sub - The initial count of sub-steps.
-	 * @param full - The initial count of full steps.
-	 * @param previousFullWasLastSubstep - Whether the the previous step was the last sub-step of a full step.
+	 * @param significant - The initial count of significant steps.
+	 * @param algorithmic - The initial count of algorithmic steps.
 	 */
 	public constructor(
 		protected code: number = 0,
-		protected sub: number = 0,
-		protected full: number = 0,
-		previousFullWasLastSubstep: boolean = false
-	) {
-		this._previousFullWasLastSubstep = previousFullWasLastSubstep;
-	}
-
-	/**
-	 * Gets the value indicating if the previous step was the last sub-step of a full step.
-	 */
-	public get previousFullWasLastSubstep(): boolean {
-		return this._previousFullWasLastSubstep;
-	}
-
-	/**
-	 * Sets the value indicating if the previous step was the last sub-step of a full step.
-	 */
-	private set previousFullWasLastSubstep(value: boolean) {
-		this._previousFullWasLastSubstep = value;
-	}
+		protected significant: number = 0,
+		protected algorithmic: number = 0,
+	) { }
 
 	/**
 	 * Increments the counter by 1 of the specified kind.
@@ -50,23 +24,13 @@ class StepCounter {
 	 */
 	public add(stepKind: StepKind) {
 		switch (stepKind) {
-			case StepKind.Full:
-			case StepKind.Sub:
-				if (this.previousFullWasLastSubstep) {
-					this.full++;
-					this.sub = 0;
-					this.previousFullWasLastSubstep = false;
-				}
-				else {
-					this.sub++;
-				}
+			case StepKind.Algorithmic:
+				this.algorithmic++;
+			case StepKind.Significant:
+				this.significant++;
 			case StepKind.Code:
 				this.code++;
 				break;
-		}
-
-		if (stepKind == StepKind.Full) {
-			this.previousFullWasLastSubstep = true;
 		}
 	}
 
@@ -78,8 +42,8 @@ class StepCounter {
 	public get(stepKind: StepKind): number {
 		switch (stepKind) {
 			case StepKind.Code: return this.code;
-			case StepKind.Sub: return this.sub;
-			case StepKind.Full: return this.full;
+			case StepKind.Significant: return this.significant;
+			case StepKind.Algorithmic: return this.algorithmic;
 		}
 	}
 
@@ -88,7 +52,7 @@ class StepCounter {
 	 * @returns A StepIndexes object containing the the current step counts.
 	 */
 	public freeze(): StepIndexes {
-		return new StepIndexes(this.full, this.sub, this.code);
+		return new StepIndexes(this.algorithmic, this.significant, this.code);
 	}
 }
 
@@ -99,12 +63,7 @@ class AlgorithmStateCollection {
 	/**
 	 * Array of all algorithm states.
 	 */
-	private steps = new Array<AlgorithmState>();
-
-	/**
-	 * Array of algorithm states, grouped by full steps.
-	 */
-	private fullSteps = new Array<Array<AlgorithmState>>();
+	private states = new Array<AlgorithmState>();
 
 	/**
 	 * @param initialState - The initial state of the algorithm.
@@ -116,87 +75,63 @@ class AlgorithmStateCollection {
 	/**
 	 * Gets the last step known to the collection.
 	 */
-	public get lastStep(): AlgorithmState {
-		return this.steps[this.steps.length - 1];
+	public get lastState(): AlgorithmState {
+		return this.states[this.states.length - 1];
 	}
 
 	/**
-	 * Adds a new state to the collection.
+	 * Adds a new state to the collection at the index specified by the state's index.
 	 * @param state - The state to add.
+	 *
+	 * @see {@link AlgorithmState.index}
 	 */
 	public insert(state: AlgorithmState): void {
-		this.steps[state.stepsIndex.code] = state;
-
-		if (state.stepKind != StepKind.Code) {
-			const fullStepIndex = state.stepsIndex.full;
-
-			if (this.fullSteps[fullStepIndex] == undefined)
-				this.fullSteps[fullStepIndex] = [];
-
-			this.fullSteps[fullStepIndex][state.stepsIndex.sub] = state;
-		}
+		this.states[state.index.code] = state;
 	}
 
 	/**
 	 * Gets an algorithm state by step kind and index.
 	 * @param stepKind - The kind of step to get.
-	 * @param step - The index of the step to get.
+	 * @param stepIndex - The index of the step to get.
 	 * @returns The algorithm state of the specified step kind at the specified index, or undefined if the requested step isn't known to the collection.
 	 */
-	public get(stepKind: StepKind.Code | StepKind.Full, step: number): AlgorithmState | undefined;
-	/**
-	 * Gets an algorithm state by step kind and index.
-	 * @param stepKind - The kind of step to get.
-	 * @param fullStep - The index of the full step whose sub-step to get.
-	 * @param subStep - The index of the sub-step of the given full step to get.
-	 * @returns The algorithm state of the specified step kind at the specified index, or undefined if the requested step isn't known to the collection.
-	 */
-	public get(stepKind: StepKind.Sub, fullStep: number, subStep: number): AlgorithmState | undefined;
-	public get(stepKind: StepKind, step: number, subStep?: number): AlgorithmState | undefined {
+	public get(stepKind: StepKind, stepIndex: number): AlgorithmState | undefined {
 		switch (stepKind) {
 			case StepKind.Code:
-				if (step >= 0 && step < this.steps.length)
-					return this.steps[step];
+				if (stepIndex >= 0 && stepIndex < this.states.length)
+					return this.states[stepIndex];
+				return undefined;
+			case StepKind.Significant:
+			case StepKind.Algorithmic:
+				let l = 0;
+				let r = this.states.length - 1;
+
+				const desiredHierarchical = StepKindHelper.getHierarchicalIndex(stepKind);
+
+				while (l <= r) {
+					const index = Math.floor((l + r) / 2);
+					const foundStep = this.states[index];
+
+					const foundStepIndex = foundStep.index.getIndex(stepKind);
+
+					if (foundStepIndex == stepIndex) {
+						const foundHierarchical = StepKindHelper.getHierarchicalIndex(foundStep.step);
+
+						if (foundHierarchical >= desiredHierarchical)
+							return foundStep;
+						else
+							r = index - 1;
+					}
+					else if (stepIndex > foundStepIndex) {
+						l = index + 1;
+					}
+					else {	// stepIndex < foundStepIndex
+						r = index - 1;
+					}
+				}
 
 				return undefined;
-			case StepKind.Sub:
-			case StepKind.Full:
-				let subSteps;
-				if (step >= 0 && step < this.fullSteps.length)
-					subSteps = this.fullSteps[step];
-				else
-					return undefined;
-
-				switch (stepKind) {
-					case StepKind.Sub:
-						if (subStep == undefined)
-							throw new Error("Sub-step requested but sub-step index is undefined");
-
-						if (subStep >= 0 && subStep <= subSteps.length)
-							return subSteps[subStep];
-
-						return undefined;
-					case StepKind.Full:
-						let possibleFullStep = subSteps[subSteps.length - 1];
-
-						if (possibleFullStep.stepKind == StepKind.Full)
-							return possibleFullStep;
-
-						return undefined;
-				}
 		}
-	}
-
-	/**
-	 * Gets all sub-steps for a given full step.
-	 * @param fullStepIndex - The index of the full step whose sub-steps to get.
-	 * @returns An array of sub-steps for the given full step index, or undefined if the requested full step isn't known to the collection.
-	 */
-	public getSubSteps(fullStepIndex: number): AlgorithmState[] | undefined {
-		if (fullStepIndex >= 0 && fullStepIndex < this.fullSteps.length)
-			return this.fullSteps[fullStepIndex];
-
-		return undefined;
 	}
 }
 
@@ -204,63 +139,86 @@ class AlgorithmStateCollection {
  * Represents a collection of steps of a sorting algorithm.
  */
 export class StepResultCollection {
-	private readonly stepCounter = new StepCounter(0, 0, 0, true);
-	private currentStepIndexes: StepIndexes;
+	private readonly stepCounter = new StepCounter(0, 0, 0);
+	private _currentStepIndexes: StepIndexes;
 	private readonly states: AlgorithmStateCollection;
 
-	private endStep: number | null = null;
-	private endFullStep: number | null = null;
+	private _finalStepIndexes: StepIndexes | null = null;
+
+
 
 	/**
 	 * @param initialStep The initial step result, representing the initial state of the algorithm.
 	 */
-	public constructor(initialStep: FullStepResult) {
-		let codeStep = initialStep.codeStepResult;
-		let stack = undefined;
+	public constructor(initialStep: StepResult) {
+		this._currentStepIndexes = this.stepCounter.freeze();
 
-		this.currentStepIndexes = this.stepCounter.freeze();
-
-		this.states = new AlgorithmStateCollection(new AlgorithmState(codeStep, initialStep, StepKindHelper.getStepKind(initialStep), this.currentStepIndexes, stack));
+		this.states = new AlgorithmStateCollection(new AlgorithmState(initialStep, this.currentStepIndexes));
 	}
+
+
+
+	/**
+	 * Gets indexes of the current step.
+	 * @returns The current step indexes.
+	 */
+	public get currentStepIndexes(): StepIndexes {
+		return this._currentStepIndexes;
+	}
+	private set currentStepIndexes(value: StepIndexes) {
+		this._currentStepIndexes = value;
+	}
+
+	/**
+	 * Gets the current state.
+	 * @returns The current algorithm state.
+	 * @throws Error if the collection is in invalid state.
+	 */
+	public get currentState(): AlgorithmState {
+		const state = this.states.get(StepKind.Code, this.currentStepIndexes.code);
+
+		if (state == undefined)
+			throw new Error("Current step doesn't exist");
+
+		return state;
+	}
+
+	/**
+	 * Gets the current step.
+	 * @returns The current algorithm state's associated step.
+	 * @throws Error if the collection is in invalid state.
+	 */
+	public get currentStep(): StepResult {
+		return this.currentState.step;
+	}
+
+	/**
+	 * Gets the final step indexes.
+	 * @returns The final step indexes or null if the final step hasn't been added yet.
+	 */
+	public get finalStepIndexes(): StepIndexes | null {
+		return this._finalStepIndexes;
+	}
+	private set finalStepIndexes(value: StepIndexes) {
+		this._finalStepIndexes = value;
+	}
+
+
 
 	/**
 	 * Adds a step result to the collection.
 	 * @param stepResult The step result to add.
 	 */
 	public add(stepResult: StepResult): void {
-		const lastStep = this.states.lastStep;
-		const stepKind = StepKindHelper.getStepKind(stepResult);
-		this.stepCounter.add(stepKind);
+		this.stepCounter.add(stepResult.stepKind);
 
-		let fullStep: FullStepResult;
-		let codeStep: CodeStepResult;
-		let stack: CallStackFrozen | undefined;
-
-		if (stepResult instanceof CodeStepResult) {
-			codeStep = stepResult;
-			fullStep = lastStep.fullStepResult;
-		}
-		else if (stepResult instanceof FullStepResult) {
-			codeStep = stepResult.codeStepResult;
-			fullStep = stepResult;
-
-			if (stepResult.final) {
-				this.endStep = this.stepCounter.get(StepKind.Code);
-				this.endFullStep = this.stepCounter.get(StepKind.Full);
-			}
-		}
-		else {
-			throw new Error("Invalid step result received");
+		if (stepResult.final) {
+			this.finalStepIndexes = this.stepCounter.freeze();
 		}
 
-		stack = codeStep.callStack;
-		const lastStack = this.states.lastStep.callStack;
+		stepResult.acceptEqualStepData(this.states.lastState.step);
 
-		if (lastStack != undefined && CallStackFrozen.equalSimple(this.states.lastStep.callStack, stack)) {
-			codeStep.acceptEqualStack(lastStack);
-		}
-
-		this.states.insert(new AlgorithmState(codeStep, fullStep, stepKind, this.stepCounter.freeze(), stack));
+		this.states.insert(new AlgorithmState(stepResult, this.stepCounter.freeze()));
 	}
 
 	/**
@@ -274,164 +232,29 @@ export class StepResultCollection {
 
 	/**
 	 * Moves forward to the next step of the specified kind.
-	 * If successful, the current step can be retrieved from the collection using the getCurrentStep method.
+	 * If successful, the current step can be retrieved from the collection using the currentState or currentStep properties.
+	 *
 	 * @param kind The kind of step to move forward to.
+	 *
 	 * @returns True if the step operation was successful and the step was advanced. False if the requested step is not in the collection
 	 * 				for example if the step is not known yet and has to be added first (user's responsibility) or if attempt to step past the final state was made.
+	 *
+	 * @see {@link StepResultCollection.currentState}
 	 */
 	public forward(kind: StepKind): boolean {
-		let nextState;
-
-		switch (kind) {
-			case StepKind.Code:
-				nextState = this.states.get(StepKind.Code, this.currentStepIndexes.code + 1);
-				break;
-			case StepKind.Full:
-			case StepKind.Sub:
-				if (kind == StepKind.Full) {
-					// Get to the end of current full step's substeps
-					nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full);
-				}
-				else {
-					// Get the current substep
-					nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub);
-				}
-
-				// If there isn't even the current step can't continue further
-				if (nextState == undefined)
-					return false;
-
-				// If already at the step or past it, go to the next one
-				if (this.currentStepIndexes.code >= nextState.stepsIndex.code) {
-					if (kind == StepKind.Full) {
-						nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full + 1);
-					}
-					else {
-						nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub + 1);
-
-						// If next substep in the current steps doesn't exist, go to the beginning of the next substeps
-						if (nextState == undefined) {
-							nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full + 1, 0);
-						}
-					}
-				}
-
-				break;
-		}
-
-		if (nextState != undefined) {
-			this.currentStepIndexes = nextState.stepsIndex;
-			return true;
-		}
-		else
-			return false;
+		return this.goToStep(this.currentStepIndexes.getIndex(kind) + 1, kind);
 	}
 
 	/**
 	 * Moves backward to the previous step of the specified kind.
-	 * If successful, the current step can be retrieved from the collection using the getCurrentStep method.
+	 * If successful, the current step can be retrieved from the collection using the currentState or currentState properties.
+	 *
 	 * @param kind The kind of step to move backward to.
+	 *
 	 * @returns True if the step operation was successful and the step was moved backward. False if attempt to step past the initial state was made.
 	 */
 	public backward(kind: StepKind): boolean {
-		let nextState;
-
-		switch (kind) {
-			case StepKind.Code:
-				nextState = this.states.get(StepKind.Code, this.currentStepIndexes.code - 1);
-				break;
-			case StepKind.Full:
-			case StepKind.Sub:
-				// Get the current step of the desired kind
-				if (kind == StepKind.Full)
-					nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full);
-				else
-					nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub);
-
-				// If the current full step is undefined, we can't be past it, so go to the previous step
-				// If we are before or at the current step, go to the previous step (if past it, nextState stays at the current step, going back to it)
-				if (nextState == undefined || this.currentStepIndexes.code <= nextState.stepsIndex.code) {
-					if (kind == StepKind.Full)
-						nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full - 1);
-					else {
-						nextState = this.states.get(StepKind.Sub, this.currentStepIndexes.full, this.currentStepIndexes.sub - 1);
-
-						// If previous substep in the current sub-steps doesn't exist, go to the end of previous substeps
-						if (nextState == undefined) {
-							nextState = this.states.get(StepKind.Full, this.currentStepIndexes.full - 1);
-						}
-					}
-				}
-
-				break;
-		}
-
-		if (nextState != undefined) {
-			this.currentStepIndexes = nextState.stepsIndex;
-			return true;
-		}
-		else
-			return false;
-	}
-
-	/**
-	 * Gets indexes of the current step.
-	 * @returns The current step indexes.
-	 */
-	public getCurrentStepNumbers(): StepIndexes {
-		return this.currentStepIndexes;
-	}
-
-	/**
-	 * Gets the current step.
-	 * @returns The current algorithm state.
-	 * @throws Error if the collection is in invalid state.
-	 */
-	public getCurrentStep(): AlgorithmState {
-		const state = this.states.get(StepKind.Code, this.currentStepIndexes.code);
-
-		if (state == undefined)
-			throw new Error("Current step doesn't exist");
-
-		return state;
-	}
-
-	/**
-	 * Gets the final step number.
-	 * @returns The final step number or null if the final step hasn't been added yet.
-	 */
-	public getEndStepNumber(): number | null;
-	/**
-	 * Gets the final step number of the specified kind.
-	 * @param kind The kind of step whose final step number to return.
-	 * @returns The end step number or null if the final step hasn't been added yet.
-	 */
-	public getEndStepNumber(kind: StepKind.Code | StepKind.Full): number | null;
-	/**
-	 * Gets the final step number for a sub-step of the specified full step.
-	 * @param kind The kind of step whose final step number to return (StepKind.Sub).
-	 * @param fullStepNumber The index of the full step whose final sub-step number to return.
-	 * @returns The final sub-step number of the given full step or null if the final sub-step of the given full step hasn't been added yet.
-	 * @throws Error if the requested full step is unknown yet.
-	 */
-	public getEndStepNumber(kind: StepKind.Sub, fullStepNumber?: number): number | null;
-	public getEndStepNumber(kind: StepKind = StepKind.Code, fullStepNumber?: number): number | null {
-		switch (kind) {
-			case StepKind.Code: return this.endStep;
-			case StepKind.Full: return this.endFullStep;
-			case StepKind.Sub:
-				if (fullStepNumber == undefined)
-					fullStepNumber = this.currentStepIndexes.full;
-
-				const subSteps = this.states.getSubSteps(fullStepNumber);
-				if (subSteps == undefined)
-					throw new Error("Invalid full step number");
-
-				if (subSteps[subSteps.length - 1].stepKind == StepKind.Full)
-					return subSteps.length - 1;
-				else
-					return null;
-		}
+		return this.goToStep(this.currentStepIndexes.getIndex(kind) - 1, kind);
 	}
 
 	/**
@@ -446,35 +269,12 @@ export class StepResultCollection {
 	 * @param kind The kind of step to which to move to.
 	 * @returns True if the operation was successful, otherwise false (i.e. if the requested step hasn't been added to this collection yet).
 	 */
-	public goToStep(step: number, kind: StepKind.Code | StepKind.Full): boolean;
-	/**
-	 * Moves to the specified sub-step of the specified full step.
-	 * @param fullStep The number of the full step to whose sub-step to move to.
-	 * @param kind The kind of step to which to move to.
-	 * @param subStep The number of the sub-step inside the full step to which to move to.
-	 * @returns True if the operation was successful, otherwise false (i.e. if the requested step hasn't been added to this collection yet).
-	 * @throws Error if the sub-step index is not provided.
-	 */
-	public goToStep(fullStep: number, kind: StepKind.Sub, subStep: number): boolean;
-	public goToStep(step: number, kind: StepKind = StepKind.Code, subStep?: number): boolean {
-		let state;
-
-		switch (kind) {
-			case StepKind.Code:
-			case StepKind.Full:
-				state = this.states.get(kind, step);
-				break;
-
-			case StepKind.Sub:
-				if (subStep == undefined)
-					throw new Error("goToStep called with SubStep step kind, but no sub-step index was given");
-
-				state = this.states.get(StepKind.Sub, step, subStep);
-				break;
-		}
+	public goToStep(step: number, kind: StepKind): boolean;
+	public goToStep(step: number, kind: StepKind = StepKind.Code): boolean {
+		let state = this.states.get(kind, step);
 
 		if (state != undefined) {
-			this.currentStepIndexes = state.stepsIndex;
+			this.currentStepIndexes = state.index;
 			return true;
 		}
 		else
@@ -485,7 +285,7 @@ export class StepResultCollection {
 	 * Moves to the last known step.
 	 */
 	public goToLastKnownStep(): void {
-		this.currentStepIndexes = this.states.lastStep.stepsIndex;
+		this.currentStepIndexes = this.states.lastState.index;
 	}
 
 	/**
@@ -498,31 +298,9 @@ export class StepResultCollection {
 	 * @param kind The kind of step whose last known step number to query.
 	 * @returns The last known step number of the specified kind.
 	 */
-	public getLastKnownStepNumber(kind: StepKind.Code | StepKind.Full): number;
-	/**
-	 * Gets the last known sub-step number of the specified full step.
-	 * @param kind The kind of step whose last known sub-step number to query (StepKind.Sub).
-	 * @param fullStep The full step whose last known sub-step number to query.
-	 * @returns The last known sub-step number.
-	 * @throws Error if the full step number is invalid (i.e. the full step hasn't been added to the collection yet).
-	 */
-	public getLastKnownStepNumber(kind: StepKind.Sub, fullStep?: number): number;
-	public getLastKnownStepNumber(kind: StepKind = StepKind.Code, fullStep?: number): number {
-		const lastStepIndexes = this.states.lastStep.stepsIndex;
-
-		switch (kind) {
-			case StepKind.Code: return lastStepIndexes.code;
-			case StepKind.Full: return lastStepIndexes.full;
-			case StepKind.Sub:
-				if (fullStep == undefined)
-					fullStep = this.currentStepIndexes.full;
-
-				const subSteps = this.states.getSubSteps(fullStep);
-				if (subSteps == undefined)
-					throw new Error("Invalid full step number");
-
-				return subSteps.length - 1;
-		}
+	public getLastKnownStepNumber(kind: StepKind): number;
+	public getLastKnownStepNumber(kind: StepKind = StepKind.Code): number {
+		return this.states.lastState.index.getIndex(kind);
 	}
 
 	/**
@@ -532,11 +310,11 @@ export class StepResultCollection {
 	 * @throws Error if the requested step isn't present in the collection.
 	 */
 	public getStepKind(stepIndex: number = this.currentStepIndexes.code): StepKind {
-		const currentStep = this.states.get(StepKind.Code, stepIndex);
+		const selectedState = this.states.get(StepKind.Code, stepIndex);
 
-		if (currentStep != undefined)
-			return currentStep.stepKind;
+		if (selectedState != undefined)
+			return selectedState.step.stepKind;
 		else
-			throw new Error("Current step doesn't exist");
+			throw new Error("Selected step doesn't exist");
 	}
 }

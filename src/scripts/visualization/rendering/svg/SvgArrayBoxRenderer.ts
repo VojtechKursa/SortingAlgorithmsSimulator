@@ -1,12 +1,11 @@
-import { CodeStepResult } from "../../../data/stepResults/CodeStepResult";
-import { FullStepResult } from "../../../data/stepResults/FullStepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { ColorSet } from "../../colors/ColorSet";
 import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
-import { UnsupportedStepResult } from "../../../errors/UnsupportedStepResult";
+import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
+import { StepResult } from "../../../data/stepResults/StepResult";
 
 class Point2D {
 	public constructor(
@@ -68,6 +67,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
 	private minY = this.defaultMinY;
 
+	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
 
 	private _colorSet: ColorSet;
@@ -95,34 +95,23 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 
 
-	public render(fullStep?: FullStepResult, codeStep?: CodeStepResult): SvgRenderResult {
-		let full: StepResultArray | undefined = undefined;
-		let code: CodeStepResult | undefined = undefined;
+	public render(step: StepResult): SvgRenderResult {
+		if (!(step instanceof StepResultArray))
+			throw new UnsupportedStepResultError(["StepResultArray"]);
 
-		if (fullStep != undefined) {
-			if (!(fullStep instanceof StepResultArray)) {
-				throw new UnsupportedStepResult(["StepResultArray"]);
+		if (this.lastRenderedStep != undefined) {
+			if (step.array == this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
+				this.drawArray(step);
 			}
-
-			full = fullStep;
-			code = fullStep.codeStepResult;
+		} else {
+			this.drawArray(step);
 		}
 
-		if (codeStep != undefined) {
-			code = codeStep;
-		}
+		this.drawVariables(step);
 
-		if (full != undefined) {
-			this.drawArray(full);
-		}
+		this.adjustViewBox();
 
-		if (code != undefined) {
-			this.drawVariables(code);
-		}
-
-		if (full != undefined || code != undefined) {
-			this.adjustViewBox();
-		}
+		this.lastRenderedStep = step;
 
 		return this.resultMemory.clone();
 	}
@@ -158,7 +147,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			rect.setAttribute("width", this.arraySettings.boxSize.toString());
 			rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
 			rect.setAttribute("stroke-width", `${this.arraySettings.borderWidth}px`);
-			rect.setAttribute("fill", this.colorSet.get(step.highlights != null ? step.highlights.get(i) : SymbolicColor.Element_Background).toString());
+			rect.setAttribute("fill", this.colorSet.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -196,7 +185,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		}
 	}
 
-	private drawVariables(step: CodeStepResult): void {
+	private drawVariables(step: StepResult): void {
 		if (this.resultMemory == undefined)
 			throw new Error("Attempted to render code step before first full step.");
 

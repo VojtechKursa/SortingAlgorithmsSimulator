@@ -1,18 +1,12 @@
-import { CallStackFrozen } from "./CallStack";
 import { StepIndexes } from "./StepIndexes";
-import { CodeStepResult } from "./stepResults/CodeStepResult";
-import { FullStepResult } from "./stepResults/FullStepResult";
-import { StepKind } from "./stepResults/StepKind";
+import { StepResult } from "./stepResults/StepResult";
 
 /**
  * Represents the state of an algorithm at a specific point in time.
  */
 export class AlgorithmState {
 	public constructor(
-		public readonly codeStepResult: CodeStepResult,
-		public readonly fullStepResult: FullStepResult,
-		public readonly stepKind: StepKind,
-		public readonly stepsIndex: StepIndexes,
-		public readonly callStack?: CallStackFrozen
+		public readonly step: StepResult,
+		public readonly index: StepIndexes,
 	) { }
 }

@@ -3,19 +3,19 @@
  */
 export class RendererControlElements {
 	/**
-	 * @param backFullStepButton - The button to step back a full step.
-	 * @param forwardFullStepButton - The button to step forward a full step.
-	 * @param backSubStepButton - The button to step back a sub step.
-	 * @param forwardSubStepButton - The button to step forward a sub step.
+	 * @param backAlgorithmicStepButton - The button to step back an algorithmic step.
+	 * @param forwardAlgorithmicStepButton - The button to step forward a algorithmic step.
+	 * @param backSignificantStepButton - The button to step back a significant step.
+	 * @param forwardSignificantStepButton - The button to step forward a significant step.
 	 * @param beginningButton - The button to go to the beginning of the algorithm.
 	 * @param endButton - The button to go to the end of the algorithm.
 	 * @param stepOutput - The element to display the current step.
 	 */
 	public constructor(
-		public readonly backFullStepButton: HTMLButtonElement,
-		public readonly forwardFullStepButton: HTMLButtonElement,
-		public readonly backSubStepButton: HTMLButtonElement,
-		public readonly forwardSubStepButton: HTMLButtonElement,
+		public readonly backAlgorithmicStepButton: HTMLButtonElement,
+		public readonly forwardAlgorithmicStepButton: HTMLButtonElement,
+		public readonly backSignificantStepButton: HTMLButtonElement,
+		public readonly forwardSignificantStepButton: HTMLButtonElement,
 		public readonly beginningButton: HTMLButtonElement,
 		public readonly endButton: HTMLButtonElement,
 		public readonly stepOutput: HTMLDivElement

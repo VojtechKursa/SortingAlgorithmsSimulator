@@ -12,13 +12,13 @@ export class CallStackLevel {
 	/**
 	 * The variables local to the given call stack level.
 	 */
-	private readonly array: Variable[];
+	private readonly array: readonly Variable[];
 
 	/**
 	 * @param functionName - The name of the function at the given call stack level.
 	 * @param variables - The variables local to the given call stack level.
 	 */
-	public constructor(functionName: string, variables: Variable[]) {
+	public constructor(functionName: string, variables: readonly Variable[]) {
 		this.functionName = functionName;
 		this.array = variables.slice();
 	}
@@ -83,7 +83,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * @param level - The level to push into the call stack.
 	 * @param newFunctionName - The name of the current function (that will virtually be at the top of the call stack after the push).
 	 */
-	public push(level: CallStackLevel | Variable[], newFunctionName?: string): void {
+	public push(level: CallStackLevel | readonly Variable[], newFunctionName?: string): void {
 		if (level instanceof Array) {
 			if (this.currentFunctionName == undefined)
 				throw new Error("Push called with variable array parameter on call stack where current function name is not defined.");
@@ -111,7 +111,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * @param variables - The variables local to the top level.
 	 * @returns The top level of the call stack.
 	 */
-	public top(variables: Variable[]): CallStackLevel | undefined {
+	public top(variables: readonly Variable[]): CallStackLevel | undefined {
 		if (this.currentFunctionName == undefined)
 			throw new Error("Top called on call stack without a defined current function name");
 
@@ -289,7 +289,7 @@ class ReverseArrayIterator<T> implements Iterator<T, T> {
 	/**
 	 * @param array - The array to iterate over.
 	 */
-	public constructor(private readonly array: Array<T>) {
+	public constructor(private readonly array: readonly T[]) {
 		this.index = array.length;
 	}
 

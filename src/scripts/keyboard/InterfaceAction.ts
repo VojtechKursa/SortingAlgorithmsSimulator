@@ -16,16 +16,16 @@ export const enum InterfaceActionGroup {
  * Enum representing all available interface actions.
  */
 export const enum InterfaceAction {
-	Backward_Full = "backward-full",
-	Backward_Sub = "backward-sub",
+	Backward_Algorithmic = "backward-algorithmic",
+	Backward_Significant = "backward-significant",
 	Backward_Code = "backward-code",
 	Backward = "backward",
-	Forward_Full = "forward-full",
-	Forward_Sub = "forward-sub",
+	Forward_Algorithmic = "forward-algorithmic",
+	Forward_Significant = "forward-significant",
 	Forward_Code = "forward-code",
 	Forward = "forward",
-	Select_Full = "select-full",
-	Select_Sub = "select-sub",
+	Select_Algorithmic = "select-algorithmic",
+	Select_Significant = "select-significant",
 	Select_Code = "select-code",
 	Select_Next = "select-next",
 	Select_Previous = "select-previous",
@@ -41,18 +41,18 @@ export class InterfaceActionData {
 	 */
 	private static readonly actionInfoMap = new Map<InterfaceAction, InterfaceActionData>(
 		[
-			[InterfaceAction.Backward_Full, new InterfaceActionData(InterfaceAction.Backward_Full, InterfaceActionGroup.Backward, "Backward full step", StepKind.Full)],
-			[InterfaceAction.Backward_Sub, new InterfaceActionData(InterfaceAction.Backward_Sub, InterfaceActionGroup.Backward, "Backward sub-step", StepKind.Sub)],
+			[InterfaceAction.Backward_Algorithmic, new InterfaceActionData(InterfaceAction.Backward_Algorithmic, InterfaceActionGroup.Backward, "Backward algorithmic step", StepKind.Algorithmic)],
+			[InterfaceAction.Backward_Significant, new InterfaceActionData(InterfaceAction.Backward_Significant, InterfaceActionGroup.Backward, "Backward significant step", StepKind.Significant)],
 			[InterfaceAction.Backward_Code, new InterfaceActionData(InterfaceAction.Backward_Code, InterfaceActionGroup.Backward, "Backward code step", StepKind.Code)],
 			[InterfaceAction.Backward, new InterfaceActionData(InterfaceAction.Backward, InterfaceActionGroup.Backward, "Backward")],
 
-			[InterfaceAction.Forward_Full, new InterfaceActionData(InterfaceAction.Forward_Full, InterfaceActionGroup.Forward, "Forward full step", StepKind.Full)],
-			[InterfaceAction.Forward_Sub, new InterfaceActionData(InterfaceAction.Forward_Sub, InterfaceActionGroup.Forward, "Forward sub-step", StepKind.Sub)],
+			[InterfaceAction.Forward_Algorithmic, new InterfaceActionData(InterfaceAction.Forward_Algorithmic, InterfaceActionGroup.Forward, "Forward algorithmic step", StepKind.Algorithmic)],
+			[InterfaceAction.Forward_Significant, new InterfaceActionData(InterfaceAction.Forward_Significant, InterfaceActionGroup.Forward, "Forward significant step", StepKind.Significant)],
 			[InterfaceAction.Forward_Code, new InterfaceActionData(InterfaceAction.Forward_Code, InterfaceActionGroup.Forward, "Forward code step", StepKind.Code)],
 			[InterfaceAction.Forward, new InterfaceActionData(InterfaceAction.Forward, InterfaceActionGroup.Forward, "Forward")],
 
-			[InterfaceAction.Select_Full, new InterfaceActionData(InterfaceAction.Select_Full, InterfaceActionGroup.Select, "Select full step", StepKind.Full)],
-			[InterfaceAction.Select_Sub, new InterfaceActionData(InterfaceAction.Select_Sub, InterfaceActionGroup.Select, "Select sub-step", StepKind.Sub)],
+			[InterfaceAction.Select_Algorithmic, new InterfaceActionData(InterfaceAction.Select_Algorithmic, InterfaceActionGroup.Select, "Select algorithmic step", StepKind.Algorithmic)],
+			[InterfaceAction.Select_Significant, new InterfaceActionData(InterfaceAction.Select_Significant, InterfaceActionGroup.Select, "Select significant step", StepKind.Significant)],
 			[InterfaceAction.Select_Code, new InterfaceActionData(InterfaceAction.Select_Code, InterfaceActionGroup.Select, "Select code step", StepKind.Code)],
 			[InterfaceAction.Select_Next, new InterfaceActionData(InterfaceAction.Select_Next, InterfaceActionGroup.Select, "Select next")],
 			[InterfaceAction.Select_Previous, new InterfaceActionData(InterfaceAction.Select_Previous, InterfaceActionGroup.Select, "Select previous")],

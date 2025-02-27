@@ -1,12 +1,11 @@
-import { FullStepResult } from "./FullStepResult";
 import { StepResult } from "./StepResult";
 
 /**
  * Represents a kind of a step in a sorting algorithm.
  */
 export const enum StepKind {
-	Full,
-	Sub,
+	Algorithmic,
+	Significant,
 	Code
 }
 
@@ -30,40 +29,26 @@ export class StepKindHelper {
 	 */
 	private static readonly stepKindsMap = new Map<StepKind, StepKindDescription>([
 		[StepKind.Code, new StepKindDescription("code", "Code step")],
-		[StepKind.Sub, new StepKindDescription("sub", "Sub-step")],
-		[StepKind.Full, new StepKindDescription("full", "Full step")]
+		[StepKind.Significant, new StepKindDescription("significant", "Significant step")],
+		[StepKind.Algorithmic, new StepKindDescription("algorithmic", "Algorithmic step")]
 	]);
 
 	/**
-	 * Gets the kind of a given step.
-	 * @param step - The step to get the kind of.
-	 * @returns The kind of the given step.
-	 */
-	public static getStepKind(step: StepResult): StepKind {
-		if (step instanceof FullStepResult) {
-			if (step.isLastSubstep)
-				return StepKind.Full;
-			else
-				return StepKind.Sub;
-		} else {
-			return StepKind.Code;
-		}
-	}
-
-	/**
 	 * Gets the hierarchical index of a given step kind.
-	 * If StepResult is passed, the StepKindHelper.getStepKind method is used to determine the step kind of the step.
-	 * @see {@link StepKindHelper.getStepKind}
+	 * If StepResult is passed, the kind is taken from the step kind of the step.
+	 * @see {@link StepResult.stepKind}
+	 *
 	 * @param value - The step or step kind to get the hierarchical index of.
+	 *
 	 * @returns The hierarchical index of the given step or step kind
 	 */
 	public static getHierarchicalIndex(value: StepKind | StepResult): number {
-		let kind = value instanceof StepResult ? this.getStepKind(value) : value;
+		let kind = value instanceof StepResult ? value.stepKind : value;
 
 		switch (kind) {
 			case StepKind.Code: return 0;
-			case StepKind.Sub: return 1;
-			case StepKind.Full: return 2;
+			case StepKind.Significant: return 1;
+			case StepKind.Algorithmic: return 2;
 		}
 	}
 
@@ -75,8 +60,8 @@ export class StepKindHelper {
 	public static getByHierarchicalIndex(index: number): StepKind | undefined {
 		switch (index) {
 			case 0: return StepKind.Code;
-			case 1: return StepKind.Sub;
-			case 2: return StepKind.Full;
+			case 1: return StepKind.Significant;
+			case 2: return StepKind.Algorithmic;
 			default: return undefined;
 		}
 	}
