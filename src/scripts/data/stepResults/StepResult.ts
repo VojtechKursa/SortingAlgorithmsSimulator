@@ -81,18 +81,13 @@ export abstract class StepResult {
 	/**
 	 * Accepts an equal step data into itself.
 	 * Can be used for the purposes of saving memory by reusing a step result already returned by a previous step result.
+	 *
 	 * @param step The step whose data to accept. Only step data that match the data in this step result will be accepted.
+	 *
+	 * @remarks
+	 * Overriding implementation should always call it's parent's method.
 	 */
 	public acceptEqualStepData(step: StepResult): void {
 		this.acceptEqualStack(step.callStack);
-
-		this.acceptEqual(step);
 	}
-
-	/**
-	 * Accepts an equal step data into itself.
-	 * This method is called by the {@link acceptEqualStepData} method and serves for internal implementation of a child StepResult.
-	 * @param step The step whose data to accept.
-	 */
-	protected abstract acceptEqual(step: StepResult): void;
 }

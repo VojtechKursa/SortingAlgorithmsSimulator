@@ -133,7 +133,7 @@ export class CallStackController {
 	 * @param variables - The variables of a call stack level to display.
 	 * @returns The created div element containing the variables of a call stack level.
 	 */
-	private createVariablesCell(variables: Variable[]): HTMLDivElement {
+	private createVariablesCell(variables: readonly Variable[]): HTMLDivElement {
 		const wrapper = document.createElement("div");
 
 		for (const variable of variables) {

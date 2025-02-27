@@ -12,7 +12,7 @@ export class CallStackLevel {
 	/**
 	 * The variables local to the given call stack level.
 	 */
-	private readonly array: readonly Variable[];
+	private readonly _variables: readonly Variable[];
 
 	/**
 	 * @param functionName - The name of the function at the given call stack level.
@@ -20,23 +20,23 @@ export class CallStackLevel {
 	 */
 	public constructor(functionName: string, variables: readonly Variable[]) {
 		this.functionName = functionName;
-		this.array = variables.slice();
+		this._variables = variables.slice();
 	}
 
 	/**
 	 * Gets the variables local to the given call stack level.
 	 * @returns The variables local to the given call stack level.
 	 */
-	public get variables(): Variable[] {
-		return this.array.slice();
+	public get variables(): readonly Variable[] {
+		return this._variables;
 	}
 
 	/**
 	 * Creates a deep copy of the call stack level.
 	 * @returns A deep copy of the call stack level.
 	 */
-	public copy() {
-		return new CallStackLevel(this.functionName.slice(), this.array.slice());
+	public copy(): CallStackLevel {
+		return new CallStackLevel(this.functionName.slice(), this.variables.slice());
 	}
 }
 
@@ -52,7 +52,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * The array of all the call stack levels in the call stack.
 	 * @see {@link CallStackLevel}
 	 */
-	protected readonly array = new Array<CallStackLevel>();
+	protected readonly levels = new Array<CallStackLevel>();
 
 	/**
 	 * The name of the current function (that is virtually at the top of the call stack).
@@ -81,8 +81,14 @@ export class CallStack implements Iterable<CallStackLevel> {
 	/**
 	 * Pushes a new level into the call stack. Used to push the last function into the stack.
 	 * @param level - The level to push into the call stack.
-	 * @param newFunctionName - The name of the current function (that will virtually be at the top of the call stack after the push).
 	 */
+	public push(level: CallStackLevel): void;
+	/**
+	 * Pushes a new level into the call stack. Used to push the last function into the stack.
+	 * @param variables - Variables of the level being pushed to the call stack.
+	 * @param newFunctionName - The name of the function that is being pushed to the call stack.
+	 */
+	public push(variables: readonly Variable[], newFunctionName: string): void;
 	public push(level: CallStackLevel | readonly Variable[], newFunctionName?: string): void {
 		if (level instanceof Array) {
 			if (this.currentFunctionName == undefined)
@@ -91,7 +97,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 			level = new CallStackLevel(this.currentFunctionName, level);
 		}
 
-		this.array.push(level);
+		this.levels.push(level);
 		this.currentFunctionName = newFunctionName;
 	}
 
@@ -101,7 +107,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 */
 	public pop(): CallStackLevel | undefined {
 		this.currentFunctionName = this.secondToTop()?.functionName;
-		return this.array.pop();
+		return this.levels.pop();
 	}
 
 	/**
@@ -125,8 +131,8 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * @returns The second-to-top level of the call stack or undefined, if the stack is shallower than 2 level.
 	 */
 	public secondToTop(): CallStackLevel | undefined {
-		if (this.array.length > 0)
-			return this.array[this.array.length - 1];
+		if (this.levels.length > 0)
+			return this.levels[this.levels.length - 1];
 		else
 			return undefined;
 	}
@@ -136,14 +142,14 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * @returns A CallStackFrozen object representing the call stack.
 	 */
 	public freeze(): CallStackFrozen {
-		return new CallStackFrozen(this.array, this.currentFunctionName);
+		return new CallStackFrozen(this.levels, this.currentFunctionName);
 	}
 
 	/**
 	 * @returns Iterator, which iterates over the stack from second-to-top to bottom as top isn't stored as an actual level.
 	 */
 	[Symbol.iterator](): Iterator<CallStackLevel> {
-		return new ReverseArrayIterator(this.array);
+		return new ReverseArrayIterator(this.levels);
 	}
 }
 
@@ -166,7 +172,7 @@ export class CallStackFrozen extends CallStack implements Iterable<CallStackLeve
 		super();
 
 		this._currentFunctionName = currentFunctionName;
-		stack.forEach(level => this.array.push(level.copy()));
+		stack.forEach(level => this.levels.push(level.copy()));
 	}
 
 	/**
@@ -185,7 +191,7 @@ export class CallStackFrozen extends CallStack implements Iterable<CallStackLeve
 	 * Gets the depth of the call stack.
 	 */
 	public get depth(): number {
-		return this.array.length;
+		return this.levels.length;
 	}
 
 	/**
@@ -207,7 +213,7 @@ export class CallStackFrozen extends CallStack implements Iterable<CallStackLeve
 	 * @returns Iterator, which iterates over the stack from top to bottom.
 	 */
 	public fromTop(): Iterator<CallStackLevel, CallStackLevel> {
-		return new ReverseArrayIterator(this.copy().array);
+		return new ReverseArrayIterator(this.copy().levels);
 	}
 
 	/**

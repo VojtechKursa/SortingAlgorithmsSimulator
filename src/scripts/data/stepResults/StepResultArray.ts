@@ -67,7 +67,9 @@ export class StepResultArray extends StepResult {
 		this._arrayHighlights = value;
 	}
 
-	protected override acceptEqual(step: StepResult): void {
+	public override acceptEqualStepData(step: StepResult): void {
+		super.acceptEqualStepData(step);
+
 		if (step instanceof StepResultArray) {
 			let arrayEquals = true;
 
