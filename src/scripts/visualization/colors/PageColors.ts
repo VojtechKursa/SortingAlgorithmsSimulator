@@ -46,17 +46,12 @@ export class PageColors {
 		localStorage.setItem(PageColors.storageKey, this.toJSON());
 	}
 
-	public static load(): PageColors {
+	public static load(): PageColors | null {
 		const json = localStorage.getItem(PageColors.storageKey);
 
-		if (json == null) {
-			const defaultColors = PageColors.getDefault();
-			defaultColors.save();
+		if (json == null)
+			return null;
 
-			return defaultColors;
-		}
-		else {
-			return PageColors.fromJSON(json);
-		}
+		return PageColors.fromJSON(json);
 	}
 }

@@ -77,6 +77,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let reset = document.getElementById("reset_simulator") as HTMLButtonElement;
 		let colors = PageColors.load();
+		if (colors == null) {
+			colors = PageColors.getDefault();
+			colors.save();
+			document.body.setAttribute("data-bs-theme", "dark");
+		}
 
 		let stepDescriptionElement = document.getElementById("step_description") as HTMLDivElement;
 		let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
