@@ -100,7 +100,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
 		if (this.lastRenderedStep != undefined) {
-			if (step.array == this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
+			if (step.array != this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
 				this.drawArray(step);
 			}
 		} else {
