@@ -4,7 +4,7 @@ import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 
-type AnimatableSVGElement = SVGRectElement | SVGTextElement | SVGPolygonElement;
+type AnimatableSVGElement = SVGRectElement | SVGTextElement | SVGPolygonElement | SVGEllipseElement;
 
 class Difference<T> {
 	public constructor(
@@ -17,19 +17,21 @@ class Difference<T> {
 class AnimatablePropertyMap {
 	private readonly map = new Map<string, string>();
 
-	public constructor(
-		element: SVGElement
-	) {
+	public constructor(element: AnimatableSVGElement) {
 		this.addCommonAttributes(element);
 	}
 
-	public addCommonAttributes(element: SVGElement) {
+	public addCommonAttributes(element: AnimatableSVGElement) {
 		this.addAttribute(element, "x");
 		this.addAttribute(element, "y");
 		this.addAttribute(element, "points");
+		this.addAttribute(element, "cx");
+		this.addAttribute(element, "cy");
+		this.addAttribute(element, "rx");
+		this.addAttribute(element, "ry");
 	}
 
-	public addAttribute(element: SVGElement, attribute: string) {
+	public addAttribute(element: AnimatableSVGElement, attribute: string) {
 		const attr = element.getAttribute(attribute);
 		if (attr != null)
 			this.map.set(attribute, attr);
@@ -204,7 +206,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * @returns An array of all supported animatable elements in the provided SVG element.
 	 */
 	private getAnimatableElements(svg: SVGSVGElement): Array<AnimatableSVGElement> {
-		const queryResult = new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
+		const queryResult = new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon,ellipse") as NodeListOf<AnimatableSVGElement>);
 		return queryResult.filter(element => element.id != "");
 	}
 

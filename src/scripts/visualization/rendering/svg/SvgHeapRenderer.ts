@@ -122,21 +122,24 @@ export class SvgHeapRenderer implements SvgRenderer {
 		// Make connections
 		if (nodeArray.length > 0) {
 			const toProcess: number[] = [0];
-			let current: number | undefined;
+			let currentIndex: number | undefined;
 
-			while ((current = toProcess.shift()) != undefined) {
-				let left = (2 * current) + 1;
-				let right = (2 * current) + 2;
+			while ((currentIndex = toProcess.shift()) != undefined) {
+				const current = nodeArray[currentIndex];
+				const leftIndex = (2 * currentIndex) + 1;
+				const rightIndex = (2 * currentIndex) + 2;
 
-				if (left >= nodeArray.length)
+				if (leftIndex >= nodeArray.length)
 					continue;
-				graphBuilder.push(`${nodeArray[current].id} -- ${nodeArray[left].id}`);
-				toProcess.push(left);
+				const left = nodeArray[leftIndex];
+				graphBuilder.push(`${current.id} -- ${left.id}`);
+				toProcess.push(leftIndex);
 
-				if (right >= nodeArray.length)
+				if (rightIndex >= nodeArray.length)
 					continue;
-				graphBuilder.push(`${nodeArray[current].id} -- ${nodeArray[right].id}`);
-				toProcess.push(right);
+				const right = nodeArray[rightIndex];
+				graphBuilder.push(`${current.id} -- ${right.id}`);
+				toProcess.push(rightIndex);
 			}
 		}
 
@@ -147,6 +150,26 @@ export class SvgHeapRenderer implements SvgRenderer {
 		const rendererPromise = DotLangInterface.getRenderer();
 		const request = graphBuilder.join("\n");
 		const svg = (await rendererPromise).renderSVGElement(request);
+
+		// Add IDs for animations to nodes
+		for (const node of svg.querySelectorAll(".node")) {
+			const nodeEllipse = node.querySelector("ellipse");
+			if (nodeEllipse != null) {
+				nodeEllipse.id = `${node.id}-ellipse`;
+			}
+
+			const nodeText = node.querySelector("text");
+			if (nodeText != null) {
+				nodeText.id = `${node.id}-text`;
+			}
+		}
+
+		/* Edges aren't animated because their IDs aren't usable for relating edges between states for animations
+			If default IDs are used for edges, they're labeled in order they're generated, which means edges with same IDs
+				are always in the same places
+			If IDs are assigned based on IDs of nodes they're connecting, then edges appear and disappear when new edges are made
+				(If switching edge between 2-3 to edge between 3-4, IDs of old and new edge are different)
+			A more complex matching algorithm would be necessary to properly animate edges, which is out of scope of this project for now. */
 
 		// Save result
 		this.resultMemory = new SvgRenderResult(svg);
