@@ -22,13 +22,22 @@ class AnimatablePropertyMap {
 	}
 
 	public addCommonAttributes(element: AnimatableSVGElement) {
-		this.addAttribute(element, "x");
-		this.addAttribute(element, "y");
-		this.addAttribute(element, "points");
-		this.addAttribute(element, "cx");
-		this.addAttribute(element, "cy");
-		this.addAttribute(element, "rx");
-		this.addAttribute(element, "ry");
+		switch (element.tagName.toLowerCase()) {
+			case "text":
+			case "rect":
+				this.addAttribute(element, "x");
+				this.addAttribute(element, "y");
+				break;
+			case "polygon":
+				this.addAttribute(element, "points");
+				break;
+			case "ellipse":
+				this.addAttribute(element, "cx");
+				this.addAttribute(element, "cy");
+				this.addAttribute(element, "rx");
+				this.addAttribute(element, "ry");
+				break;
+		}
 	}
 
 	public addAttribute(element: AnimatableSVGElement, attribute: string) {
