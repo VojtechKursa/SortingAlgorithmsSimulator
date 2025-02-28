@@ -1,59 +1,55 @@
+import Color from "colorjs.io";
 import { IndexedNumber } from "../../../data/IndexedNumber";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
 import { ColorSet } from "../../colors/ColorSet";
 import { SymbolicColor } from "../../colors/SymbolicColor";
-import { RendererClasses } from "../../css/RendererClasses";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { DotLangInterface } from "./DotLangInterface";
 
 class DotLangNode {
 	public constructor(
-		public readonly baseNumber: IndexedNumber
-	) {
-
-	}
+		public readonly baseNumber: IndexedNumber,
+		public backgroundColor?: Color,
+		public fontColor?: Color,
+		public borderColor?: Color,
+	) { }
 
 	public get id(): number {
 		return this.baseNumber.id;
 	}
+
 	public get text(): string {
-		return this.baseNumber.value.toString();
+		let result = this.baseNumber.value.toString();
+
+		if (this.baseNumber.index != null) {
+			result += ` - ${this.baseNumber.index}`;
+		}
+
+		return result;
 	}
 
 	public toString(): string {
-		return `${this.id} [id="${this.id}",label="${this.text}"]`;
-	}
-}
+		const base = `${this.id} [id="${this.id}",label="${this.text}"`;
 
-class FontProperties {
-	public constructor(
-		public readonly fontSize: number,
-		public readonly strokeWidth: number
-	) { }
-}
+		const attributeBuilder: string[] = [""];
 
-class HeapRenderSettings {
-	public constructor(
-		public readonly circleCircumference: number = 10,
-		public readonly horizontalMargin: number = 10,
-		public readonly verticalMargin: number = 10,
-		public readonly borderWidth: number = 0.5,
-		public readonly fontMain: FontProperties = new FontProperties(4, 0.5),
-		public readonly fontIndex: FontProperties = new FontProperties(2.5, 0.5),
-		public readonly indexRightMargin: number = 1,
-		public readonly indexBottomMargin: number = 1
-	) { }
+		if (this.backgroundColor != undefined) {
+			attributeBuilder.push(`fillcolor="${this.backgroundColor.toString({ format: "hex" })}"`);
+		}
+		if (this.fontColor != undefined) {
+			attributeBuilder.push(`fontcolor="${this.fontColor.toString({ format: "hex" })}"`);
+		}
+		if (this.borderColor != undefined) {
+			attributeBuilder.push(`color="${this.borderColor.toString({ format: "hex" })}"`);
+		}
 
-	public get circleRadius(): number {
-		return this.circleCircumference / 2;
+		return base + attributeBuilder.join(",") + "]";
 	}
 }
 
 export class SvgHeapRenderer implements SvgRenderer {
-	private readonly heapSettings = new HeapRenderSettings();
-
 	private lastRenderedStep: StepResultArray | undefined;
 	private resultMemory: SvgRenderResult;
 
@@ -67,11 +63,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 
 
-	public constructor(
-		colorSet: ColorSet,
-		public drawFinalVariables: boolean = false,
-		public drawLastStackLevelVariables: boolean = false,
-	) {
+	public constructor(colorSet: ColorSet) {
 		this._colorSet = colorSet;
 
 		this.resultMemory = new SvgRenderResult(
@@ -105,10 +97,29 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 
 	private async drawHeap(step: StepResultArray): Promise<void> {
+		const getHexColor = (color: SymbolicColor) => this.colorSet.get(color).toString({ format: "hex" });
+
+		// Build array of Nodes from array
 		const nodeArray = step.array.map(number => new DotLangNode(number));
 
-		const graphBuilder: string[] = ["graph {", ...nodeArray.map(node => node.toString())];
+		// Add highlights to Nodes as defined in arrayHighlights
+		if (step.arrayHighlights != null) {
+			for (const highlight of step.arrayHighlights) {
+				const color = this.colorSet.get(highlight[1]);
+				nodeArray[highlight[0]].backgroundColor = color;
+			}
+		}
 
+		// Initialize graph
+		const graphBuilder: string[] = [
+			"graph {",
+			'bgcolor="transparent"',
+			`node [tooltip=" ",style="filled",color="${getHexColor(SymbolicColor.Element_Border)}",fillcolor="${getHexColor(SymbolicColor.Element_Background)}",fontcolor="${getHexColor(SymbolicColor.Element_Foreground)}"]`,
+			'edge [tooltip=" "]',
+			...nodeArray.map(node => node.toString())
+		];
+
+		// Make connections
 		if (nodeArray.length > 0) {
 			const toProcess: number[] = [0];
 			let current: number | undefined;
@@ -129,12 +140,15 @@ export class SvgHeapRenderer implements SvgRenderer {
 			}
 		}
 
+		// Finish graph definition
 		graphBuilder.push("}");
 
+		// Render
 		const rendererPromise = DotLangInterface.getRenderer();
 		const request = graphBuilder.join("\n");
 		const svg = (await rendererPromise).renderSVGElement(request);
 
+		// Save result
 		this.resultMemory = new SvgRenderResult(svg);
 	}
 }

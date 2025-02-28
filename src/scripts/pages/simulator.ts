@@ -95,7 +95,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		let renderer;
 		if (heapTesting) {
-			renderer = new SvgHeapRenderer(colors.currentColorSet, false, false);
+			renderer = new SvgHeapRenderer(colors.currentColorSet);
 		}
 		else {
 			renderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
