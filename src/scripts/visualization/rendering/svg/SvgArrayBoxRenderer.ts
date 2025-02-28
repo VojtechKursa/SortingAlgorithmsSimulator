@@ -95,12 +95,12 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 
 
-	public render(step: StepResult): SvgRenderResult {
+	public render(step: StepResult): Promise<SvgRenderResult> {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
 		if (this.lastRenderedStep != undefined) {
-			if (step.array == this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
+			if (step.array != this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
 				this.drawArray(step);
 			}
 		} else {
@@ -113,11 +113,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		this.lastRenderedStep = step;
 
-		return this.resultMemory.clone();
+		return Promise.resolve(this.resultMemory.clone());
 	}
 
-	public redraw(): SvgRenderResult | null {
-		return null;
+	public redraw(): Promise<SvgRenderResult | null> {
+		return Promise.resolve(null);
 	}
 
 

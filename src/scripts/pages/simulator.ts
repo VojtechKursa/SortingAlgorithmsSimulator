@@ -92,11 +92,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		callStackController = new CallStackController(callStackWrapper);
 
 
-		let svgBoxesRenderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
+		let renderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
 
-		let renderers = [svgBoxesRenderer];
+		let renderers = [renderer];
 
-		let svgDisplayVisitor = new HtmlSvgDisplayHandler(svgBoxesRenderer, output);
+		let svgDisplayVisitor = new HtmlSvgDisplayHandler(renderer, output);
 
 		let displayHandlers: StepDisplayHandler[] = [
 			new HtmlDescriptionDisplayHandler(stepDescriptionController),

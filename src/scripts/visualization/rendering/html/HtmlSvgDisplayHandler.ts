@@ -4,7 +4,7 @@ import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 
-type AnimatableSVGElement = SVGRectElement | SVGTextElement | SVGPolygonElement;
+type AnimatableSVGElement = SVGRectElement | SVGTextElement | SVGPolygonElement | SVGEllipseElement;
 
 class Difference<T> {
 	public constructor(
@@ -17,19 +17,30 @@ class Difference<T> {
 class AnimatablePropertyMap {
 	private readonly map = new Map<string, string>();
 
-	public constructor(
-		element: SVGElement
-	) {
+	public constructor(element: AnimatableSVGElement) {
 		this.addCommonAttributes(element);
 	}
 
-	public addCommonAttributes(element: SVGElement) {
-		this.addAttribute(element, "x");
-		this.addAttribute(element, "y");
-		this.addAttribute(element, "points");
+	public addCommonAttributes(element: AnimatableSVGElement) {
+		switch (element.tagName.toLowerCase()) {
+			case "text":
+			case "rect":
+				this.addAttribute(element, "x");
+				this.addAttribute(element, "y");
+				break;
+			case "polygon":
+				this.addAttribute(element, "points");
+				break;
+			case "ellipse":
+				this.addAttribute(element, "cx");
+				this.addAttribute(element, "cy");
+				this.addAttribute(element, "rx");
+				this.addAttribute(element, "ry");
+				break;
+		}
 	}
 
-	public addAttribute(element: SVGElement, attribute: string) {
+	public addAttribute(element: AnimatableSVGElement, attribute: string) {
 		const attr = element.getAttribute(attribute);
 		if (attr != null)
 			this.map.set(attribute, attr);
@@ -145,12 +156,12 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		if (step == undefined)
 			return;
 
-		const rendered = this.renderer.render(step);
+		this.renderer.render(step).then(rendered => {
+			this.applySvgResult(rendered);
 
-		this.applySvgResult(rendered);
-
-		this.lastStep = step;
-		this.lastRenderResult = rendered;
+			this.lastStep = step;
+			this.lastRenderResult = rendered;
+		});
 	}
 
 	/**
@@ -160,22 +171,22 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		if (this.lastStep == undefined)
 			return;
 
-		const rendered = this.renderer.render(this.lastStep);
-
-		this.applySvgResult(rendered, true);
-		this.lastRenderResult = rendered;
+		this.renderer.render(this.lastStep).then(rendered => {
+			this.applySvgResult(rendered, true);
+			this.lastRenderResult = rendered;
+		});
 	}
 
 	public redraw(): void {
-		let rendered = this.renderer.redraw();
-
-		if (rendered != null) {
-			this.applySvgResult(rendered);
-			this.lastRenderResult = rendered;
-		}
-		else if (this.lastRenderResult != undefined) {
-			this.adjustMargins(this.lastRenderResult);
-		}
+		this.renderer.redraw().then(rendered => {
+			if (rendered != null) {
+				this.applySvgResult(rendered);
+				this.lastRenderResult = rendered;
+			}
+			else if (this.lastRenderResult != undefined) {
+				this.adjustMargins(this.lastRenderResult);
+			}
+		});
 	}
 
 	/**
@@ -204,7 +215,8 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * @returns An array of all supported animatable elements in the provided SVG element.
 	 */
 	private getAnimatableElements(svg: SVGSVGElement): Array<AnimatableSVGElement> {
-		return new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
+		const queryResult = new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon,ellipse") as NodeListOf<AnimatableSVGElement>);
+		return queryResult.filter(element => element.id != "");
 	}
 
 	/**
