@@ -145,12 +145,12 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		if (step == undefined)
 			return;
 
-		const rendered = this.renderer.render(step);
+		this.renderer.render(step).then(rendered => {
+			this.applySvgResult(rendered);
 
-		this.applySvgResult(rendered);
-
-		this.lastStep = step;
-		this.lastRenderResult = rendered;
+			this.lastStep = step;
+			this.lastRenderResult = rendered;
+		});
 	}
 
 	/**
@@ -160,22 +160,22 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		if (this.lastStep == undefined)
 			return;
 
-		const rendered = this.renderer.render(this.lastStep);
-
-		this.applySvgResult(rendered, true);
-		this.lastRenderResult = rendered;
+		this.renderer.render(this.lastStep).then(rendered => {
+			this.applySvgResult(rendered, true);
+			this.lastRenderResult = rendered;
+		});
 	}
 
 	public redraw(): void {
-		let rendered = this.renderer.redraw();
-
-		if (rendered != null) {
-			this.applySvgResult(rendered);
-			this.lastRenderResult = rendered;
-		}
-		else if (this.lastRenderResult != undefined) {
-			this.adjustMargins(this.lastRenderResult);
-		}
+		this.renderer.redraw().then(rendered => {
+			if (rendered != null) {
+				this.applySvgResult(rendered);
+				this.lastRenderResult = rendered;
+			}
+			else if (this.lastRenderResult != undefined) {
+				this.adjustMargins(this.lastRenderResult);
+			}
+		});
 	}
 
 	/**

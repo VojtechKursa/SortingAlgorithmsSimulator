@@ -78,7 +78,7 @@ export interface SvgRenderer {
 	 * @see {@link StepResult}
 	 * @see {@link SvgRenderResult}
 	 */
-	render(step: StepResult): SvgRenderResult;
+	render(step: StepResult): Promise<SvgRenderResult>;
 
 	/**
 	 * Redraws the last rendered state of an algorithm after changes in the displayed viewport's size.
@@ -86,5 +86,5 @@ export interface SvgRenderer {
 	 * @returns The redrawn SVG adjusted to the new display area and it's associated alignment information,
 	 * or null if the renderer doesn't need manual resizing.
 	 */
-	redraw(): SvgRenderResult | null;
+	redraw(): Promise<SvgRenderResult | null>;
 }

@@ -95,7 +95,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 
 
-	public render(step: StepResult): SvgRenderResult {
+	public render(step: StepResult): Promise<SvgRenderResult> {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
@@ -113,11 +113,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		this.lastRenderedStep = step;
 
-		return this.resultMemory.clone();
+		return Promise.resolve(this.resultMemory.clone());
 	}
 
-	public redraw(): SvgRenderResult | null {
-		return null;
+	public redraw(): Promise<SvgRenderResult | null> {
+		return Promise.resolve(null);
 	}
 
 
