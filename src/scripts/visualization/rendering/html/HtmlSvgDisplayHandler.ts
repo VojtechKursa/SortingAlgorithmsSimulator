@@ -204,7 +204,8 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * @returns An array of all supported animatable elements in the provided SVG element.
 	 */
 	private getAnimatableElements(svg: SVGSVGElement): Array<AnimatableSVGElement> {
-		return new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
+		const queryResult = new Array<AnimatableSVGElement>(...svg.querySelectorAll("rect,text,polygon") as NodeListOf<AnimatableSVGElement>);
+		return queryResult.filter(element => element.id != "");
 	}
 
 	/**
