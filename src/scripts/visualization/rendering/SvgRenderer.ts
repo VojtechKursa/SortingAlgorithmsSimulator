@@ -42,7 +42,7 @@ export class SvgRenderResult {
 	 */
 	public constructor(
 		public readonly svg: SVGSVGElement,
-		public readonly alignment: AlignmentData | null,
+		public readonly alignment: AlignmentData | null = null,
 	) { }
 
 	/**

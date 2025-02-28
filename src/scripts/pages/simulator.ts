@@ -22,8 +22,9 @@ import { StepKindController } from "../controllers/StepKindController";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
+import { SvgHeapRenderer } from "../visualization/rendering/svg/SvgHeapRenderer";
 
-
+const heapTesting: boolean = true;
 
 export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
 	const initCommonResult = initCommon();
@@ -92,11 +93,17 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		callStackController = new CallStackController(callStackWrapper);
 
 
-		let svgBoxesRenderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
+		let renderer;
+		if (heapTesting) {
+			renderer = new SvgHeapRenderer(colors.currentColorSet, false, false);
+		}
+		else {
+			renderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
+		}
 
-		let renderers = [svgBoxesRenderer];
+		let renderers = [renderer];
 
-		let svgDisplayVisitor = new HtmlSvgDisplayHandler(svgBoxesRenderer, output);
+		let svgDisplayVisitor = new HtmlSvgDisplayHandler(renderer, output);
 
 		let displayHandlers: StepDisplayHandler[] = [
 			new HtmlDescriptionDisplayHandler(stepDescriptionController),
