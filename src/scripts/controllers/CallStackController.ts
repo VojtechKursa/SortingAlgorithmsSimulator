@@ -93,7 +93,7 @@ export class CallStackController {
 	 * @param currentLevelVariables - The variables of the current call stack level, if any.
 	 */
 	public display(stack: CallStack | CallStackFrozen, currentLevelVariables?: readonly Variable[]): void {
-		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
+		const localStack = stack instanceof CallStack ? stack.freeze() : stack;
 
 		this.tableBody.textContent = "";
 

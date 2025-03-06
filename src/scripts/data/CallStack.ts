@@ -41,13 +41,13 @@ export class CallStackLevel {
 }
 
 /**
- * Represents a call stack of an algorithm.
+ * Represents a frozen (read-only) call stack of an algorithm.
  *
  * The current function is not stored as a call stack level so, but instead just the function name is stored and related variables must be stored
  * outside the call stack. This is done to keep the ever-changing variables outside the call stack to enable stack reuse between steps
  * for the purposes of saving memory.
  */
-export class CallStack implements Iterable<CallStackLevel> {
+export class CallStackFrozen implements Iterable<CallStackLevel> {
 	/**
 	 * The array of all the call stack levels in the call stack.
 	 * @see {@link CallStackLevel}
@@ -59,12 +59,6 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 */
 	protected _currentFunctionName: string | undefined;
 	/**
-	 * Sets the name of the current function (that is virtually at the top of the call stack).
-	 */
-	public set currentFunctionName(value: string | undefined) {
-		this._currentFunctionName = value;
-	}
-	/**
 	 * Gets the name of the current function (that is virtually at the top of the call stack).
 	 */
 	public get currentFunctionName(): string | undefined {
@@ -72,42 +66,22 @@ export class CallStack implements Iterable<CallStackLevel> {
 	}
 
 	/**
-	 * @param initialFunctionName - The name of the function that initially at the top of the call stack.
+	 * @param stack - The array of all the call stack levels in the call stack.
+	 * @param currentFunctionName - The name of the current function (that is virtually at the top of the call stack).
 	 */
-	public constructor(initialFunctionName?: string) {
-		this.currentFunctionName = initialFunctionName;
+	public constructor(
+		currentFunctionName?: string,
+		stack?: Array<CallStackLevel>
+	) {
+		this._currentFunctionName = currentFunctionName;
+		stack?.forEach(level => this.levels.push(level.copy()));
 	}
 
 	/**
-	 * Pushes a new level into the call stack. Used to push the last function into the stack.
-	 * @param level - The level to push into the call stack.
+	 * Gets the depth of the call stack.
 	 */
-	public push(level: CallStackLevel): void;
-	/**
-	 * Pushes a new level into the call stack. Used to push the last function into the stack.
-	 * @param variables - Variables of the level being pushed to the call stack.
-	 * @param newFunctionName - The name of the function that is being pushed to the call stack.
-	 */
-	public push(variables: readonly Variable[], newFunctionName: string): void;
-	public push(level: CallStackLevel | readonly Variable[], newFunctionName?: string): void {
-		if (level instanceof Array) {
-			if (this.currentFunctionName == undefined)
-				throw new Error("Push called with variable array parameter on call stack where current function name is not defined.");
-
-			level = new CallStackLevel(this.currentFunctionName, level);
-		}
-
-		this.levels.push(level);
-		this.currentFunctionName = newFunctionName;
-	}
-
-	/**
-	 * Pops the top level from the call stack.
-	 * @returns The popped level or undefined, if the stack is empty.
-	 */
-	public pop(): CallStackLevel | undefined {
-		this.currentFunctionName = this.secondToTop()?.functionName;
-		return this.levels.pop();
+	public get depth(): number {
+		return this.levels.length;
 	}
 
 	/**
@@ -117,7 +91,7 @@ export class CallStack implements Iterable<CallStackLevel> {
 	 * @param variables - The variables local to the top level.
 	 * @returns The top level of the call stack.
 	 */
-	public top(variables: readonly Variable[]): CallStackLevel | undefined {
+	public top(variables: readonly Variable[]): CallStackLevel {
 		if (this.currentFunctionName == undefined)
 			throw new Error("Top called on call stack without a defined current function name");
 
@@ -138,74 +112,17 @@ export class CallStack implements Iterable<CallStackLevel> {
 	}
 
 	/**
-	 * Freezes the call stack into a CallStackFrozen object.
-	 * @returns A CallStackFrozen object representing the call stack.
-	 */
-	public freeze(): CallStackFrozen {
-		return new CallStackFrozen(this.levels, this.currentFunctionName);
-	}
-
-	/**
-	 * @returns Iterator, which iterates over the stack from second-to-top to bottom as top isn't stored as an actual level.
-	 */
-	[Symbol.iterator](): Iterator<CallStackLevel> {
-		return new ReverseArrayIterator(this.levels);
-	}
-}
-
-/**
- * Represents a frozen (read-only) call stack of an algorithm.
- *
- * The current function is not stored as a call stack level so, but instead just the function name is stored and related variables must be stored
- * outside the call stack. This is done to keep the ever-changing variables outside the call stack to enable stack reuse between steps
- * for the purposes of saving memory.
- */
-export class CallStackFrozen extends CallStack implements Iterable<CallStackLevel> {
-	/**
-	 * @param stack - The array of all the call stack levels in the call stack.
-	 * @param currentFunctionName - The name of the current function (that is virtually at the top of the call stack).
-	 */
-	public constructor(
-		stack: Array<CallStackLevel>,
-		currentFunctionName?: string
-	) {
-		super();
-
-		this._currentFunctionName = currentFunctionName;
-		stack.forEach(level => this.levels.push(level.copy()));
-	}
-
-	/**
-	 * Overrides parent's setter to prevent overwriting of the current function name.
-	 */
-	private override set currentFunctionName(_: string | undefined) { }
-
-	/**
-	 * Get the name of the current function (that is virtually at the top of the call stack).
-	 */
-	public override get currentFunctionName(): string | undefined {
-		return this._currentFunctionName;
-	}
-
-	/**
-	 * Gets the depth of the call stack.
-	 */
-	public get depth(): number {
-		return this.levels.length;
-	}
-
-	/**
 	 * Creates a deep copy of the call stack.
 	 * @returns A deep copy of the call stack.
 	 */
 	public copy(): CallStackFrozen {
-		return this.freeze();
+		return new CallStackFrozen(this.currentFunctionName, this.levels);
 	}
 
 	/**
 	 * @returns Iterator, which iterates over the stack from top to bottom.
 	 */
-	public override[Symbol.iterator]() {
+	public [Symbol.iterator]() {
 		return this.fromTop();
 	}
 
@@ -280,6 +197,87 @@ export class CallStackFrozen extends CallStack implements Iterable<CallStackLeve
 		}
 
 		return true;
+	}
+}
+
+/**
+ * Represents a call stack of an algorithm.
+ *
+ * The current function is not stored as a call stack level so, but instead just the function name is stored and related variables must be stored
+ * outside the call stack. This is done to keep the ever-changing variables outside the call stack to enable stack reuse between steps
+ * for the purposes of saving memory.
+ */
+export class CallStack extends CallStackFrozen {
+	/**
+	 * Sets the name of the current function (that is virtually at the top of the call stack).
+	 */
+	public override set currentFunctionName(value: string | undefined) {
+		this._currentFunctionName = value;
+	}
+	/**
+	 * Gets the name of the current function (that is virtually at the top of the call stack).
+	 * When overriding setter, getter must also be overridden, otherwise it's undefined.
+	 */
+	public override get currentFunctionName(): string | undefined {
+		return this._currentFunctionName;
+	}
+
+	/**
+	 * @param initialFunctionName - The name of the function that initially at the top of the call stack.
+	 */
+	public constructor(
+		initialFunctionName?: string,
+		initialCallStack?: Array<CallStackLevel>
+	) {
+		super(initialFunctionName, initialCallStack);
+	}
+
+	/**
+	 * Pushes a new level into the call stack. Used to push the last function into the stack.
+	 * @param level - The level to push into the call stack.
+	 */
+	public push(level: CallStackLevel): void;
+	/**
+	 * Pushes a new level into the call stack. Used to push the last function into the stack.
+	 * @param variables - Variables of the level being pushed to the call stack.
+	 * @param newFunctionName - The name of the function that is being pushed to the call stack.
+	 */
+	public push(variables: readonly Variable[], newFunctionName: string): void;
+	public push(level: CallStackLevel | readonly Variable[], newFunctionName?: string): void {
+		if (level instanceof Array) {
+			if (this.currentFunctionName == undefined)
+				throw new Error("Push called with variable array parameter on call stack where current function name is not defined.");
+
+			level = new CallStackLevel(this.currentFunctionName, level);
+		}
+
+		this.levels.push(level);
+		this.currentFunctionName = newFunctionName;
+	}
+
+	/**
+	 * Pops the top level from the call stack.
+	 * @returns The popped level or undefined, if the stack is empty.
+	 */
+	public pop(): CallStackLevel | undefined {
+		this.currentFunctionName = this.secondToTop()?.functionName;
+		return this.levels.pop();
+	}
+
+	/**
+	 * Creates a deep copy of the call stack.
+	 * @returns A deep copy of the call stack.
+	 */
+	public override copy(): CallStack {
+		return new CallStack(this.currentFunctionName, this.levels);
+	}
+
+	/**
+	 * Freezes the call stack into a CallStackFrozen object.
+	 * @returns A CallStackFrozen object representing the call stack.
+	 */
+	public freeze(): CallStackFrozen {
+		return new CallStackFrozen(this.currentFunctionName, this.levels);
 	}
 }
 

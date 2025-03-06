@@ -35,7 +35,7 @@ export abstract class StepResult {
 		stack: CallStack | CallStackFrozen | undefined = undefined
 	) {
 		if (stack != undefined) {
-			this.stack = stack instanceof CallStackFrozen ? stack : stack.freeze();
+			this.stack = stack instanceof CallStack ? stack.freeze() : stack;
 		} else {
 			this.stack = undefined;
 		}
@@ -72,7 +72,7 @@ export abstract class StepResult {
 		if (this.stack == undefined || stack == undefined)
 			return;
 
-		const localStack = stack instanceof CallStackFrozen ? stack : stack.freeze();
+		const localStack = stack instanceof CallStack ? stack.freeze() : stack;
 
 		if (CallStackFrozen.equal(this.stack, localStack))
 			this.stack = localStack;
