@@ -119,6 +119,7 @@ export class QuickSort extends SortingAlgorithmArray {
 
 		yield this.makeCodeStepResult(1, "Return from initial recursive call");
 
+		this.callStack.currentFunctionName = undefined;
 		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted", false, undefined, 2, true);
 	}
 
