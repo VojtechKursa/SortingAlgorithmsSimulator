@@ -3,6 +3,17 @@
  */
 export class IndexedNumber {
 	/**
+	 * The order of the number among numbers of the same value in the INPUT array. Useful for showing algorithm's stability.
+	*/
+	protected _index: number | null;
+	/**
+	 * The order of the number among numbers of the same value in the INPUT array. Useful for showing algorithm's stability.
+	*/
+	public get index(): number | null {
+		return this._index;
+	}
+
+	/**
 	 * @param id - The unique identifier of the number, usually it's index in the INPUT array.
 	 * @param value - The value of the number.
 	 * @param index - The order of the number among numbers of the same value in the INPUT array. Useful for showing algorithm's stability.
@@ -10,8 +21,10 @@ export class IndexedNumber {
 	public constructor(
 		public readonly id: number,
 		public readonly value: number,
-		public readonly index: number | null
-	) { }
+		index: number | null
+	) {
+		this._index = index;
+	}
 
 	public static equals(number1: IndexedNumber, number2: IndexedNumber): boolean {
 		return number1.id === number2.id && number1.value === number2.value && number1.index === number2.index;

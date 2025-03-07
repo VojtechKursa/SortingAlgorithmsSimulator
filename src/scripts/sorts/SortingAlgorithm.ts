@@ -7,27 +7,25 @@ import { StepResult } from "../data/stepResults/StepResult";
  *
  * @see {@link IndexedNumber}
  */
-class TemporaryIndexedNumber {
-	/**
-	 * @see {@link IndexedNumber} for parameter descriptions as they're identical.
-	 */
-	public constructor(
-		public readonly id: number,
-		public readonly value: number,
-		public index: number | null
-	) { }
+class MutableIndexedNumber extends IndexedNumber {
+	public override get index(): number | null {
+		return this._index;
+	}
+	public override set index(value: number | null) {
+		this._index = value;
+	}
 
 	/**
-	 * Freezes the temporary indexed number into an IndexedNumber instance.
+	 * Freezes the mutable indexed number into an IndexedNumber instance.
 	 *
-	 * @returns The IndexedNumber instance created from this temporary indexed number.
+	 * @returns The IndexedNumber instance created from this mutable indexed number.
 	 *
 	 * @see {@link IndexedNumber}
 	 */
 	public freeze(): IndexedNumber {
 		return new IndexedNumber(this.id, this.value, this.index);
 	}
-};
+}
 
 /**
  * A class for storing indexing data during the indexing of an array of numbers into an array of IndexedNumbers.
@@ -42,7 +40,7 @@ class IndexingData {
 	 */
 	public constructor(
 		public lastUsedIndex: number,
-		public readonly firstNumber: TemporaryIndexedNumber
+		public readonly firstNumber: MutableIndexedNumber
 	) { }
 }
 
@@ -121,15 +119,15 @@ export abstract class SortingAlgorithm {
 	 */
 	private indexInput(input: number[]): IndexedNumber[] {
 		let indexes = new Map<number, IndexingData>();
-		let result = new Array<TemporaryIndexedNumber>();
+		let result = new Array<MutableIndexedNumber>();
 		let idCounter = 0;
 
 		for (const num of input) {
 			let indexData = indexes.get(num);
-			let indexedNumber: TemporaryIndexedNumber;
+			let indexedNumber: MutableIndexedNumber;
 
 			if (indexData == undefined) {
-				indexedNumber = new TemporaryIndexedNumber(idCounter, num, null);
+				indexedNumber = new MutableIndexedNumber(idCounter, num, null);
 				indexes.set(num, new IndexingData(1, indexedNumber));
 			} else {
 				if (indexData.lastUsedIndex == 1) {
@@ -138,7 +136,7 @@ export abstract class SortingAlgorithm {
 
 				indexData.lastUsedIndex++;
 
-				indexedNumber = new TemporaryIndexedNumber(idCounter, num, indexData.lastUsedIndex);
+				indexedNumber = new MutableIndexedNumber(idCounter, num, indexData.lastUsedIndex);
 			}
 
 			result.push(indexedNumber);
