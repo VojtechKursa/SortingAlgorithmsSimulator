@@ -26,6 +26,13 @@ export class IndexedNumber {
 		this._index = index;
 	}
 
+	/**
+	 * Compares 2 indexed numbers for equality. Numbers are equal if their IDs, values and indexes are equal.
+	 *
+	 * @param number1 First number to compare
+	 * @param number2 Seconds number to compare
+	 * @returns Whether the 2 numbers are equal
+	 */
 	public static equals(number1: IndexedNumber, number2: IndexedNumber): boolean {
 		return number1.id === number2.id && number1.value === number2.value && number1.index === number2.index;
 	}
