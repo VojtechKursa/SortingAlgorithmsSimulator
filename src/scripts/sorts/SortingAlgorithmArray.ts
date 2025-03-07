@@ -50,6 +50,7 @@ export abstract class SortingAlgorithmArray extends SortingAlgorithm {
 	public override reset(): StepResultArray {
 		this.current = this.input.slice();
 		this.arrayGenerator = this.stepForwardArray();
+		this.lastArrayHighlights = null;
 
 		const result = super.reset();
 		if (result instanceof StepResultArray)

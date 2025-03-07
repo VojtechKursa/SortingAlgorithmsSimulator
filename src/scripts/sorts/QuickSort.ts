@@ -278,6 +278,7 @@ export class QuickSort extends SortingAlgorithmArray {
 		this.resetVariables();
 
 		this.callStack = new CallStack();
+		this.sorted.clear();
 	}
 
 	protected resetVariables(): void {
