@@ -141,7 +141,7 @@ export class PlayerController {
 		if (this.steps.forward(kind))
 			this.draw();
 		else {
-			if (!this.algorithm.isCompleted()) {
+			if (!this.algorithm.completed) {
 				if (kind == StepKind.Code)
 					this.steps.addAndAdvance(this.algorithm.stepForward(kind));
 				else {
@@ -190,7 +190,7 @@ export class PlayerController {
 			this.steps.goToStep(endStepNumber.code);
 		}
 		else {
-			while (!this.algorithm.isCompleted()) {
+			while (!this.algorithm.completed) {
 				let result = this.algorithm.stepForward();
 				this.steps.add(result);
 			}

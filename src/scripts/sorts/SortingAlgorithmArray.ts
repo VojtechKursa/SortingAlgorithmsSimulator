@@ -12,7 +12,7 @@ export abstract class SortingAlgorithmArray extends SortingAlgorithm {
 	/**
 	 * The current working version of the input array of the algorithm.
 	 */
-	protected _current: Array<IndexedNumber>;
+	private _current: Array<IndexedNumber>;
 
 	/**
 	 * The last highlights of the array.
@@ -26,7 +26,7 @@ export abstract class SortingAlgorithmArray extends SortingAlgorithm {
 
 
 
-	protected constructor(input: number[]) {
+	protected constructor(input: readonly number[]) {
 		super(input);
 
 		this._current = this.input.slice();
@@ -96,30 +96,9 @@ export abstract class SortingAlgorithmArray extends SortingAlgorithm {
 	 */
 	protected abstract stepForwardArray(): Generator<StepResultArray>;
 	protected *stepForwardInternal(): Generator<StepResult> {
-		let result = this.arrayGenerator.next();
-		if (result.done ?? false) {
-			if (result.value instanceof StepResult)
-				yield result.value;
-			return;
-		}
-
-		let step: StepResultArray;
-
-		while (true) {
-			if (!(result.value instanceof StepResultArray)) {
-				throw new UnsupportedStepResultError(["StepResultArray"]);
-			}
-
-			step = result.value;
-
+		for (const step of this.arrayGenerator) {
 			this.lastArrayHighlights = step.arrayHighlights;
-
 			yield step;
-
-			if (result.done ?? false)
-				return;
-
-			result = this.arrayGenerator.next();
 		}
 	}
 

@@ -64,7 +64,7 @@ export abstract class SortingAlgorithm {
 	/**
 	 * The input array of the algorithm.
 	 */
-	protected _input: readonly IndexedNumber[];
+	private _input: readonly IndexedNumber[];
 
 	/**
 	 * The input array of the algorithm.
@@ -90,11 +90,20 @@ export abstract class SortingAlgorithm {
 	/**
 	 * @param input - The input array for the algorithm.
 	 */
-	protected constructor(input: number[]) {
-		this._input = this.indexInput(input);
+	protected constructor(input: readonly number[]) {
+		this._input = SortingAlgorithm.indexInput(input);
 		this.finalStepResult = null;
 
 		this.generator = this.stepForwardInternal();
+	}
+
+	/**
+	 * Checks if the algorithm has completed.
+	 *
+	 * @returns True if the algorithm has completed, false otherwise.
+	 */
+	public get completed(): boolean {
+		return this.finalStepResult != null;
 	}
 
 	/**
@@ -102,8 +111,8 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @param input - The input array for the algorithm.
 	 */
-	public setInput(input: number[]): void {
-		this.input = this.indexInput(input);
+	public setInput(input: readonly number[]): void {
+		this.input = SortingAlgorithm.indexInput(input);
 
 		this.reset();
 	}
@@ -117,7 +126,7 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @see {@link IndexedNumber}
 	 */
-	private indexInput(input: number[]): IndexedNumber[] {
+	private static indexInput(input: readonly number[]): IndexedNumber[] {
 		let indexes = new Map<number, IndexingData>();
 		let result = new Array<MutableIndexedNumber>();
 		let idCounter = 0;
@@ -159,15 +168,6 @@ export abstract class SortingAlgorithm {
 		this.generator = this.stepForwardInternal();
 
 		return this.getInitialStepResult();
-	}
-
-	/**
-	 * Checks if the algorithm has completed.
-	 *
-	 * @returns True if the algorithm has completed, false otherwise.
-	 */
-	public isCompleted(): boolean {
-		return this.finalStepResult != null;
 	}
 
 	/**
