@@ -67,7 +67,7 @@ export class BubbleSort extends SortingAlgorithmArray {
 	}
 
 	protected override makeCodeStepResult(highlightedLines: number[] | number, description: string | undefined = undefined): StepResultArray {
-		return super.makeCodeStepResult(highlightedLines, description, this.getVariables())
+		return super.makeCodeStepResult(highlightedLines, description, this.getVariables());
 	}
 
 	protected override * stepForwardArray(): Generator<StepResultArray> {
@@ -114,7 +114,7 @@ export class BubbleSort extends SortingAlgorithmArray {
 		return [
 			new Variable("k", this.k, SymbolicColor.Variable_1),
 			new Variable("swapped", this.swapped)
-		]
+		];
 	}
 
 	public override getInitialStepResultArray(): StepResultArray {
