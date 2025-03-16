@@ -1,8 +1,8 @@
 import Color from "colorjs.io";
-import { SymbolicColor } from "../colors/SymbolicColor";
+import { SymbolicColor } from "./SymbolicColor";
 import { SymbolicColorHelper } from "./SymbolicColorHelper";
 
-export class ColorSet implements Iterable<[SymbolicColor, Color]> {
+export class ColorMap implements Iterable<[SymbolicColor, Color]> {
 	private map: Map<SymbolicColor, Color>;
 
 	public constructor(
@@ -42,29 +42,29 @@ export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 		}
 	}
 
-	public static fromJSON(source: string): ColorSet;
-	public static fromJSON(source: object): ColorSet;
-	public static fromJSON(source: Array<[SymbolicColor, string]>, defaultValue: Color): ColorSet;
-	public static fromJSON(source: any, defaultValue?: Color): ColorSet {
+	public static fromJSON(source: string): ColorMap;
+	public static fromJSON(source: object): ColorMap;
+	public static fromJSON(source: Array<[SymbolicColor, string]>, defaultValue: Color): ColorMap;
+	public static fromJSON(source: any, defaultValue?: Color): ColorMap {
 		let parsed = typeof source === "string" ? JSON.parse(source) : source;
 
 		if (parsed instanceof Array) {
 			if (defaultValue != undefined)
-				return new ColorSet(parsed, defaultValue);
+				return new ColorMap(parsed, defaultValue);
 			else
-				throw new Error("Default value not defined with Array-type source when parsing ColorSet");
+				throw new Error("Default value not defined with Array-type source when parsing ColorMap");
 		}
 		else if (typeof parsed === "object") {
 			let data = parsed.data;
 			let defaultValue = parsed.defaultValue;
 
 			if (data instanceof Array && typeof defaultValue === "string")
-				return new ColorSet(data.map(value => [value[0], new Color(value[1])]), new Color(defaultValue));
+				return new ColorMap(data.map(value => [value[0], new Color(value[1])]), new Color(defaultValue));
 			else
-				throw new Error("Attempted to parse invalid ColorSet object");
+				throw new Error("Attempted to parse invalid ColorMap object");
 		}
 		else {
-			throw new Error("Attempted to parse ColorSet from unsupported format");
+			throw new Error("Attempted to parse ColorMap from unsupported format");
 		}
 	}
 
@@ -93,8 +93,8 @@ export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 		return this.toArray().map(value => [value[0], value[1].toString()]);
 	}
 
-	public static getDefaultLight(): ColorSet {
-		return new ColorSet([
+	public static getDefaultLight(): ColorMap {
+		return new ColorMap([
 			[SymbolicColor.Simulator_Background, new Color("transparent")],
 			[SymbolicColor.Simulator_Foreground, new Color("black")],
 			[SymbolicColor.Simulator_Border, new Color("black")],
@@ -115,8 +115,8 @@ export class ColorSet implements Iterable<[SymbolicColor, Color]> {
 		], new Color("white"));
 	}
 
-	public static getDefaultDark(): ColorSet {
-		return new ColorSet([
+	public static getDefaultDark(): ColorMap {
+		return new ColorMap([
 			[SymbolicColor.Simulator_Background, new Color("transparent")],
 			[SymbolicColor.Simulator_Foreground, new Color("white")],
 			[SymbolicColor.Simulator_Border, new Color("black")],

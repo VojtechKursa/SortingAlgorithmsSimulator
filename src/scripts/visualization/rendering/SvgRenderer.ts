@@ -1,5 +1,5 @@
 import { StepResult } from "../../data/stepResults/StepResult";
-import { ColorSet } from "../colors/ColorSet";
+import { ColorMap } from "../colors/ColorMap";
 
 /**
  * Enum representing the type of alignment to use for an SVG image with custom alignment requirements.
@@ -60,13 +60,13 @@ export class SvgRenderResult {
  */
 export interface SvgRenderer {
 	/**
-	 * Gets the color set used by the renderer.
+	 * Gets the color map used by the renderer.
 	 */
-	get colorSet(): ColorSet;
+	get colorMap(): ColorMap;
 	/**
-	 * Sets the color set used by the renderer.
+	 * Sets the color map used by the renderer.
 	 */
-	set colorSet(value: ColorSet);
+	set colorMap(value: ColorMap);
 
 	/**
 	 * Renders the state of an algorithm represented by the given step results.

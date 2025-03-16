@@ -1,5 +1,5 @@
 import { StepResult } from "../../../data/stepResults/StepResult";
-import { ColorSet } from "../../colors/ColorSet";
+import { ColorMap } from "../../colors/ColorMap";
 import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
@@ -114,21 +114,21 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 
 
 	/**
-	 * The color set used by the renderer.
+	 * The color map used by the renderer.
 	 */
-	public get colorSet(): ColorSet {
-		return this.renderer.colorSet;
+	public get colorMap(): ColorMap {
+		return this.renderer.colorMap;
 	}
 
 	/**
-	 * Updates the color set used by the renderer and immediately re-renders the SVG image using the new color set.
+	 * Updates the color map used by the renderer and immediately re-renders the SVG image using the new color map.
 	 *
-	 * @param newColorSet - The new color set to use.
+	 * @param newColorMap - The new color map to use.
 	 *
-	 * @see {@link SvgRenderer.colorSet}
+	 * @see {@link SvgRenderer.colorMap}
 	 */
-	public updateColorSet(newColorSet: ColorSet): void {
-		this.renderer.colorSet = newColorSet;
+	public updateColorMap(newColorMap: ColorMap): void {
+		this.renderer.colorMap = newColorMap;
 
 		this.displayLastStep();
 	}

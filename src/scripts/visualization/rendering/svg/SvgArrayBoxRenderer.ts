@@ -1,5 +1,5 @@
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
-import { ColorSet } from "../../colors/ColorSet";
+import { ColorMap } from "../../colors/ColorMap";
 import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
@@ -70,22 +70,22 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
 
-	private _colorSet: ColorSet;
-	public get colorSet(): ColorSet {
-		return this._colorSet;
+	private _colorMap: ColorMap;
+	public get colorMap(): ColorMap {
+		return this._colorMap;
 	}
-	public set colorSet(value: ColorSet) {
-		this._colorSet = value;
+	public set colorMap(value: ColorMap) {
+		this._colorMap = value;
 	}
 
 
 
 	public constructor(
-		colorSet: ColorSet,
+		colorMap: ColorMap,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
 	) {
-		this._colorSet = colorSet;
+		this._colorMap = colorMap;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -145,9 +145,9 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			rect.setAttribute("y", rectY.toString());
 			rect.setAttribute("height", this.arraySettings.boxSize.toString());
 			rect.setAttribute("width", this.arraySettings.boxSize.toString());
-			rect.setAttribute("stroke", this.colorSet.get(SymbolicColor.Element_Border).toString());
+			rect.setAttribute("stroke", this.colorMap.get(SymbolicColor.Element_Border).toString());
 			rect.setAttribute("stroke-width", `${this.arraySettings.borderWidth}px`);
-			rect.setAttribute("fill", this.colorSet.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
+			rect.setAttribute("fill", this.colorMap.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -156,7 +156,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			text.setAttribute("y", (rectY + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("font-size", `${this.arraySettings.fontMain.fontSize}px`);
 			text.setAttribute("stroke-width", `${this.arraySettings.fontMain.strokeWidth}px`);
-			text.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
+			text.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 			text.setAttribute("dominant-baseline", "central");
 			text.setAttribute("text-anchor", "middle");
 			text.textContent = item.value.toString();
@@ -172,7 +172,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 				index.setAttribute("y", (rectY + this.arraySettings.boxSize - this.arraySettings.indexBottomMargin).toString());
 				index.setAttribute("font-size", `${this.arraySettings.fontIndex.fontSize}px`);
 				index.setAttribute("stroke-width", `${this.arraySettings.fontIndex.strokeWidth}px`);
-				index.setAttribute("color", this.colorSet.get(SymbolicColor.Element_Foreground).toString());
+				index.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 				index.setAttribute("dominant-baseline", "text-bottom");
 				index.setAttribute("text-anchor", "end");
 				index.textContent = item.index.toString();
@@ -257,10 +257,10 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		chevron.id = `${group.id}_chevron`;
 		chevron.classList.add(RendererClasses.variablePointerClass);
 		chevron.setAttribute("points", points.map(point => point.toString()).join(" "));
-		chevron.setAttribute("stroke", this.colorSet.get(SymbolicColor.Simulator_Border).toString());
+		chevron.setAttribute("stroke", this.colorMap.get(SymbolicColor.Simulator_Border).toString());
 		chevron.setAttribute("stroke-width", this.variableSettings.chevronStrokeWidth.toString());
 
-		const color = this.colorSet.get(variable.color).clone();
+		const color = this.colorMap.get(variable.color).clone();
 		color.alpha *= alphaFactor;
 		chevron.setAttribute("fill", color.toString());
 
@@ -274,7 +274,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		text.setAttribute("y", (chevronBorderTop - this.variableSettings.textMarginBottom).toString());
 		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
 		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
-		text.setAttribute("fill", this.colorSet.get(SymbolicColor.Simulator_Foreground).toString());
+		text.setAttribute("fill", this.colorMap.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
 		text.setAttribute("dominant-baseline", "text-bottom");
 

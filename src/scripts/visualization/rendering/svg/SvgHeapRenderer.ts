@@ -3,7 +3,7 @@ import { IndexedNumber } from "../../../data/IndexedNumber";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { StepResultArray } from "../../../data/stepResults/StepResultArray";
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
-import { ColorSet } from "../../colors/ColorSet";
+import { ColorMap } from "../../colors/ColorMap";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { DotLangInterface } from "./DotLangInterface";
@@ -53,18 +53,18 @@ export class SvgHeapRenderer implements SvgRenderer {
 	private lastRenderedStep: StepResultArray | undefined;
 	private resultMemory: SvgRenderResult;
 
-	private _colorSet: ColorSet;
-	public get colorSet(): ColorSet {
-		return this._colorSet;
+	private _colorMap: ColorMap;
+	public get colorMap(): ColorMap {
+		return this._colorMap;
 	}
-	public set colorSet(value: ColorSet) {
-		this._colorSet = value;
+	public set colorMap(value: ColorMap) {
+		this._colorMap = value;
 	}
 
 
 
-	public constructor(colorSet: ColorSet) {
-		this._colorSet = colorSet;
+	public constructor(colorMap: ColorMap) {
+		this._colorMap = colorMap;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -97,7 +97,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 
 	private async drawHeap(step: StepResultArray): Promise<void> {
-		const getHexColor = (color: SymbolicColor) => this.colorSet.get(color).toString({ format: "hex" });
+		const getHexColor = (color: SymbolicColor) => this.colorMap.get(color).toString({ format: "hex" });
 
 		// Build array of Nodes from array
 		const nodeArray = step.array.map(number => new DotLangNode(number));
@@ -105,7 +105,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 		// Add highlights to Nodes as defined in arrayHighlights
 		if (step.arrayHighlights != null) {
 			for (const highlight of step.arrayHighlights) {
-				const color = this.colorSet.get(highlight[1]);
+				const color = this.colorMap.get(highlight[1]);
 				nodeArray[highlight[0]].backgroundColor = color;
 			}
 		}

@@ -6,7 +6,7 @@ import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlController } from "./ContinuousControlController";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 import { PageColors } from "../visualization/colors/PageColors";
-import { ColorSet } from "../visualization/colors/ColorSet";
+import { ColorMap } from "../visualization/colors/ColorMap";
 import { DebuggerController } from "./DebuggerController";
 import { StepKindController } from "./StepKindController";
 import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
@@ -26,9 +26,9 @@ export class PlayerController {
 	private steps: StepResultCollection;
 
 	/**
-	 * The current color set being used for the UI.
+	 * The current color map being used for the UI.
 	 */
-	private currentColorSet: ColorSet;
+	private currentColorMap: ColorMap;
 
 	/**
 	 * Indicates whether the sorting algorithms is currently playing (continuously stepping forward).
@@ -100,7 +100,7 @@ export class PlayerController {
 		this.continuousControls.addEventListenerPause(() => this.pause(true));
 		this.continuousControls.addEventListenerTick((kind) => this.forward(kind));
 
-		this.currentColorSet = colors.currentColorSet;
+		this.currentColorMap = colors.currentColorMap;
 	}
 
 	/**
@@ -336,12 +336,12 @@ export class PlayerController {
 	 * @param darkMode - True to switch to the dark mode, false to switch to the light mode.
 	 */
 	public setDarkMode(darkMode: boolean): void {
-		const newColorSet = darkMode ? this.colors.darkColors : this.colors.lightColors;
+		const newColorMap = darkMode ? this.colors.darkColors : this.colors.lightColors;
 
-		if (this.currentColorSet != newColorSet) {
-			this.currentColorSet = newColorSet;
+		if (this.currentColorMap != newColorMap) {
+			this.currentColorMap = newColorMap;
 
-			this.svgDisplayHandler.updateColorSet(newColorSet);
+			this.svgDisplayHandler.updateColorMap(newColorMap);
 		}
 	}
 

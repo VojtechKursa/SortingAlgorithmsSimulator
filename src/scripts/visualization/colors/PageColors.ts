@@ -1,21 +1,21 @@
-import { ColorSet } from "./ColorSet";
+import { ColorMap } from "./ColorMap";
 
 export class PageColors {
 	private static readonly storageKey = "colors";
 
-	public get currentColorSet(): ColorSet {
+	public get currentColorMap(): ColorMap {
 		return document.body.getAttribute("data-bs-theme") === "dark" ? this.darkColors : this.lightColors;
 	}
 
 	public constructor(
-		public readonly lightColors: ColorSet,
-		public readonly darkColors: ColorSet
+		public readonly lightColors: ColorMap,
+		public readonly darkColors: ColorMap
 	) { }
 
 	public static getDefault(): PageColors {
 		return new PageColors(
-			ColorSet.getDefaultLight(),
-			ColorSet.getDefaultDark()
+			ColorMap.getDefaultLight(),
+			ColorMap.getDefaultDark()
 		);
 	}
 
@@ -24,8 +24,8 @@ export class PageColors {
 
 		try {
 			return new PageColors(
-				ColorSet.fromJSON(parsed.light),
-				ColorSet.fromJSON(parsed.dark)
+				ColorMap.fromJSON(parsed.light),
+				ColorMap.fromJSON(parsed.dark)
 			);
 		} catch {
 			const defaultColors = PageColors.getDefault();

@@ -92,7 +92,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		callStackController = new CallStackController(callStackWrapper);
 
 
-		let renderer = new SvgArrayBoxRenderer(colors.currentColorSet, false, false);
+		let renderer = new SvgArrayBoxRenderer(colors.currentColorMap, false, false);
 
 		let renderers = [renderer];
 
