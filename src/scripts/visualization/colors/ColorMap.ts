@@ -3,7 +3,7 @@ import { SymbolicColor } from "./SymbolicColor";
 import { SymbolicColorHelper } from "./SymbolicColorHelper";
 
 export class ColorMap implements Iterable<[SymbolicColor, Color]> {
-	private map: Map<SymbolicColor, Color>;
+	private readonly map: Map<SymbolicColor, Color>;
 
 	public constructor(
 		map: Iterable<readonly [SymbolicColor, Color]>,
