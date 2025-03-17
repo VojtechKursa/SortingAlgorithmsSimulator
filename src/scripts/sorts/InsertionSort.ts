@@ -93,7 +93,9 @@ export class InsertionSort extends SortingAlgorithmArray {
 			while (this.j > 0 && this.current[this.j - 1].value > this.x) {
 				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightStateInsertionSort.Selected, 4);
 
-				this.current[this.j] = this.current[this.j - 1];
+				let picked = this.current[this.j - 1];
+				this.current[this.j] = picked;
+				this.current[this.j - 1] = picked.duplicate();
 				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is incorrect, shift lower element up`, HighlightStateInsertionSort.OrderSwapped, 5);
 
 				this.j--;

@@ -134,13 +134,14 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 			group.classList.add(RendererClasses.elementWrapperClass);
-			group.id = `elem_${item.id}`;
+			if (!item.duplicated) {
+				group.id = `elem_${item.id}`;
+			}
 
 			const rectX = i * this.arraySettings.boxSize;
 			const rectY = 0;
 
 			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-			rect.id = `${group.id}_rect`;
 			rect.setAttribute("x", rectX.toString());
 			rect.setAttribute("y", rectY.toString());
 			rect.setAttribute("height", this.arraySettings.boxSize.toString());
@@ -149,9 +150,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			rect.setAttribute("stroke-width", `${this.arraySettings.borderWidth}px`);
 			rect.setAttribute("fill", this.colorMap.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
+			if (group.id != "") {
+				rect.id = `${group.id}_rect`;
+			}
 
 			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			text.id = `${group.id}_text`;
 			text.setAttribute("x", (rectX + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("y", (rectY + (this.arraySettings.boxSize / 2)).toString());
 			text.setAttribute("font-size", `${this.arraySettings.fontMain.fontSize}px`);
@@ -161,13 +164,15 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			text.setAttribute("text-anchor", "middle");
 			text.textContent = item.value.toString();
 			text.classList.add(RendererClasses.elementValueClass);
+			if (group.id != "") {
+				text.id = `${group.id}_text`;
+			}
 
 			group.appendChild(rect);
 			group.appendChild(text);
 
 			if (item.index != null) {
 				const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
-				index.id = `${group.id}_index`;
 				index.setAttribute("x", (rectX + this.arraySettings.boxSize - this.arraySettings.indexRightMargin).toString());
 				index.setAttribute("y", (rectY + this.arraySettings.boxSize - this.arraySettings.indexBottomMargin).toString());
 				index.setAttribute("font-size", `${this.arraySettings.fontIndex.fontSize}px`);
@@ -177,6 +182,9 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 				index.setAttribute("text-anchor", "end");
 				index.textContent = item.index.toString();
 				index.classList.add(RendererClasses.elementIndexClass);
+				if (group.id != "") {
+					index.id = `${group.id}_index`;
+				}
 
 				group.appendChild(index);
 			}
