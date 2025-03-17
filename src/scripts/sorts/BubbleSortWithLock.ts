@@ -21,8 +21,9 @@ export class BubbleSortWithLock extends BubbleSort {
 			yield this.makeCodeStepResult(3);
 
 			this.l = this.next_l;
+			yield this.makeCodeStepResult(4);
 			this.next_l = 0;
-			yield this.makeCodeStepResult([4, 5]);
+			yield this.makeCodeStepResult(5);
 
 			for (this.k = 0; this.k < this.l - 1; this.k++) {
 				if (this.k == 0) {
