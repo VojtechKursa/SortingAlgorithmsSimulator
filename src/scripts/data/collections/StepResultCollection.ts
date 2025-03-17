@@ -271,6 +271,11 @@ export class StepResultCollection {
 	 */
 	public goToStep(step: number, kind: StepKind): boolean;
 	public goToStep(step: number, kind: StepKind = StepKind.Code): boolean {
+		if (step < 0) {
+			step = 0;
+			kind = StepKind.Code;
+		}
+
 		let state = this.states.get(kind, step);
 
 		if (state != undefined) {
