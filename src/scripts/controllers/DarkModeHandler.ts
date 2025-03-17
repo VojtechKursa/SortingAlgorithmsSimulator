@@ -78,7 +78,7 @@ export class DarkModeHandler {
 
 		if (darkModeSwitchButton != undefined && darkModeSwitchButton != null) {
 			this.darkModeSwitchButton = darkModeSwitchButton;
-			darkModeSwitchButton.addEventListener("click", _ => this.DarkMode = !this.DarkMode);
+			darkModeSwitchButton.addEventListener("click", () => this.DarkMode = !this.DarkMode);
 		}
 
 		this.apply();

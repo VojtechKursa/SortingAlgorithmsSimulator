@@ -60,8 +60,8 @@ export class SimulatorPageController {
 			playerController.setDarkMode(dark);
 		});
 
-		window.addEventListener("resize", _ => this.resizeHandler());
-		debuggerCollapseButton.addEventListener("click", _ => {
+		window.addEventListener("resize", () => this.resizeHandler());
+		debuggerCollapseButton.addEventListener("click", () => {
 			const period = 1000 / 30;
 			const limit = 400;
 

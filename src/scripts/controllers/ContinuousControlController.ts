@@ -85,8 +85,8 @@ export class ContinuousControlController {
 		public readonly playButton: HTMLInputElement,
 		public readonly stepKindController: StepKindController
 	) {
-		pauseButton.addEventListener("click", _ => this.pause());
-		playButton.addEventListener("click", _ => this.play());
+		pauseButton.addEventListener("click", () => this.pause());
+		playButton.addEventListener("click", () => this.play());
 	}
 
 	/**

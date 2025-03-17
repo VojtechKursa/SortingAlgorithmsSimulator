@@ -120,7 +120,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		);
 	}
 
-	window.addEventListener("load", _ => {
+	window.addEventListener("load", () => {
 		// Ensure correct theme is selected
 		playerController.setDarkMode(document.body.getAttribute("data-bs-theme") === "dark");
 

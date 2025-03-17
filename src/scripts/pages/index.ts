@@ -1,7 +1,7 @@
 import { IndexPageController } from "../controllers/IndexPageController";
 import { initCommon } from "./common";
 
-document.addEventListener("DOMContentLoaded", _ => {
+document.addEventListener("DOMContentLoaded", () => {
 	initCommon();
 	initIndex();
 });

@@ -84,17 +84,17 @@ export class PlayerController {
 
 		this.reset();
 
-		this.playerControls.backAlgorithmicStepButton.addEventListener("click", _ => this.backward(StepKind.Algorithmic));
-		this.playerControls.forwardAlgorithmicStepButton.addEventListener("click", _ => this.forward(StepKind.Algorithmic));
-		this.playerControls.backSignificantStepButton.addEventListener("click", _ => this.backward(StepKind.Significant));
-		this.playerControls.forwardSignificantStepButton.addEventListener("click", _ => this.forward(StepKind.Significant));
-		this.playerControls.beginningButton.addEventListener("click", _ => this.toBeginning());
-		this.playerControls.endButton.addEventListener("click", _ => this.toEnd());
+		this.playerControls.backAlgorithmicStepButton.addEventListener("click", () => this.backward(StepKind.Algorithmic));
+		this.playerControls.forwardAlgorithmicStepButton.addEventListener("click", () => this.forward(StepKind.Algorithmic));
+		this.playerControls.backSignificantStepButton.addEventListener("click", () => this.backward(StepKind.Significant));
+		this.playerControls.forwardSignificantStepButton.addEventListener("click", () => this.forward(StepKind.Significant));
+		this.playerControls.beginningButton.addEventListener("click", () => this.toBeginning());
+		this.playerControls.endButton.addEventListener("click", () => this.toEnd());
 
-		this.debuggerControls.backCodeStepButton.addEventListener("click", _ => this.backward(StepKind.Code));
-		this.debuggerControls.forwardCodeStepButton.addEventListener("click", _ => this.forward(StepKind.Code));
+		this.debuggerControls.backCodeStepButton.addEventListener("click", () => this.backward(StepKind.Code));
+		this.debuggerControls.forwardCodeStepButton.addEventListener("click", () => this.forward(StepKind.Code));
 
-		this.resetButton.addEventListener("click", _ => this.reset());
+		this.resetButton.addEventListener("click", () => this.reset());
 
 		this.continuousControls.addEventListenerPlay((kind, intervalMs) => this.play(kind, intervalMs, true));
 		this.continuousControls.addEventListenerPause(() => this.pause(true));
