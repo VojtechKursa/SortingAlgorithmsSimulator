@@ -7,14 +7,11 @@ import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
 import { StepKind } from "../data/stepResults/StepKind";
 
 export class BubbleSort extends SortingAlgorithmArray {
-	protected k: number;
-	protected swapped: boolean;
+	protected k?: number;
+	protected swapped?: boolean;
 
 	public constructor(input: number[]) {
 		super(input);
-
-		this.k = 0;
-		this.swapped = false;
 	}
 
 	protected makeFullStepResult(
@@ -34,17 +31,19 @@ export class BubbleSort extends SortingAlgorithmArray {
 			}
 		}
 		else {
-			if (highlightState == HighlightState.Selected) {
-				highlights.set(this.k, SymbolicColor.Element_Highlight_1);
-				highlights.set(this.k + 1, SymbolicColor.Element_Highlight_2);
-			}
-			else if (highlightState == HighlightState.OrderCorrect) {
-				highlights.set(this.k, SymbolicColor.Element_OrderCorrect);
-				highlights.set(this.k + 1, SymbolicColor.Element_OrderCorrect);
-			}
-			else if (highlightState == HighlightState.OrderSwapped) {
-				highlights.set(this.k, SymbolicColor.Element_OrderIncorrect);
-				highlights.set(this.k + 1, SymbolicColor.Element_OrderIncorrect);
+			if (this.k != undefined) {
+				if (highlightState == HighlightState.Selected) {
+					highlights.set(this.k, SymbolicColor.Element_Highlight_1);
+					highlights.set(this.k + 1, SymbolicColor.Element_Highlight_2);
+				}
+				else if (highlightState == HighlightState.OrderCorrect) {
+					highlights.set(this.k, SymbolicColor.Element_OrderCorrect);
+					highlights.set(this.k + 1, SymbolicColor.Element_OrderCorrect);
+				}
+				else if (highlightState == HighlightState.OrderSwapped) {
+					highlights.set(this.k, SymbolicColor.Element_OrderIncorrect);
+					highlights.set(this.k + 1, SymbolicColor.Element_OrderIncorrect);
+				}
 			}
 
 			if (l != undefined) {
@@ -106,15 +105,19 @@ export class BubbleSort extends SortingAlgorithmArray {
 	}
 
 	protected resetInternal(): void {
-		this.k = 0;
-		this.swapped = false;
+		this.k = undefined;
+		this.swapped = undefined;
 	}
 
 	protected getVariables(): Array<Variable> {
-		return [
-			new Variable("k", this.k, SymbolicColor.Variable_1),
-			new Variable("swapped", this.swapped)
-		];
+		let result: Variable[] = [];
+
+		if (this.k != undefined)
+			result.push(new Variable("k", this.k, SymbolicColor.Variable_1));
+		if (this.swapped != undefined)
+			result.push(new Variable("swapped", this.swapped));
+
+		return result;
 	}
 
 	public override getInitialStepResultArray(): StepResultArray {
@@ -123,7 +126,7 @@ export class BubbleSort extends SortingAlgorithmArray {
 
 	public getPseudocode(): string[] {
 		return [
-			"function bubbleSort(a: list_of_comparable_items)",
+			"function bubbleSort(a: array)",
 			"\tdo",
 			"\t\tswapped := false",
 			"\t\t",

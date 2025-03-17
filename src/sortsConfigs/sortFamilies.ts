@@ -2,7 +2,7 @@ import { Complexity } from "./definitions/Complexity";
 import { SortFamilyProperties } from "./definitions/SortFamilyProperties";
 
 import { BubbleSortProperties } from "./sorts/BubbleSortProperties";
-import { BubbleSortOptimizedProperties } from "./sorts/BubbleSortOptimizedProperties";
+import { BubbleSortWithLockProperties } from "./sorts/BubbleSortWithLockProperties";
 import { SelectSortProperties } from "./sorts/SelectSortProperties";
 import { InsertSortProperties } from "./sorts/InsertSortProperties";
 import { QuickSortProperties } from "./sorts/QuickSortProperties";
@@ -23,7 +23,7 @@ const sortFamilies: SortFamilyProperties[] = [
 		inPlace: true,
 		sorts: [
 			BubbleSortProperties,
-			BubbleSortOptimizedProperties,
+			BubbleSortWithLockProperties,
 		]
 	},
 	{
