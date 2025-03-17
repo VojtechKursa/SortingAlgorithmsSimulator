@@ -331,8 +331,8 @@ export class StepController {
 
 		const significantWrapper = document.createElement("div");
 		const algorithmicWrapper = document.createElement("div");
-		rendererControllerWrapper.appendChild(significantWrapper);
 		rendererControllerWrapper.appendChild(algorithmicWrapper);
+		rendererControllerWrapper.appendChild(significantWrapper);
 
 		// Generate controllers
 		const generationConfig: [StepKind, HTMLDivElement][] = [
