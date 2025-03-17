@@ -1,13 +1,18 @@
-import { StepKind } from "../data/stepResults/StepKind";
+import { StepIndexes } from "../data/StepIndexes";
+import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
+import { StepControllerClasses } from "../visualization/css/StepControllerClasses";
 
 export const enum StepAction {
 	Forward,
-	Backward
+	Backward,
+	ToBeginning,
+	ToEnd
 }
 
-export interface StepEventHandler { (stepKind: StepKind, stepAction: StepAction, controller: StepController): void }
+export interface StepEventHandler { (stepKind: StepKind, stepAction: StepAction): void }
+interface StepEventHandlerElementary { (stepKind: StepKind, stepAction: StepAction, controller: StepControllerElementary): void }
 
-export class StepController {
+class StepControllerElementary {
 	private readonly backButton: HTMLButtonElement;
 	private readonly nextButton: HTMLButtonElement;
 	private readonly stepDisplay: HTMLOutputElement;
@@ -16,7 +21,7 @@ export class StepController {
 	private _finalStep: number | undefined;
 	private _unknownSymbol: string;
 
-	private readonly eventHandlers: StepEventHandler[] = [];
+	private readonly eventHandlers: StepEventHandlerElementary[] = [];
 
 	public constructor(
 		public readonly wrapper: HTMLDivElement,
@@ -25,23 +30,48 @@ export class StepController {
 	) {
 		this._unknownSymbol = unknownSymbol;
 
+		wrapper.classList.add(StepControllerClasses.wrapperClass);
+
+		const buttonGroup = document.createElement("div");
+		buttonGroup.classList.add("btn-group");
+		buttonGroup.role = "group";
+
 		this.backButton = document.createElement("button");
+		const backIcon = document.createElement("i");
+		backIcon.classList.add("bi", "bi-caret-left-fill");
+		this.backButton.appendChild(backIcon);
 
 		this.nextButton = document.createElement("button");
+		const nextIcon = document.createElement("i");
+		nextIcon.classList.add("bi", "bi-caret-right-fill");
+		this.nextButton.appendChild(nextIcon);
+
+		for (const button of [this.backButton, this.nextButton]) {
+			button.classList.add("btn", "btn-primary");
+			button.type = "button";
+		}
 
 		this.stepDisplay = document.createElement("output");
+		this.stepDisplay.classList.add("disabled");
 
-		wrapper.appendChild(this.backButton);
-		wrapper.appendChild(this.stepDisplay);
-		wrapper.appendChild(this.nextButton);
+		const label = document.createElement("div");
+		label.textContent = `${StepKindHelper.toString(stepKind).displayName.charAt(0)}:`;
+		label.classList.add(StepControllerClasses.labelClass);
 
-		this.backButton.addEventListener("click", _ => {
+		buttonGroup.appendChild(this.backButton);
+		buttonGroup.appendChild(this.stepDisplay);
+		buttonGroup.appendChild(this.nextButton);
+
+		wrapper.appendChild(label);
+		wrapper.appendChild(buttonGroup);
+
+		this.backButton.addEventListener("click", () => {
 			for (const handler of this.eventHandlers) {
 				handler(this.stepKind, StepAction.Backward, this);
 			}
 		});
 
-		this.nextButton.addEventListener("click", _ => {
+		this.nextButton.addEventListener("click", () => {
 			for (const handler of this.eventHandlers) {
 				handler(this.stepKind, StepAction.Forward, this);
 			}
@@ -85,8 +115,20 @@ export class StepController {
 		this.update();
 	}
 
-	public setDisabled(disabled: boolean): void;
-	public setDisabled(disabled: boolean, stepAction: StepAction): void;
+	public getDisabled(stepAction?: StepAction): boolean {
+		if (stepAction == undefined)
+			return this.nextButton.disabled || this.backButton.disabled;
+
+		switch (stepAction) {
+			case StepAction.Backward:
+			case StepAction.ToBeginning:
+				return this.backButton.disabled;
+			case StepAction.Forward:
+			case StepAction.ToEnd:
+				return this.nextButton.disabled;
+		}
+	}
+
 	public setDisabled(disabled: boolean, stepAction?: StepAction): void {
 		if (stepAction == undefined) {
 			this.nextButton.disabled = disabled;
@@ -102,19 +144,155 @@ export class StepController {
 
 	private update(): void {
 		this.stepDisplay.textContent = `${this.currentStep} / ${this.finalStep ?? this.unknownSymbol}`;
+	}
 
-		if (this.currentStep <= 0) {
-			this.setDisabled(true, StepAction.Backward);
+	public registerHandler(handler: StepEventHandlerElementary): void {
+		this.eventHandlers.push(handler);
+	}
+
+	public unregisterHandler(handler: StepEventHandlerElementary): void {
+		let index = this.eventHandlers.findIndex(val => val == handler);
+
+		while (index != -1) {
+			this.eventHandlers.splice(index, 1);
+
+			index = this.eventHandlers.findIndex(val => val == handler);
 		}
-		else {
-			this.setDisabled(false, StepAction.Backward);
+	}
+}
+
+export class StepController {
+	private readonly stepControllers: readonly StepControllerElementary[];
+
+	private readonly eventHandlers: StepEventHandler[] = [];
+
+	private readonly beginningButton: HTMLButtonElement;
+	private readonly endButton: HTMLButtonElement;
+
+	private _currentStep: StepIndexes;
+	public get currentStep(): StepIndexes {
+		return this._currentStep;
+	}
+	public set currentStep(indexes: StepIndexes) {
+		for (const controller of this.stepControllers.values()) {
+			const stepCount = indexes.getIndex(controller.stepKind);
+			controller.currentStep = stepCount;
 		}
 
-		if (this.finalStep != undefined && this.currentStep >= this.finalStep) {
-			this.setDisabled(true, StepAction.Forward);
+		this._currentStep = indexes;
+	}
+
+	private _finalStep: StepIndexes | undefined;
+	public get finalStep(): StepIndexes | undefined {
+		return this._finalStep;
+	}
+	public set finalStep(indexes: StepIndexes | undefined | null) {
+		if (indexes == null)
+			indexes = undefined;
+
+		for (const controller of this.stepControllers.values()) {
+			if (indexes != undefined) {
+				const stepCount = indexes.getIndex(controller.stepKind);
+				controller.finalStep = stepCount;
+			}
+			else {
+				controller.finalStep = undefined;
+			}
 		}
-		else {
-			this.setDisabled(false, StepAction.Backward);
+
+		this._finalStep = indexes;
+	}
+
+	public constructor(
+		rendererStepControllerWrapper: HTMLDivElement,
+		debuggerStepControllerWrapper: HTMLDivElement
+	) {
+		this._currentStep = new StepIndexes(0, 0, 0);
+
+		const rendererControllerWrapper = document.createElement("div");
+		rendererControllerWrapper.classList.add(StepControllerClasses.verticalWrapperClass);
+
+		const significantWrapper = document.createElement("div");
+		const algorithmicWrapper = document.createElement("div");
+		rendererControllerWrapper.appendChild(significantWrapper);
+		rendererControllerWrapper.appendChild(algorithmicWrapper);
+
+		const generationConfig: [StepKind, HTMLDivElement][] = [
+			[StepKind.Code, debuggerStepControllerWrapper],
+			[StepKind.Significant, significantWrapper],
+			[StepKind.Algorithmic, algorithmicWrapper]
+		];
+
+		const controllers: StepControllerElementary[] = [];
+
+		for (const config of generationConfig) {
+			const controller = new StepControllerElementary(config[1], config[0]);
+			controllers.push(controller);
+
+			controller.registerHandler((stepKind, stepAction) => this.stepHandler(stepKind, stepAction));
+		}
+
+		this.stepControllers = controllers;
+
+		this.beginningButton = document.createElement("button");
+		this.beginningButton.id = "step-beginning";
+		const beginningIcon = document.createElement("i");
+		beginningIcon.classList.add("bi", "bi-skip-backward-fill");
+		this.beginningButton.appendChild(beginningIcon);
+
+		this.endButton = document.createElement("button");
+		this.endButton.id = "step-end";
+		const endIcon = document.createElement("i");
+		endIcon.classList.add("bi", "bi-skip-forward-fill");
+		this.endButton.appendChild(endIcon);
+
+		for (const button of [this.beginningButton, this.endButton]) {
+			button.classList.add("btn", "btn-primary");
+			button.type = "button";
+		}
+
+		this.beginningButton.addEventListener("click", () => this.stepHandler(StepKind.Algorithmic, StepAction.ToBeginning));
+		this.endButton.addEventListener("click", () => this.stepHandler(StepKind.Algorithmic, StepAction.ToEnd));
+
+		rendererStepControllerWrapper.appendChild(this.beginningButton);
+		rendererStepControllerWrapper.appendChild(rendererControllerWrapper);
+		rendererStepControllerWrapper.appendChild(this.endButton);
+	}
+
+	private stepHandler(stepKind: StepKind, stepAction: StepAction) {
+		for (const handler of this.eventHandlers) {
+			handler(stepKind, stepAction);
+		}
+	}
+
+	public getDisabled(stepAction?: StepAction, stepKind?: StepKind): boolean {
+		const toScan = stepKind == undefined ? this.stepControllers : this.stepControllers.filter(controller => controller.stepKind == stepKind);
+
+		for (const controller of toScan) {
+			if (controller.getDisabled(stepAction))
+				return true;
+		}
+
+		return false;
+	}
+
+	public setDisabled(disabled: boolean, stepAction?: StepAction, stepKind?: StepKind): void {
+		if (stepAction == StepAction.ToBeginning || stepAction == undefined) {
+			this.beginningButton.disabled = disabled;
+			if (stepAction != undefined)
+				return;
+		}
+
+		if (stepAction == StepAction.ToEnd || stepAction == undefined) {
+			this.endButton.disabled = disabled;
+			if (stepAction != undefined)
+				return;
+		}
+
+		const toSet = stepKind == undefined ? this.stepControllers : this.stepControllers.filter(controller => controller.stepKind == stepKind);
+
+		for (const controller of toSet) {
+			controller.setDisabled(disabled, stepAction);
 		}
 	}
 

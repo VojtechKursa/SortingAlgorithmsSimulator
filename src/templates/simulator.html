@@ -53,15 +53,7 @@
 			<div id="row_main">
 				<div id="state_renderer">
 					<div class="control_module">
-						<div id="stepping" class="btn-group" role="group">
-							<button id="step-beginning" type="button" class="btn btn-primary"><i class="bi bi-skip-backward-fill"></i></button>
-							<button id="step-back-algorithmic" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
-							<button id="step-back-significant" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
-							<output id="step_id" type="number" class="btn btn-secondary disabled">0</output>
-							<button id="step-next-significant" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
-							<button id="step-next-algorithmic" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
-							<button id="step-end" type="button" class="btn btn-primary"><i class="bi bi-skip-forward-fill"></i></button>
-						</div>
+						<div id="stepping" class="step_controls"></div>
 					</div>
 					<div id="canvas_wrapper">
 						<svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -76,11 +68,7 @@
 					</button>
 					<div id="debugger_collection" class="collapse show">
 						<div class="control_module">
-							<div id="stepping_code" class="btn-group" role="group">
-								<button id="step-back-code" type="button" class="btn btn-primary"><i class="bi bi-caret-left-fill"></i></button>
-								<output id="step_id-code" type="number" class="btn btn-secondary disabled">0</output>
-								<button id="step-next-code" type="button" class="btn btn-primary"><i class="bi bi-caret-right-fill"></i></button>
-							</div>
+							<div id="stepping_code" class="step_controls"></div>
 						</div>
 						<div id="debugger_row">
 							<div id="debugger_wrapper">
