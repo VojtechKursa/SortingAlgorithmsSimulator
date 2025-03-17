@@ -1,10 +1,16 @@
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { HighlightState } from "./SortingAlgorithm";
 import { Variable } from "../data/Variable";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { StepKind } from "../data/stepResults/StepKind";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
+
+const enum HighlightStateSelectionSort {
+	Selected,
+	OrderCorrect,
+	OrderSwapped,
+	MinSwap
+}
 
 export class SelectionSort extends SortingAlgorithmArray {
 	protected i?: number;
@@ -35,8 +41,7 @@ export class SelectionSort extends SortingAlgorithmArray {
 	protected makeFullStepResult(
 		stepKind: StepKind.Algorithmic | StepKind.Significant,
 		description: string,
-		swapping: boolean,
-		highlightState: HighlightState | undefined,
+		highlightState: HighlightStateSelectionSort | undefined,
 		highlightedLines: number[] | number,
 		final: boolean = false,
 		additionalHighlights?: Highlights
@@ -55,34 +60,36 @@ export class SelectionSort extends SortingAlgorithmArray {
 				}
 			}
 
-
-			if (swapping) {
-				if (this.min != undefined && this.i != undefined) {
-					if (highlightState == HighlightState.Selected) {
-						arrayHighlights.set(this.i, SymbolicColor.Element_Highlight_1);
-						arrayHighlights.set(this.min, SymbolicColor.Element_Highlight_2);
-					}
-					else if (highlightState == HighlightState.OrderSwapped) {
-						arrayHighlights.set(this.i, SymbolicColor.Element_OrderCorrect);
-						arrayHighlights.set(this.min, SymbolicColor.Element_OrderCorrect);
-					}
-				}
-			}
-			else {
-				if (this.j != undefined) {
-					if (highlightState == HighlightState.Selected && this.min != undefined) {
+			switch (highlightState) {
+				case HighlightStateSelectionSort.Selected:
+					if (this.j != undefined && this.min != undefined) {
 						arrayHighlights.set(this.j, SymbolicColor.Element_Highlight_1);
 						arrayHighlights.set(this.min, SymbolicColor.Element_Highlight_2);
 					}
-					else if (highlightState == HighlightState.OrderCorrect && this.min != undefined) {
-						arrayHighlights.set(this.min, SymbolicColor.Element_OrderCorrect);
+					break;
+				case HighlightStateSelectionSort.OrderCorrect:
+					if (this.j != undefined && this.min != undefined) {
 						arrayHighlights.set(this.j, SymbolicColor.Element_OrderCorrect);
+						arrayHighlights.set(this.min, SymbolicColor.Element_OrderCorrect);
 					}
-					else if (highlightState == HighlightState.OrderSwapped && this.lastMin != undefined) {
-						arrayHighlights.set(this.lastMin, SymbolicColor.Element_OrderIncorrect);
+					break;
+				case HighlightStateSelectionSort.OrderSwapped:
+					if (this.j != undefined && this.lastMin != undefined) {
 						arrayHighlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
+						arrayHighlights.set(this.lastMin, SymbolicColor.Element_OrderIncorrect);
 					}
-				}
+					break;
+				case HighlightStateSelectionSort.MinSwap:
+					if (this.i != undefined && this.min != undefined) {
+						if (this.i == this.min) {
+							arrayHighlights.set(this.i, SymbolicColor.Element_OrderCorrect)
+						}
+						else {
+							arrayHighlights.set(this.i, SymbolicColor.Element_OrderIncorrect);
+							arrayHighlights.set(this.min, SymbolicColor.Element_OrderIncorrect);
+						}
+					}
+					break;
 			}
 		}
 
@@ -105,76 +112,52 @@ export class SelectionSort extends SortingAlgorithmArray {
 	private getVariables(): Array<Variable> {
 		let variables = new Array<Variable>();
 
-		if (this.i != null)
+		if (this.i != undefined)
 			variables.push(new Variable("i", this.i, SymbolicColor.Variable_3));
-		if (this.min != null)
+		if (this.min != undefined)
 			variables.push(new Variable("min", this.min, SymbolicColor.Variable_2));
-		if (this.j != null)
+		if (this.j != undefined)
 			variables.push(new Variable("j", this.j, SymbolicColor.Variable_1));
 
 		return variables;
 	}
 
 	protected override * stepForwardArray(): Generator<StepResultArray> {
-		this.i = 0;
-		yield this.makeCodeStepResult(1);
+		for (this.i = 0; this.i < this.current.length - 1; this.i++) {
+			yield this.makeCodeStepResult(1);
 
-		let stop = this.current.length - 1;
-		let enteredOuterWhile = false;
-
-		if (!(this.i < stop))
+			this.min = this.i;
 			yield this.makeCodeStepResult(2);
 
-		while (this.i < stop) {
-			enteredOuterWhile = true;
-			yield this.makeCodeStepResult(2);
+			for (this.j = this.min + 1; this.j < this.current.length; this.j++) {
+				yield this.makeCodeStepResult(3);
 
-			this.j = this.i + 1;
-			yield this.makeCodeStepResult(3);
-
-			this.min = this.j;
-			yield this.makeCodeStepResult(4);
-
-			if (!(this.j < this.current.length))
-				yield this.makeCodeStepResult(5);
-
-			let enteredInnerWhile = false;
-			while (this.j < this.current.length) {
-				enteredInnerWhile = true;
-				yield this.makeCodeStepResult(5);
-
-				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.min} and ${this.j}`, false, HighlightState.Selected, 6);
+				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.min} and ${this.j}`, HighlightStateSelectionSort.Selected, 4);
 				if (this.current[this.j].value < this.current[this.min].value) {
 					this.min = this.j;
-					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.lastMin} and ${this.j}: Mark new minimum`, true, HighlightState.OrderSwapped, 7);
-					yield this.makeCodeStepResult(8);
+					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.lastMin} and ${this.j}: Mark new minimum`, HighlightStateSelectionSort.OrderSwapped, 5);
+					yield this.makeCodeStepResult(6);
 				}
 				else {
-					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.min} and ${this.j}: Order is correct`, true, HighlightState.OrderCorrect, 8);
+					yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.min} and ${this.j}: Order is correct`, HighlightStateSelectionSort.OrderCorrect, 6);
 				}
 
-				this.j++;
-				yield this.makeCodeStepResult(9);
+				yield this.makeCodeStepResult(7);
 			}
 
-			if (enteredInnerWhile)
-				yield this.makeCodeStepResult(5);
+			yield this.makeCodeStepResult(3);
+			yield this.makeCodeStepResult(7);
 
-			yield this.makeCodeStepResult(10);
-
-			yield this.makeFullStepResult(StepKind.Significant, `Swap minimum on index ${this.min} with element on index i (${this.i})`, false, HighlightState.Selected, 11);
 			this.swapCurrent(this.i, this.min);
-			yield this.makeFullStepResult(StepKind.Algorithmic, `Swap minimum on index ${this.min} with element on index i (${this.i})`, true, HighlightState.OrderSwapped, 11);
+			yield this.makeFullStepResult(StepKind.Algorithmic, `Swap minimum on index ${this.min} with element on index i (${this.i})`, HighlightStateSelectionSort.MinSwap, 8);
 
-			this.i++;
-			yield this.makeCodeStepResult(12);
+			yield this.makeCodeStepResult(9);
 		}
 
-		if (enteredOuterWhile)
-			yield this.makeCodeStepResult(2);
+		yield this.makeCodeStepResult(1);
+		yield this.makeCodeStepResult(9);
 
-		yield this.makeCodeStepResult(13);
-		yield this.makeFullStepResult(StepKind.Algorithmic, "Array sorted", false, undefined, 14, true);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array sorted", undefined, this.getPseudocode().length - 1, true);
 	}
 
 	public override getInitialStepResultArray(): StepResultArray {
@@ -189,20 +172,16 @@ export class SelectionSort extends SortingAlgorithmArray {
 
 	public getPseudocode(): string[] {
 		return [
-			"function selectSort(a: list)",
-			"\ti := 0",
-			"\twhile i < (length(a) - 1)",
-			"\t\tj := i + 1",
-			"\t\tmin := j",
-			"\t\twhile j < length(a)",
+			"function selectSort(a: array)",
+			"\tfor i := 0 to length(a)-2 do",
+			"\t\tmin := i",
+			"\t\tfor j := min+1 to length(a)-1 do",
 			"\t\t\tif a[j] < a[min]",
 			"\t\t\t\tmin := j",
 			"\t\t\tend if",
-			"\t\t\tj := j + 1",
-			"\t\tend while",
+			"\t\tend for",
 			"\t\tswap(i, min)",
-			"\t\ti := i + 1",
-			"\tend while",
+			"\tend for",
 			"end function"
 		];
 	}

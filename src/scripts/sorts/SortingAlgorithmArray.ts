@@ -4,7 +4,6 @@ import { StepKind } from "../data/stepResults/StepKind";
 import { StepResult } from "../data/stepResults/StepResult";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { Variable } from "../data/Variable";
-import { UnsupportedStepResultError } from "../errors/UnsupportedStepResultError";
 import { ReadOnlyHighlights } from "../visualization/Highlights";
 import { SortingAlgorithm } from "./SortingAlgorithm";
 

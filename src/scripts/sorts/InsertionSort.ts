@@ -1,11 +1,19 @@
 import { StepResultArray } from "../data/stepResults/StepResultArray";
-import { HighlightState } from "./SortingAlgorithm";
 import { Variable } from "../data/Variable";
 import { IndexedNumber } from "../data/IndexedNumber";
 import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
 import { StepKind } from "../data/stepResults/StepKind";
+
+//TODO: Fix animations
+
+const enum HighlightStateInsertionSort {
+	Selected,
+	OrderCorrect,
+	OrderSwapped,
+	Inserted
+}
 
 export class InsertionSort extends SortingAlgorithmArray {
 	protected i?: number;
@@ -19,7 +27,7 @@ export class InsertionSort extends SortingAlgorithmArray {
 	protected makeFullStepResult(
 		stepKind: StepKind.Algorithmic | StepKind.Significant,
 		description: string,
-		highlightState: HighlightState | undefined,
+		highlightState: HighlightStateInsertionSort | undefined,
 		highlightedLines: number[] | number,
 		final: boolean = false,
 		additionalHighlights?: Highlights
@@ -33,17 +41,22 @@ export class InsertionSort extends SortingAlgorithmArray {
 		}
 		else {
 			if (this.j != undefined) {
-				if (highlightState == HighlightState.Selected) {
-					highlights.set(this.j - 1, SymbolicColor.Element_Highlight_1);
-					highlights.set(this.j, SymbolicColor.Element_Highlight_2);
-				}
-				else if (highlightState == HighlightState.OrderCorrect) {
-					highlights.set(this.j - 1, SymbolicColor.Element_OrderCorrect);
-					highlights.set(this.j, SymbolicColor.Element_OrderCorrect);
-				}
-				else if (highlightState == HighlightState.OrderSwapped) {
-					highlights.set(this.j - 1, SymbolicColor.Element_OrderIncorrect);
-					highlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
+				switch (highlightState) {
+					case HighlightStateInsertionSort.Selected:
+						highlights.set(this.j - 1, SymbolicColor.Element_Highlight_1);
+						highlights.set(this.j, SymbolicColor.Element_Highlight_2);
+						break;
+					case HighlightStateInsertionSort.OrderCorrect:
+						highlights.set(this.j - 1, SymbolicColor.Element_OrderCorrect);
+						highlights.set(this.j, SymbolicColor.Element_OrderCorrect);
+						break;
+					case HighlightStateInsertionSort.OrderSwapped:
+						highlights.set(this.j - 1, SymbolicColor.Element_OrderIncorrect);
+						highlights.set(this.j, SymbolicColor.Element_OrderIncorrect);
+						break;
+					case HighlightStateInsertionSort.Inserted:
+						highlights.set(this.j, SymbolicColor.Element_Highlight_3);
+						break;
 				}
 			}
 		}
@@ -66,69 +79,47 @@ export class InsertionSort extends SortingAlgorithmArray {
 
 	protected override * stepForwardArray(): Generator<StepResultArray> {
 		let xIndexed: IndexedNumber;
-		let enteredOuterWhile = false;
 
-		this.i = 1;
-		yield this.makeCodeStepResult(1);
-
-		if (!(this.i < this.current.length))
-			yield this.makeCodeStepResult(2);
-
-		while (this.i < this.current.length) {
-			enteredOuterWhile = true;
-
-			yield this.makeCodeStepResult(2);
+		for (this.i = 1; this.i < this.current.length; this.i++) {
+			yield this.makeCodeStepResult(1);
 
 			xIndexed = this.current[this.i];
 			this.x = xIndexed.value;
-			yield this.makeCodeStepResult(3);
+			yield this.makeCodeStepResult(2);
 
 			this.j = this.i;
-			yield this.makeCodeStepResult(4);
-
-			if (!(this.j > 0 && this.current[this.j - 1].value > this.x))
-				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
-
-			let enteredInnerWhile = false;
+			yield this.makeCodeStepResult(3);
 
 			while (this.j > 0 && this.current[this.j - 1].value > this.x) {
-				enteredInnerWhile = true;
+				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightStateInsertionSort.Selected, 4);
 
-				yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
-
-				this.swapCurrent(this.j, this.j - 1);
-				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is incorrect, swap them`, HighlightState.OrderSwapped, 6);
+				this.current[this.j] = this.current[this.j - 1];
+				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is incorrect, shift lower element up`, HighlightStateInsertionSort.OrderSwapped, 5);
 
 				this.j--;
+				yield this.makeCodeStepResult(6);
 				yield this.makeCodeStepResult(7);
 			}
 
-			if (this.j > 0) {
-				if (enteredInnerWhile)
-					yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightState.Selected, 5);
+			yield this.makeFullStepResult(StepKind.Significant, `Compare index ${this.j - 1} and ${this.j}`, HighlightStateInsertionSort.Selected, 4);
 
-				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, HighlightState.OrderCorrect, 8);
+			if (this.j > 0) {
+				yield this.makeFullStepResult(StepKind.Algorithmic, `Compare index ${this.j - 1} and ${this.j}: Order is correct`, HighlightStateInsertionSort.OrderCorrect, 7);
 			}
 			else {
-				yield this.makeFullStepResult(StepKind.Algorithmic, `Reached the beginning of the list`, HighlightState.OrderCorrect, 5);
-				yield this.makeCodeStepResult(8);
+				yield this.makeFullStepResult(StepKind.Significant, `Reached the beginning of the list`, HighlightStateInsertionSort.Selected, 7);
 			}
 
 			this.current[this.j] = xIndexed;
-			yield this.makeCodeStepResult(9);
+			yield this.makeFullStepResult(StepKind.Algorithmic, `Insert x into index ${this.j}`, HighlightStateInsertionSort.Inserted, 8);
 
-			this.i++;
-			yield this.makeCodeStepResult(10);
+			yield this.makeCodeStepResult(9);
 		}
 
-		if (enteredOuterWhile)
-			yield this.makeCodeStepResult(2);
+		yield this.makeCodeStepResult(1);
+		yield this.makeCodeStepResult(9);
 
-		yield this.makeCodeStepResult(11);
-
-		yield this.makeCodeStepResult(12);
-
-		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted.", undefined, [this.getPseudocode().length - 1], true);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted.", undefined, this.getPseudocode().length - 1, true);
 	}
 
 	protected resetInternal(): void {
@@ -156,9 +147,8 @@ export class InsertionSort extends SortingAlgorithmArray {
 
 	public getPseudocode(): string[] {
 		return [
-			"function insertionSort(A: list)",
-			"\ti := 1",
-			"\twhile i < length(A)",
+			"function insertionSort(A: array)",
+			"\tfor i := 1 to length(A)-1 do",
 			"\t\tx := A[i]",
 			"\t\tj := i",
 			"\t\twhile j > 0 and A[j-1] > x",
@@ -166,8 +156,7 @@ export class InsertionSort extends SortingAlgorithmArray {
 			"\t\t\tj := j - 1",
 			"\t\tend while",
 			"\t\tA[j] := x",
-			"\t\ti := i + 1",
-			"\tend while",
+			"\tend for",
 			"end function"
 		];
 	}

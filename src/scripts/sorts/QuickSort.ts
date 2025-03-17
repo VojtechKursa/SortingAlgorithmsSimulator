@@ -188,8 +188,6 @@ export class QuickSort extends SortingAlgorithmArray {
 		if (this.l == undefined || this.r == undefined)
 			throw new Error("Invalid partition call");
 
-		const whileCheckText = "See if we're at the end of the assigned section";
-
 		yield this.makeCodeStepResult(13);
 
 		this.pivot = new Pivot(this.r, this.current[this.r].value);
@@ -198,61 +196,50 @@ export class QuickSort extends SortingAlgorithmArray {
 		this.i = this.l;
 		yield this.makeCodeStepResult(15, "Define i (position to swap elements lower than pivot to) as l");
 
-		this.j = this.l;
-		yield this.makeCodeStepResult(17);
+		for (this.j = this.l; this.j < this.r; this.j++) {
+			yield this.makeCodeStepResult(17, "Check if we're at the end of the assigned section");
 
-		let enteredWhile = false;
-
-		if (!(this.j < this.r))
-			yield this.makeCodeStepResult(18, whileCheckText);
-
-		while (this.j < this.r) {
-			enteredWhile = true;
-			yield this.makeCodeStepResult(18, whileCheckText);
-
-			yield this.makeFullStepResult(StepKind.Significant, "Check if the current element is lower or equal to pivot", false, HighlightState.Selected, 19);
+			const compareText = `Compare element on index ${this.j} with pivot`;
+			yield this.makeFullStepResult(StepKind.Significant, compareText, false, HighlightState.Selected, 18);
 
 			if (this.current[this.j].value <= this.pivot.value) {
 				this.swapCurrent(this.i, this.j);
 				yield this.makeFullStepResult(
 					StepKind.Algorithmic,
-					"Check if the current element is lower or equal to pivot: Element is lower or equal, swap it to the end of the lower section",
+					compareText + ": Element is lower or equal, swap it to the end of the lower section",
 					false,
 					HighlightState.OrderSwapped,
-					20
+					19
 				);
 
 				this.i++;
-				yield this.makeCodeStepResult(21, "Shift the end of the lower section");
+				yield this.makeCodeStepResult(20, "Shift the end of the lower section");
 
+				yield this.makeCodeStepResult(21);
 			}
 			else {
 				yield this.makeFullStepResult(
 					StepKind.Algorithmic,
-					"Check if the current element is lower or equal to pivot: Element is higher, don't swap.",
+					compareText + ": Element is higher, don't swap",
 					false,
 					HighlightState.OrderCorrect,
-					22
+					21
 				);
 			}
 
-			this.j++;
-			yield this.makeCodeStepResult(23, "Increment the index counter");
+			yield this.makeCodeStepResult(22);
 		}
 
-		if (enteredWhile)
-			yield this.makeCodeStepResult(18, whileCheckText);
+		yield this.makeCodeStepResult(18, "Check if we're at the end of the assigned section");
+		yield this.makeCodeStepResult(22, "Went through the entire assigned section");
 
-		yield this.makeCodeStepResult(24, "Went through the entire assigned section");
-
-		yield this.makeFullStepResult(StepKind.Significant, "Swap the pivot to the end of the lower section", true, HighlightState.Selected, 26);
 		this.swapCurrent(this.i, this.pivot.index);
-		yield this.makeFullStepResult(StepKind.Algorithmic, "Swap the pivot to the end of the lower section", true, HighlightState.OrderSwapped, 26);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Swap the pivot to the end of the lower section", true, HighlightState.OrderSwapped, 24);
 
 		result.p = this.i;
 		this.sorted.add(this.i);
 
-		yield this.makeCodeStepResult(27, "Return the new pivot point");
+		yield this.makeCodeStepResult(25, "Return the new pivot point");
 	}
 
 	protected getVariables(): Variable[] {
@@ -327,11 +314,11 @@ export class QuickSort extends SortingAlgorithmArray {
 
 	public getPseudocode(): string[] {
 		return [
-			"function quicksort(A: list)",
+			"function quicksort(A: array)",
 			"\tquicksortR(A, 0, len(A) - 1)",
 			"end function",
 			"",
-			"function quicksortR(A: list, l: int, r: int)",
+			"function quicksortR(A: array, l: int, r: int)",
 			"\tif l >= r || l < 0",
 			"\t\treturn",
 			"\tend if",
@@ -340,18 +327,16 @@ export class QuickSort extends SortingAlgorithmArray {
 			"\tquicksortR(A, p + 1, r)",
 			"end function",
 			"",
-			"function partition(A: list, l: int, r: int)",
+			"function partition(A: array, l: int, r: int)",
 			"\tpivot := A[r]",
 			"\ti := l",
 			"",
-			"\tj := l",
-			"\twhile j < r",
+			"\tfor j := l to r-1 do",
 			"\t\tif A[j] <= pivot",
 			"\t\t\tswap(A[i], A[j])",
 			"\t\t\ti := i + 1",
 			"\t\tend if",
-			"\t\tj := j + 1",
-			"\tend while",
+			"\tend for",
 			"",
 			"\tswap(A[i], A[r])",
 			"\treturn i",
