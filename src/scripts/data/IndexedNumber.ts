@@ -14,14 +14,23 @@ export class IndexedNumber {
 	}
 
 	/**
+	 * Whether this number is duplicated.
+	 */
+	public get duplicated(): boolean {
+		return this.original != null;
+	}
+
+	/**
 	 * @param id - The unique identifier of the number, usually it's index in the INPUT array.
 	 * @param value - The value of the number.
 	 * @param index - The order of the number among numbers of the same value in the INPUT array. Useful for showing algorithm's stability.
+	 * @param original - If this number is a duplicated number, the original number, otherwise null.
 	 */
 	public constructor(
 		public readonly id: number,
 		public readonly value: number,
-		index: number | null
+		index: number | null,
+		public readonly original: IndexedNumber | null = null
 	) {
 		this._index = index;
 	}
@@ -40,5 +49,15 @@ export class IndexedNumber {
 	// Simplifies comparisons ("IndexedNumber > IndexedNumber" instead of "IndexedNumber.value > IndexedNumber.value")
 	public valueOf(): number {
 		return this.value;
+	}
+
+	/**
+	 * Creates a duplicate of this {@link IndexedNumber}.
+	 * For use in algorithms that duplicate values, to prevent weird animations.
+	 *
+	 * @returns An {@link IndexedNumber} duplicated from this number.
+	 */
+	public duplicate(): IndexedNumber {
+		return new IndexedNumber(this.id, this.value, this.index, this);
 	}
 }
