@@ -11,6 +11,7 @@ import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../k
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
 import { StepAction, StepController } from "./StepController";
+import { VisualizationOptionsController } from "./VisualizationOptionsController";
 
 /**
  * The PlayerController class for managing the interaction between the user interface and the sorting algorithm.
@@ -71,7 +72,7 @@ export class PlayerController {
 		private readonly stepKindController: StepKindController,
 		private readonly htmlDisplayHandlers: readonly StepDisplayHandler[],
 		private readonly svgDisplayHandler: HtmlSvgDisplayHandler,
-		private readonly renderers: readonly SvgRenderer[],
+		private readonly visualizationOptionsController: VisualizationOptionsController,
 		public readonly colors: PageColors,
 		private readonly resetButton: HTMLButtonElement
 	) {
@@ -90,6 +91,19 @@ export class PlayerController {
 		this.continuousControls.addEventListenerTick((kind) => this.forward(kind));
 
 		this.currentColorMap = colors.currentColorMap;
+
+		this.svgDisplayHandler.animate = this.visualizationOptionsController.animationsEnabled;
+		const renderer = this.visualizationOptionsController.currentRenderer;
+		if (renderer != null) {
+			this.svgDisplayHandler.updateRenderer(renderer);
+		}
+
+		this.visualizationOptionsController.registerAnimationsChangedHandler(enabled => this.svgDisplayHandler.animate = enabled);
+		this.visualizationOptionsController.registerRendererChangedHandler(newRenderer => {
+			if (newRenderer != null) {
+				this.svgDisplayHandler.updateRenderer(newRenderer);
+			}
+		});
 	}
 
 	private stepHandler(stepKind: StepKind, stepAction: StepAction): void {

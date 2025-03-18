@@ -38,12 +38,12 @@ select {
 .control_module {
 	@include common.margin-vertical();
 
-	display: flex;
 	width: 100%;
 
-	> * {
-		min-width: max-content;
-	}
+	display: flex;
+	flex-wrap: wrap;
+
+	justify-content: space-between;
 }
 
 #top_controls {
@@ -60,7 +60,7 @@ select {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		
+
 		justify-content: center;
 		align-items: center;
 
@@ -113,9 +113,14 @@ select {
 	display: flex;
 	flex-direction: row;
 
+	padding-right: 1rem;
+	padding-bottom: 0.5rem;
+
 	.step_control-wrapper-vertical {
 		display: flex;
 		flex-direction: column;
+
+		justify-content: space-between;
 
 		@include common.pad-horizontal(0.75rem);
 
@@ -307,6 +312,59 @@ body.vertical2 {
 
 	border: $border;
 	text-align: center;
+
+	#visualization_options_wrapper {
+		flex-grow: 1;
+
+		display: flex;
+		flex-direction: row;
+
+		justify-content: flex-end;
+
+		&.wrapped {
+			justify-content: flex-start;
+		}
+
+		#visualization_options {
+			display: flex;
+			flex-direction: column;
+
+			> * {
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+
+				margin-top: 0.5rem;
+				margin-bottom: 0.5rem;
+
+				&:first-child {
+					margin-top: 0;
+				}
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				label {
+					text-align: left;
+					width: 6rem;
+				}
+			}
+
+			.select_wrapper {
+				select {
+					margin-top: 0;
+				}
+			}
+
+			.animations_checkbox_wrapper {
+				.form-check {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
 
 	#state_renderer {
 		flex-grow: 1;

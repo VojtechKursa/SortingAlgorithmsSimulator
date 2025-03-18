@@ -21,6 +21,7 @@ import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 import { StepController } from "../controllers/StepController";
+import { VisualizationOptionsController } from "../controllers/VisualizationOptionsController";
 
 
 
@@ -30,6 +31,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 	let playerController: PlayerController;
 	let callStackController: CallStackController;
+	let visualizationOptionsWrapper: HTMLDivElement;
 	{
 		let stepController: StepController;
 		{
@@ -76,10 +78,11 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackWrapper = document.getElementById("call_stack-hide_wrapper") as HTMLDivElement;
 		callStackController = new CallStackController(callStackWrapper);
 
-
 		let renderer = new SvgArrayBoxRenderer(colors.currentColorMap, false, false);
-
 		let renderers = [renderer];
+
+		visualizationOptionsWrapper = document.getElementById("visualization_options_wrapper") as HTMLDivElement;
+		let visualizationOptionsController = new VisualizationOptionsController(visualizationOptionsWrapper, renderers);
 
 		let svgDisplayVisitor = new HtmlSvgDisplayHandler(renderer, output);
 
@@ -98,7 +101,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			stepKindController,
 			displayHandlers,
 			svgDisplayVisitor,
-			renderers,
+			visualizationOptionsController,
 			colors,
 			reset
 		);
@@ -144,7 +147,8 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			callStackController,
 			settingsOpenButton,
 			darkModeHandler,
-			KeyboardSettings.load(true)
+			KeyboardSettings.load(true),
+			visualizationOptionsWrapper
 		);
 	}
 

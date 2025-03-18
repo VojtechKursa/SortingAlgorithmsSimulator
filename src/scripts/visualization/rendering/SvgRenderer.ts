@@ -69,6 +69,16 @@ export interface SvgRenderer {
 	set colorMap(value: ColorMap);
 
 	/**
+	 * Gets the string used to represent this renderer for machine processing purposes.
+	 */
+	get machineName(): string;
+
+	/**
+	 * Gets the string displayed to user to identify this renderer.
+	 */
+	get displayName(): string;
+
+	/**
 	 * Renders the state of an algorithm represented by the given step results.
 	 *
 	 * @param step - The step to render.

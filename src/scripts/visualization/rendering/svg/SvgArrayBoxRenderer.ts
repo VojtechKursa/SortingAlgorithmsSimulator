@@ -78,6 +78,14 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		this._colorMap = value;
 	}
 
+	public get displayName(): string {
+		return "Array";
+	}
+
+	public get machineName(): string {
+		return "renderer-array";
+	}
+
 
 
 	public constructor(
