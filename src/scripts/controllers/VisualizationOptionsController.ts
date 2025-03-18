@@ -1,9 +1,19 @@
 import { animationsCheckboxWrapperClass, selectWrapperClass as rendererSelectWrapperClass, visualizationOptionsWrapperId } from "../visualization/css/VisualizationOptionsClasses";
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
 
+/**
+ * An interface for handler that handles changes in animations enabled state.
+ */
 export interface AnimationsEnabledChangeHandler { (enabledNow: boolean): void }
+
+/**
+ * An interface for handler that handles changes of active renderer.
+ */
 export interface RendererChangedHandler { (newRenderer: SvgRenderer | null, previousRenderer: SvgRenderer | null): void }
 
+/**
+ * Controller for managing the visualization options.
+ */
 export class VisualizationOptionsController {
 	private readonly rendererSelector: HTMLSelectElement;
 	private readonly animationsCheckbox: HTMLInputElement;
@@ -14,6 +24,12 @@ export class VisualizationOptionsController {
 	private readonly animationsEventListeners: AnimationsEnabledChangeHandler[] = [];
 	private readonly rendererEventListeners: RendererChangedHandler[] = [];
 
+	/**
+	 * @param wrapper Wrapper into which to create the controller's UI elements.
+	 * @param renderers Array of renderers to be available in the simulator.
+	 * @param defaultRenderer The renderer that's selected by default. If not provided, the first renderer in the array is selected. Null to not select any renderer.
+	 * @param animationsEnabled Whether animations are enabled by default.
+	 */
 	public constructor(
 		wrapper: HTMLDivElement,
 		renderers: readonly SvgRenderer[],
@@ -115,6 +131,9 @@ export class VisualizationOptionsController {
 		this.rendererSelector.addEventListener("selectionchange", () => this.rendererSelectorChangedHandler());
 	}
 
+	/**
+	 * Gets the currently selected renderer, or null if no renderer is selected.
+	 */
 	public get currentRenderer(): SvgRenderer | null {
 		const selectedIndex = this.rendererSelector.selectedIndex;
 		if (selectedIndex < 0 || selectedIndex >= this.rendererSelector.options.length)
@@ -127,6 +146,9 @@ export class VisualizationOptionsController {
 		return selectedRenderer ?? null;
 	}
 
+	/**
+	 * Gets whether animations are currently enabled.
+	 */
 	public get animationsEnabled(): boolean {
 		return this.animationsCheckbox.checked;
 	}
