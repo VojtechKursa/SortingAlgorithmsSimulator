@@ -1,7 +1,5 @@
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
 import { StepResultCollection } from "../data/collections/StepResultCollection";
-import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
-import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { StepKind } from "../data/stepResults/StepKind";
 import { ContinuousControlController } from "./ContinuousControlController";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
@@ -12,7 +10,7 @@ import { StepKindController } from "./StepKindController";
 import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
-import { StepResult } from "../data/stepResults/StepResult";
+import { StepAction, StepController } from "./StepController";
 
 /**
  * The PlayerController class for managing the interaction between the user interface and the sorting algorithm.
@@ -67,8 +65,7 @@ export class PlayerController {
 	 */
 	public constructor(
 		private readonly algorithm: SortingAlgorithm,
-		private readonly playerControls: RendererControlElements,
-		private readonly debuggerControls: DebuggerControlElements,
+		private readonly stepController: StepController,
 		private readonly debuggerController: DebuggerController,
 		private readonly continuousControls: ContinuousControlController,
 		private readonly stepKindController: StepKindController,
@@ -84,23 +81,24 @@ export class PlayerController {
 
 		this.reset();
 
-		this.playerControls.backAlgorithmicStepButton.addEventListener("click", _ => this.backward(StepKind.Algorithmic));
-		this.playerControls.forwardAlgorithmicStepButton.addEventListener("click", _ => this.forward(StepKind.Algorithmic));
-		this.playerControls.backSignificantStepButton.addEventListener("click", _ => this.backward(StepKind.Significant));
-		this.playerControls.forwardSignificantStepButton.addEventListener("click", _ => this.forward(StepKind.Significant));
-		this.playerControls.beginningButton.addEventListener("click", _ => this.toBeginning());
-		this.playerControls.endButton.addEventListener("click", _ => this.toEnd());
+		this.stepController.registerHandler((stepKind, stepAction) => this.stepHandler(stepKind, stepAction));
 
-		this.debuggerControls.backCodeStepButton.addEventListener("click", _ => this.backward(StepKind.Code));
-		this.debuggerControls.forwardCodeStepButton.addEventListener("click", _ => this.forward(StepKind.Code));
-
-		this.resetButton.addEventListener("click", _ => this.reset());
+		this.resetButton.addEventListener("click", () => this.reset());
 
 		this.continuousControls.addEventListenerPlay((kind, intervalMs) => this.play(kind, intervalMs, true));
 		this.continuousControls.addEventListenerPause(() => this.pause(true));
 		this.continuousControls.addEventListenerTick((kind) => this.forward(kind));
 
 		this.currentColorMap = colors.currentColorMap;
+	}
+
+	private stepHandler(stepKind: StepKind, stepAction: StepAction): void {
+		switch (stepAction) {
+			case StepAction.Backward: this.backward(stepKind); break;
+			case StepAction.Forward: this.forward(stepKind); break;
+			case StepAction.ToBeginning: this.toBeginning(); break;
+			case StepAction.ToEnd: this.toEnd(); break;
+		}
 	}
 
 	/**
@@ -115,10 +113,10 @@ export class PlayerController {
 		}
 		this.svgDisplayHandler.display(currentState.step);
 
-		const finalStepIndexes = this.steps.finalStepIndexes;
-
-		this.playerControls.stepOutput.innerHTML = `${currentStepNumbers.algorithmic}<sub>${currentStepNumbers.significant} / ${finalStepIndexes == null ? "?" : finalStepIndexes.significant}</sub> / ${finalStepIndexes == null ? "?" : finalStepIndexes.algorithmic}`;
-		this.debuggerControls.stepOutput.value = `${currentStepNumbers.code} / ${finalStepIndexes == null ? "?" : finalStepIndexes.code}`;
+		this.stepController.currentStep = currentStepNumbers;
+		if (this.stepController.finalStep != this.steps.finalStepIndexes) {
+			this.stepController.finalStep = this.steps.finalStepIndexes;
+		}
 	}
 
 	/**
@@ -210,62 +208,34 @@ export class PlayerController {
 		let currentStep = this.steps.currentStepIndexes.code;
 
 		if (this.continuousControls.playing) {
-			this.disableAllDirectStepControls(true);
+			this.stepController.setDisabled(true);
 
 			if (currentStep == endStep)
 				this.pause();
 		}
 		else {
 			if (currentStep == endStep) {
-				this.playerControls.forwardAlgorithmicStepButton.disabled = true;
-				this.playerControls.forwardSignificantStepButton.disabled = true;
-				this.playerControls.endButton.disabled = true;
-
-				this.debuggerControls.forwardCodeStepButton.disabled = true;
+				this.stepController.setDisabled(true, StepAction.Forward);
+				this.stepController.setDisabled(true, StepAction.ToEnd);
 
 				this.continuousControls.playButton.disabled = true;
 			}
-			else if (this.playerControls.forwardAlgorithmicStepButton.disabled) {
-				this.playerControls.forwardAlgorithmicStepButton.disabled = false;
-				this.playerControls.forwardSignificantStepButton.disabled = false;
-				this.playerControls.endButton.disabled = false;
-
-				this.debuggerControls.forwardCodeStepButton.disabled = false;
+			else {
+				this.stepController.setDisabled(false, StepAction.Forward);
+				this.stepController.setDisabled(false, StepAction.ToEnd);
 
 				this.continuousControls.playButton.disabled = false;
 			}
 
 			if (currentStep <= 0) {
-				this.playerControls.backAlgorithmicStepButton.disabled = true;
-				this.playerControls.backSignificantStepButton.disabled = true;
-				this.playerControls.beginningButton.disabled = true;
-
-				this.debuggerControls.backCodeStepButton.disabled = true;
+				this.stepController.setDisabled(true, StepAction.Backward);
+				this.stepController.setDisabled(true, StepAction.ToBeginning);
 			}
-			else if (this.playerControls.backAlgorithmicStepButton.disabled) {
-				this.playerControls.backAlgorithmicStepButton.disabled = false;
-				this.playerControls.backSignificantStepButton.disabled = false;
-				this.playerControls.beginningButton.disabled = false;
-
-				this.debuggerControls.backCodeStepButton.disabled = false;
+			else {
+				this.stepController.setDisabled(false, StepAction.Backward);
+				this.stepController.setDisabled(false, StepAction.ToBeginning);
 			}
 		}
-	}
-
-	/**
-	 * Enables or disables all direct step control buttons.
-	 * @param disabled - Whether to disable the buttons.
-	 */
-	private disableAllDirectStepControls(disabled: boolean): void {
-		this.playerControls.forwardAlgorithmicStepButton.disabled = disabled;
-		this.playerControls.forwardSignificantStepButton.disabled = disabled;
-		this.playerControls.endButton.disabled = disabled;
-		this.debuggerControls.forwardCodeStepButton.disabled = disabled;
-
-		this.playerControls.backAlgorithmicStepButton.disabled = disabled;
-		this.playerControls.backSignificantStepButton.disabled = disabled;
-		this.playerControls.beginningButton.disabled = disabled;
-		this.debuggerControls.backCodeStepButton.disabled = disabled;
 	}
 
 	/**
@@ -297,7 +267,7 @@ export class PlayerController {
 			return;
 		}
 
-		this.disableAllDirectStepControls(false);
+		this.stepController.setDisabled(false);
 
 		// update step controls after enabling all of them
 		this.updateStepControls();

@@ -65,7 +65,7 @@ export class PresetInputMethod implements InputMethod {
 			select.add(option);
 		});
 
-		select.addEventListener("change", _ => this.switchToPreset(select.selectedIndex))
+		select.addEventListener("change", () => this.switchToPreset(select.selectedIndex))
 
 		let parametersDiv = document.createElement("div");
 		parametersDiv.id = "preset_parameters";

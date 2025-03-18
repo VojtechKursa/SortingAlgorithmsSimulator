@@ -1,8 +1,6 @@
 import { PlayerController } from "../controllers/PlayerController";
 import { SimulatorPageController } from "../controllers/SimulatorPageController";
 import { SortingAlgorithm } from "../sorts/SortingAlgorithm";
-import { RendererControlElements } from "../data/collections/htmlElementCollections/RendererControlElements";
-import { DebuggerControlElements } from "../data/collections/htmlElementCollections/DebuggerControlElements";
 import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
@@ -22,6 +20,7 @@ import { StepKindController } from "../controllers/StepKindController";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
+import { StepController } from "../controllers/StepController";
 
 
 
@@ -32,26 +31,12 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 	let playerController: PlayerController;
 	let callStackController: CallStackController;
 	{
-		let playerElementContainer: RendererControlElements;
+		let stepController: StepController;
 		{
-			let backAlgorithmic = document.getElementById("step-back-algorithmic") as HTMLButtonElement;
-			let backSignificant = document.getElementById("step-back-significant") as HTMLButtonElement;
-			let step = document.getElementById("step_id") as HTMLDivElement;
-			let nextSignificant = document.getElementById("step-next-significant") as HTMLButtonElement;
-			let nextAlgorithmic = document.getElementById("step-next-algorithmic") as HTMLButtonElement;
-			let beginning = document.getElementById("step-beginning") as HTMLButtonElement;
-			let end = document.getElementById("step-end") as HTMLButtonElement;
+			let rendererStepControllerWrapper = document.getElementById("stepping") as HTMLDivElement;
+			let debuggerStepControllerWrapper = document.getElementById("stepping_code") as HTMLDivElement;
 
-			playerElementContainer = new RendererControlElements(backAlgorithmic, nextAlgorithmic, backSignificant, nextSignificant, beginning, end, step);
-		}
-
-		let debuggerElementContainer: DebuggerControlElements;
-		{
-			let backCode = document.getElementById("step-back-code") as HTMLButtonElement;
-			let stepCode = document.getElementById("step_id-code") as HTMLOutputElement;
-			let nextCode = document.getElementById("step-next-code") as HTMLButtonElement;
-
-			debuggerElementContainer = new DebuggerControlElements(backCode, nextCode, stepCode);
+			stepController = new StepController(rendererStepControllerWrapper, debuggerStepControllerWrapper);
 		}
 
 		let stepKindController: StepKindController;
@@ -107,8 +92,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 
 		playerController = new PlayerController(
 			sortingAlgorithm,
-			playerElementContainer,
-			debuggerElementContainer,
+			stepController,
 			debuggerController,
 			continuousControl,
 			stepKindController,
@@ -120,7 +104,7 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		);
 	}
 
-	window.addEventListener("load", _ => {
+	window.addEventListener("load", () => {
 		// Ensure correct theme is selected
 		playerController.setDarkMode(document.body.getAttribute("data-bs-theme") === "dark");
 

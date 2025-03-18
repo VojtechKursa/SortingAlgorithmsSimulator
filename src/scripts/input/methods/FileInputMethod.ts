@@ -22,7 +22,7 @@ export class FileInputMethod implements InputMethod {
 		let inputElement = document.createElement("input");
 		inputElement.type = "file";
 		inputElement.id = "input_file";
-		inputElement.addEventListener("input", _ => {
+		inputElement.addEventListener("input", () => {
 			if (this.loadButton != undefined)
 				this.loadButton.disabled = !this.inputElement?.value;
 		});
