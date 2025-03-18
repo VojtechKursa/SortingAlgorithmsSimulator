@@ -61,6 +61,14 @@ export class SvgHeapRenderer implements SvgRenderer {
 		this._colorMap = value;
 	}
 
+	public get displayName(): string {
+		return "Heap";
+	}
+
+	public get machineName(): string {
+		return "renderer-heap";
+	}
+
 
 
 	public constructor(colorMap: ColorMap) {

@@ -1,6 +1,7 @@
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { KeyPress } from "../keyboard/KeyPress";
+import { flexWrappedClass } from "../visualization/css/GenericClasses";
 import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/css/LayoutClasses";
 import { CallStackController } from "./CallStackController";
 import { DarkModeHandler } from "./DarkModeHandler";
@@ -54,7 +55,8 @@ export class SimulatorPageController {
 		private readonly callStackController: CallStackController,
 		private readonly settingsOpenButton: HTMLButtonElement,
 		darkModeHandler: DarkModeHandler,
-		private readonly keyboardSettings: KeyboardSettings
+		private readonly keyboardSettings: KeyboardSettings,
+		private readonly visualizationOptionsWrapper: HTMLDivElement
 	) {
 		darkModeHandler.addEventHandler(dark => {
 			playerController.setDarkMode(dark);
@@ -93,6 +95,8 @@ export class SimulatorPageController {
 		});
 
 		this.resizeHandler();
+
+		new ResizeObserver(() => this.visualizationOptionsResizeHandler()).observe(visualizationOptionsWrapper);
 	}
 
 	/**
@@ -130,5 +134,17 @@ export class SimulatorPageController {
 		}
 
 		this.playerController.redraw();
+	}
+
+	private visualizationOptionsResizeHandler() {
+		const parent = this.visualizationOptionsWrapper.parentElement;
+		if (parent == null)
+			return;
+
+		if (this.visualizationOptionsWrapper.offsetTop > parent.offsetTop) {
+			this.visualizationOptionsWrapper.classList.add(flexWrappedClass);
+		} else {
+			this.visualizationOptionsWrapper.classList.remove(flexWrappedClass);
+		}
 	}
 }
