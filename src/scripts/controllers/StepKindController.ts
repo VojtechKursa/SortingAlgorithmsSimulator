@@ -39,7 +39,7 @@ export class StepKindController {
 	) {
 		let firstRadioButton: HTMLInputElement | null = null;
 
-		for (const kind of StepKindHelper.getStepKindsStrings()) {
+		for (const kind of StepKindHelper.getStepKindsStrings().reverse()) {
 			const radio = document.createElement("input");
 			radio.type = "radio";
 			radio.name = "continuous_control-step_kind";

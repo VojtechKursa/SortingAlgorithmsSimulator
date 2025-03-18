@@ -184,12 +184,12 @@ export class KeyboardSettings {
 		return new KeyboardSettings([
 			[new KeyBind("D"), InterfaceAction.Forward],
 			[new KeyBind("A"), InterfaceAction.Backward],
-			[new KeyBind("E"), InterfaceAction.Select_Next],
-			[new KeyBind("Q"), InterfaceAction.Select_Previous],
+			[new KeyBind("E"), InterfaceAction.Select_Previous],
+			[new KeyBind("Q"), InterfaceAction.Select_Next],
 			[new KeyBind(" "), InterfaceAction.PlayPause],
-			[new KeyBind("Digit1"), InterfaceAction.Select_Code],
+			[new KeyBind("Digit1"), InterfaceAction.Select_Algorithmic],
 			[new KeyBind("Digit2"), InterfaceAction.Select_Significant],
-			[new KeyBind("Digit3"), InterfaceAction.Select_Algorithmic],
+			[new KeyBind("Digit3"), InterfaceAction.Select_Code],
 		]);
 	}
 }

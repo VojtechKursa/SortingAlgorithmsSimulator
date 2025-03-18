@@ -68,6 +68,7 @@ export class StepKindHelper {
 
 	/**
 	 * Gets an array of descriptions of all step kinds.
+	 * The array is generated, so modifications to it won't affect the data in the {@link StepKindHelper}.
 	 * @returns An array of descriptions of all step kinds.
 	 * @see {@link StepKindDescription}
 	 */
