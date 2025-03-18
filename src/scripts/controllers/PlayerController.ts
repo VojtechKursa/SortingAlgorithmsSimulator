@@ -92,6 +92,12 @@ export class PlayerController {
 
 		this.currentColorMap = colors.currentColorMap;
 
+		this.svgDisplayHandler.animate = this.visualizationOptionsController.animationsEnabled;
+		const renderer = this.visualizationOptionsController.currentRenderer;
+		if (renderer != null) {
+			this.svgDisplayHandler.updateRenderer(renderer);
+		}
+
 		this.visualizationOptionsController.registerAnimationsChangedHandler(enabled => this.svgDisplayHandler.animate = enabled);
 		this.visualizationOptionsController.registerRendererChangedHandler(newRenderer => {
 			if (newRenderer != null) {
