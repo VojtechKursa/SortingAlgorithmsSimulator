@@ -29,8 +29,11 @@ div#card_container {
 
 					text-align: center;
 
+					display: flex;
+					justify-content: space-between;
+
 					.btn {
-						width: 100%;
+						width: 48%;
 					}
 				}
 			}
@@ -183,5 +186,11 @@ div#table_container {
 				}
 			}
 		}
+	}
+
+	[data-sort-family], [data-sort-algorithm] {
+		text-decoration: underline;
+
+		cursor: help;
 	}
 }

@@ -6,6 +6,8 @@ import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { CallStack } from "../data/CallStack";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
 import { StepKind } from "../data/stepResults/StepKind";
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { QuickSortProperties } from "../../sortsConfigs/sorts/QuickSortProperties";
 
 class PartitionResult {
 	public p?: number;
@@ -28,6 +30,10 @@ export class QuickSort extends SortingAlgorithmArray {
 	protected p?: number;
 
 	protected sorted = new Set<number>();
+
+	public get properties(): SortProperties {
+		return QuickSortProperties;
+	}
 
 	public constructor(input: number[]) {
 		super(input);

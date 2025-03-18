@@ -1,3 +1,5 @@
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { BubbleSortWithLockProperties } from "../../sortsConfigs/sorts/BubbleSortWithLockProperties";
 import { StepKind } from "../data/stepResults/StepKind";
 import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { Variable } from "../data/Variable";
@@ -8,6 +10,10 @@ import { HighlightState } from "./SortingAlgorithm";
 export class BubbleSortWithLock extends BubbleSort {
 	protected l?: number;
 	protected next_l?: number;
+
+	public override get properties(): SortProperties {
+		return BubbleSortWithLockProperties;
+	}
 
 	public constructor(input: number[]) {
 		super(input);

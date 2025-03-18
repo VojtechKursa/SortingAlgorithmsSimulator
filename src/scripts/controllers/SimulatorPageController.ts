@@ -1,8 +1,10 @@
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { KeyPress } from "../keyboard/KeyPress";
 import { flexWrappedClass } from "../visualization/css/GenericClasses";
 import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/css/LayoutClasses";
+import { AlgorithmDescriptionController } from "./AlgorithmDescriptionController";
 import { CallStackController } from "./CallStackController";
 import { DarkModeHandler } from "./DarkModeHandler";
 import { InputController } from "./InputController";
@@ -38,12 +40,19 @@ export class SimulatorPageController {
 	private playerKeysActive: boolean = true;
 
 	/**
+	 * The algorithm description controller of the simulator.
+	 */
+	private readonly algorithmDescriptionController: AlgorithmDescriptionController;
+
+	/**
 	 * @param playerController - The player controller for the simulator.
 	 * @param inputController - The input dialog controller for the simulator.
 	 * @param collapseWrappers - The wrappers for the collapsible elements in the simulator.
 	 * @param debuggerCollapseButton - The button element used to collapse the debugger.
 	 * @param callStackController - The call stack controller for the simulator.
 	 * @param settingsOpenButton - The button element used to open the settings dialog.
+	 * @param algorithmProperties - The properties of the sorting algorithm used in the current simulator.
+	 * @param algorithmDescriptionButton - The button element used to open the algorithm description dialog.
 	 * @param darkModeHandler - The dark mode handler for the simulator.
 	 * @param keyboardSettings - The current keyboard settings used to control the simulator.
 	 */
@@ -54,6 +63,8 @@ export class SimulatorPageController {
 		debuggerCollapseButton: HTMLButtonElement,
 		private readonly callStackController: CallStackController,
 		private readonly settingsOpenButton: HTMLButtonElement,
+		algorithmProperties: SortProperties,
+		algorithmDescriptionButton: HTMLButtonElement,
 		darkModeHandler: DarkModeHandler,
 		private readonly keyboardSettings: KeyboardSettings,
 		private readonly visualizationOptionsWrapper: HTMLDivElement
@@ -97,6 +108,11 @@ export class SimulatorPageController {
 		this.resizeHandler();
 
 		new ResizeObserver(() => this.visualizationOptionsResizeHandler()).observe(visualizationOptionsWrapper);
+
+		this.algorithmDescriptionController = new AlgorithmDescriptionController(algorithmProperties);
+		algorithmDescriptionButton.addEventListener("click", () => {
+			this.algorithmDescriptionController.open();
+		});
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
 import { IndexedNumber } from "../data/IndexedNumber";
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 import { StepResult } from "../data/stepResults/StepResult";
@@ -89,6 +90,11 @@ export abstract class SortingAlgorithm {
 		this._input = value;
 	}
 
+	/**
+	 * Gets the properties of this sorting algorithm.
+	 */
+	public abstract get properties(): SortProperties;
+    
 	/**
 	 * The minimum of the input array
 	*/
