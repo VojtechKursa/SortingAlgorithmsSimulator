@@ -44,7 +44,6 @@ export class IndexPageController {
 			trigger.addEventListener("click", ev => {
 				ev.preventDefault();
 				const familyName = trigger.getAttribute(IndexPageController.sortFamilyData);
-				console.log("Family name", familyName);
 				if (familyName != null) {
 					const properties = sortFamilies.find(family => family.nameMachine == familyName);
 					if (properties != undefined) {
@@ -54,7 +53,6 @@ export class IndexPageController {
 				}
 
 				const algorithmName = trigger.getAttribute(IndexPageController.sortAlgorithmData);
-				console.log("Algorithm name", algorithmName);
 				if (algorithmName != null) {
 					const allAlgorithms = sortFamilies.map(family => family.sorts).flat();
 					const properties = allAlgorithms.find(algorithm => algorithm.nameMachine == algorithmName);
