@@ -127,6 +127,10 @@ export class VisualizationOptionsController {
 		return selectedRenderer ?? null;
 	}
 
+	public get animationsEnabled(): boolean {
+		return this.animationsCheckbox.checked;
+	}
+
 	private rendererSelectorChangedHandler() {
 		const currentRenderer = this.currentRenderer;
 
