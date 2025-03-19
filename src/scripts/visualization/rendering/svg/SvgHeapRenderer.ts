@@ -128,27 +128,17 @@ export class SvgHeapRenderer implements SvgRenderer {
 		];
 
 		// Make connections
-		if (nodeArray.length > 0) {
-			const toProcess: number[] = [0];
-			let currentIndex: number | undefined;
+		for (let i = 0; i < nodeArray.length; i++) {
+			const current = nodeArray[i];
+			const left = nodeArray[2 * i + 1];
+			if (left == undefined)
+				break;
+			graphBuilder.push(`${current.id} -- ${left.id}`);
 
-			while ((currentIndex = toProcess.shift()) != undefined) {
-				const current = nodeArray[currentIndex];
-				const leftIndex = (2 * currentIndex) + 1;
-				const rightIndex = (2 * currentIndex) + 2;
-
-				if (leftIndex >= nodeArray.length)
-					continue;
-				const left = nodeArray[leftIndex];
-				graphBuilder.push(`${current.id} -- ${left.id}`);
-				toProcess.push(leftIndex);
-
-				if (rightIndex >= nodeArray.length)
-					continue;
-				const right = nodeArray[rightIndex];
-				graphBuilder.push(`${current.id} -- ${right.id}`);
-				toProcess.push(rightIndex);
-			}
+			const right = nodeArray[2 * i + 2];
+			if (right == undefined)
+				break;
+			graphBuilder.push(`${current.id} -- ${right.id}`);
 		}
 
 		// Finish graph definition
