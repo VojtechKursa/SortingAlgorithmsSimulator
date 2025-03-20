@@ -33,11 +33,11 @@ export class StepResultArray extends StepResult {
 	 */
 	public constructor(
 		stepKind: StepKind,
-		array: IndexedNumber[],
+		array: readonly IndexedNumber[],
 		arrayHighlights: ReadOnlyHighlights | null = null,
 		description: string = "",
 		highlightedCodeLines?: ReadOnlyHighlights | number | number[],
-		variables?: Variable[],
+		variables?: readonly Variable[],
 		final?: boolean,
 		stack?: CallStack | CallStackFrozen,
 	) {

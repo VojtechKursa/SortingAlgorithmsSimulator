@@ -6,17 +6,7 @@ import { VariableDrawInformation } from "../../../data/Variable";
 import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
 import { StepResult } from "../../../data/stepResults/StepResult";
-
-class Point2D {
-	public constructor(
-		public readonly x: number,
-		public readonly y: number
-	) { }
-
-	public toString(): string {
-		return `${this.x},${this.y}`;
-	}
-}
+import { Point2D } from "../../../data/graphical/Point2D";
 
 class FontProperties {
 	public constructor(

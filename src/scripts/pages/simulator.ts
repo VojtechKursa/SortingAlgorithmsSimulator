@@ -5,7 +5,6 @@ import { InputPreset } from "../input/presets/InputPreset";
 import { InputController } from "../controllers/InputController";
 import { StepDescriptionController } from "../controllers/StepDescriptionController";
 import { ContinuousControlController } from "../controllers/ContinuousControlController";
-import { SvgArrayBoxRenderer } from "../visualization/rendering/svg/SvgArrayBoxRenderer";
 import { PageColors } from "../visualization/colors/PageColors";
 import { CallStackController } from "../controllers/CallStackController";
 import { DebuggerController } from "../controllers/DebuggerController";
@@ -22,10 +21,29 @@ import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDi
 import { StepDisplayHandler } from "../visualization/rendering/StepDisplayHandler";
 import { StepController } from "../controllers/StepController";
 import { VisualizationOptionsController } from "../controllers/VisualizationOptionsController";
+import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
+import { ColorMap } from "../visualization/colors/ColorMap";
+import { SvgArrayBoxRenderer } from "../visualization/rendering/svg/SvgArrayBoxRenderer";
 
 
 
-export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?: InputPreset[]): SimulatorPageController {
+export function getCurrentColorMap(): ColorMap {
+	initCommon();
+
+	let colors = PageColors.load();
+	if (colors == null) {
+		colors = PageColors.getDefault();
+	}
+
+	return colors.currentColorMap;
+}
+
+export function initSimulator(
+	sortingAlgorithm: SortingAlgorithm,
+	defaultRenderer: SvgRenderer | undefined = undefined,
+	availableRenderers: SvgRenderer[] | undefined = undefined,
+	extraPresets: InputPreset[] | undefined = undefined,
+): SimulatorPageController {
 	const initCommonResult = initCommon();
 	const darkModeHandler = initCommonResult.darkModeHandler;
 
@@ -70,6 +88,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 			document.body.setAttribute("data-bs-theme", "dark");
 		}
 
+		if (defaultRenderer == undefined) {
+			defaultRenderer = new SvgArrayBoxRenderer(colors.currentColorMap);
+		}
+
 		let stepDescriptionElement = document.getElementById("step_description") as HTMLDivElement;
 		let stepDescriptionController = new StepDescriptionController(stepDescriptionElement);
 
@@ -78,13 +100,10 @@ export function initSimulator(sortingAlgorithm: SortingAlgorithm, extraPresets?:
 		let callStackWrapper = document.getElementById("call_stack-hide_wrapper") as HTMLDivElement;
 		callStackController = new CallStackController(callStackWrapper);
 
-		let renderer = new SvgArrayBoxRenderer(colors.currentColorMap, false, false);
-		let renderers = [renderer];
-
 		visualizationOptionsWrapper = document.getElementById("visualization_options_wrapper") as HTMLDivElement;
-		let visualizationOptionsController = new VisualizationOptionsController(visualizationOptionsWrapper, renderers);
+		let visualizationOptionsController = new VisualizationOptionsController(visualizationOptionsWrapper, availableRenderers ?? [defaultRenderer], defaultRenderer);
 
-		let svgDisplayVisitor = new HtmlSvgDisplayHandler(renderer, output);
+		let svgDisplayVisitor = new HtmlSvgDisplayHandler(defaultRenderer, output);
 
 		let displayHandlers: StepDisplayHandler[] = [
 			new HtmlDescriptionDisplayHandler(stepDescriptionController),

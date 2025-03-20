@@ -7,6 +7,8 @@ import { ColorMap } from "../../colors/ColorMap";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { DotLangInterface } from "./DotLangInterface";
+import { StepResultArrayHeapSort } from "../../../data/stepResults/StepResultArrayHeapSort";
+import { ReadOnlyHighlights } from "../../Highlights";
 
 class DotLangNode {
 	public constructor(
@@ -85,12 +87,20 @@ export class SvgHeapRenderer implements SvgRenderer {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
-		if (this.lastRenderedStep != undefined) {
-			if (step.array != this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
-				await this.drawHeap(step);
+		if (
+			this.lastRenderedStep == undefined ||
+			(
+				step.array != this.lastRenderedStep.array ||
+				step.arrayHighlights != this.lastRenderedStep.arrayHighlights
+			)
+		) {
+			if (step instanceof StepResultArrayHeapSort) {
+				if (step.drawHeap && step.endOfHeap > 0) {
+					await this.drawHeap(step.array.slice(0, step.endOfHeap), step.arrayHighlights);
+				}
+			} else {
+				await this.drawHeap(step.array, step.arrayHighlights);
 			}
-		} else {
-			await this.drawHeap(step);
 		}
 
 		this.lastRenderedStep = step;
@@ -104,17 +114,21 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 
 
-	private async drawHeap(step: StepResultArray): Promise<void> {
+	private async drawHeap(array: readonly IndexedNumber[], highlights: ReadOnlyHighlights | null): Promise<void> {
 		const getHexColor = (color: SymbolicColor) => this.colorMap.get(color).toString({ format: "hex" });
 
 		// Build array of Nodes from array
-		const nodeArray = step.array.map(number => new DotLangNode(number));
+		const nodeArray = array.map(number => new DotLangNode(number));
 
 		// Add highlights to Nodes as defined in arrayHighlights
-		if (step.arrayHighlights != null) {
-			for (const highlight of step.arrayHighlights) {
+		if (highlights != null) {
+			for (const highlight of highlights) {
+				const node = nodeArray[highlight[0]];
+				if (node == undefined)
+					continue;
+
 				const color = this.colorMap.get(highlight[1]);
-				nodeArray[highlight[0]].backgroundColor = color;
+				node.backgroundColor = color;
 			}
 		}
 

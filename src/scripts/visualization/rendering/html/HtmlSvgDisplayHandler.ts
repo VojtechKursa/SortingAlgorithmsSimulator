@@ -320,16 +320,16 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 	 * @see {@link SvgRenderResult.alignment}
 	*/
 	private adjustMargins(svgResult: SvgRenderResult): void {
-		if (svgResult.alignment == undefined)
+		if (this.svgOutput.parentElement == undefined)
 			return;
 
-		if (document.body.classList.contains(bodyVertical1LayoutClass)) {
+		if (svgResult.alignment == null || document.body.classList.contains(bodyVertical1LayoutClass)) {
 			this.svgOutput.style.marginTop = "";
+			this.svgOutput.parentElement.style.alignContent = "center";
 			return;
 		}
 
-		if (this.svgOutput.parentElement == undefined)
-			return;
+		this.svgOutput.parentElement.style.alignContent = "";
 
 		let currentParentHeight = this.svgOutput.parentElement.clientHeight;
 		if (currentParentHeight == undefined)
