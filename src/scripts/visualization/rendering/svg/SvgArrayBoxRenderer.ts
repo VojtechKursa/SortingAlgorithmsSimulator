@@ -7,13 +7,8 @@ import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../S
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { Point2D } from "../../../data/graphical/Point2D";
-
-class FontProperties {
-	public constructor(
-		public readonly fontSize: number,
-		public readonly strokeWidth: number
-	) { }
-}
+import { FontProperties } from "./utils/FontProperties";
+import { getOneVariableVerticalSpace, VariableRenderSettings } from "./utils/VariableRendering";
 
 class ArrayRenderSettings {
 	public constructor(
@@ -28,29 +23,11 @@ class ArrayRenderSettings {
 	) { }
 }
 
-class VariableRenderSettings {
-	public constructor(
-		public readonly chevronWidth: number,
-		public readonly chevronHeight: number = chevronWidth / 2,
-		public readonly chevronMargin: number = chevronHeight / 2,
-		public readonly chevronStrokeWidth: number = 0.5,
-		public readonly textFont: FontProperties = new FontProperties(2.5, 0.1),
-		public readonly textMarginBottom: number = 1,
-		public readonly textMarginTop: number = 0
-	) { }
-}
-
 export class SvgArrayBoxRenderer implements SvgRenderer {
 	public readonly arraySettings = new ArrayRenderSettings();
 	public readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 
-	public readonly oneVariableVerticalSpace = (
-		this.variableSettings.chevronMargin +
-		this.variableSettings.chevronHeight +
-		this.variableSettings.textMarginBottom +
-		this.variableSettings.textFont.fontSize +
-		this.variableSettings.textMarginTop
-	);
+	public readonly oneVariableVerticalSpace = getOneVariableVerticalSpace(this.variableSettings);
 
 	private _currentArrayLength: number | undefined;
 	public get currentArrayLength(): number | undefined {
