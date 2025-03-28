@@ -1,4 +1,3 @@
-import { StepResultArray } from "../data/stepResults/StepResultArray";
 import { HighlightState } from "./SortingAlgorithm";
 import { Variable } from "../data/Variable";
 import { Highlights } from "../visualization/Highlights";
@@ -7,6 +6,8 @@ import { StepKind } from "../data/stepResults/StepKind";
 import { CallStack } from "../data/CallStack";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { StepResultArrayHeapSort } from "../data/stepResults/StepResultArrayHeapSort";
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { HeapSortProperties } from "../../sortsConfigs/sorts/HeapSortProperties";
 
 export enum HeapSortContext {
 	CompareChildren,
@@ -27,6 +28,10 @@ export class HeapSort extends SortingAlgorithmArray {
 	protected drawArray: boolean = true;
 	protected drawHeap: boolean = true;
 	protected lastIsOrdered: boolean = false;
+
+	public override get properties(): SortProperties {
+		return HeapSortProperties;
+	}
 
 	public constructor(input: number[]) {
 		super(input);
