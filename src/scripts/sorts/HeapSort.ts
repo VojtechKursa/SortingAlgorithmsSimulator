@@ -162,7 +162,7 @@ export class HeapSort extends SortingAlgorithmArray {
 			this.returnFromFunction();
 			yield this.makeFullStepResult(StepKind.Significant, "New root has been moved to the correct position", 5);
 
-			yield this.makeCodeStepResult(6, `Element on index ${this.last} is now in it's sorted position`);
+			yield this.makeCodeStepResult(6, `Element on index ${this.last} is now in its sorted position`);
 		}
 
 		yield this.makeCodeStepResult(3, "Check if the algorithm is finished");
@@ -230,8 +230,7 @@ export class HeapSort extends SortingAlgorithmArray {
 				yield this.makeFullStepResult(StepKind.Significant, "Left child node is bigger", 22, HeapSortContext.CompareChildren, HighlightState.OrderCorrect);
 			}
 
-			yield this.makeFullStepResult(StepKind.Significant, "Compare the selected child node with it's parent", 23, HeapSortContext.CompareChildAndParent, HighlightState.Selected);
-
+			yield this.makeFullStepResult(StepKind.Significant, "Compare the selected child node with its parent", 23, HeapSortContext.CompareChildAndParent, HighlightState.Selected);
 			if (this.current[this.root] < this.current[this.child]) {
 				this.swapCurrent(this.root, this.child);
 				this.root = this.child;
