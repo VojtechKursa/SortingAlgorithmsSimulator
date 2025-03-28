@@ -76,9 +76,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 	public constructor(colorMap: ColorMap) {
 		this._colorMap = colorMap;
 
-		this.resultMemory = new SvgRenderResult(
-			document.createElementNS("http://www.w3.org/2000/svg", "svg")
-		);
+		this.resultMemory = this.getFreshResultMemory();
 	}
 
 
@@ -87,9 +85,18 @@ export class SvgHeapRenderer implements SvgRenderer {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
+		let previousParametersDiffer: boolean = false;
+		if (step instanceof StepResultArrayHeapSort && this.lastRenderedStep instanceof StepResultArrayHeapSort) {
+			previousParametersDiffer = (
+				step.drawHeap != this.lastRenderedStep.drawHeap ||
+				step.endOfHeap != this.lastRenderedStep.endOfHeap
+			);
+		}
+
 		if (
 			this.lastRenderedStep == undefined ||
 			(
+				previousParametersDiffer ||
 				step.array != this.lastRenderedStep.array ||
 				step.arrayHighlights != this.lastRenderedStep.arrayHighlights
 			)
@@ -97,6 +104,8 @@ export class SvgHeapRenderer implements SvgRenderer {
 			if (step instanceof StepResultArrayHeapSort) {
 				if (step.drawHeap && step.endOfHeap > 0) {
 					await this.drawHeap(step.array.slice(0, step.endOfHeap), step.arrayHighlights);
+				} else {
+					this.resultMemory = this.getFreshResultMemory();
 				}
 			} else {
 				await this.drawHeap(step.array, step.arrayHighlights);
@@ -113,6 +122,12 @@ export class SvgHeapRenderer implements SvgRenderer {
 	}
 
 
+
+	private getFreshResultMemory(): SvgRenderResult {
+		return new SvgRenderResult(
+			document.createElementNS("http://www.w3.org/2000/svg", "svg")
+		);
+	}
 
 	private async drawHeap(array: readonly IndexedNumber[], highlights: ReadOnlyHighlights | null): Promise<void> {
 		const getHexColor = (color: SymbolicColor) => this.colorMap.get(color).toString({ format: "hex" });
