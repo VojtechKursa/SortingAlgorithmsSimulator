@@ -7,17 +7,11 @@ import { ColorMap } from "../../colors/ColorMap";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { SvgArrayBoxRenderer } from "./SvgArrayBoxRenderer";
 import { SvgHeapRenderer } from "./SvgHeapRenderer";
-import { Point2D } from "../../../data/graphical/Point2D";
-
-class AttributeAndShift {
-	public constructor(
-		public readonly attributeName: string,
-		public readonly shift: number,
-	) { }
-}
 
 export class SvgHeapAndArrayRenderer implements SvgRenderer {
-	private readonly spaceBetweenHeapAndArray: number = 20;
+	private readonly spaceBetweenHeapAndArray: number = 2;
+	private readonly heapRelativeScale: number = 0.75;
+	private readonly heapMaxVerticalSizeInArrayMultiples: number = 5;
 
 	private arrayRenderer: SvgArrayBoxRenderer;
 	private heapRenderer: SvgHeapRenderer;
@@ -40,14 +34,12 @@ export class SvgHeapAndArrayRenderer implements SvgRenderer {
 	}
 
 	public constructor(
-		colorMap: ColorMap,
-		drawFinalVariables: boolean = false,
-		drawLastStackLevelVariables: boolean = false
+		arrayRenderer: SvgArrayBoxRenderer
 	) {
-		this._colorMap = colorMap;
+		this._colorMap = arrayRenderer.colorMap;
 
-		this.arrayRenderer = new SvgArrayBoxRenderer(colorMap, drawFinalVariables, drawLastStackLevelVariables);
-		this.heapRenderer = new SvgHeapRenderer(colorMap);
+		this.arrayRenderer = arrayRenderer;
+		this.heapRenderer = new SvgHeapRenderer(this.colorMap);
 	}
 
 	public async render(step: StepResult): Promise<SvgRenderResult> {
@@ -83,27 +75,22 @@ export class SvgHeapAndArrayRenderer implements SvgRenderer {
 			const arrayViewBox = array.svg.viewBox.baseVal;
 			const resultViewBox = new SvgViewBox();
 
-			resultViewBox.width = Math.max(arrayViewBox.width, heapViewBox.width);
-			resultViewBox.height = heapViewBox.height + this.spaceBetweenHeapAndArray + arrayViewBox.height;
+			const arrayElementsWidth = this.arrayRenderer.arraySettings.boxSize * (this.arrayRenderer.currentArrayLength ?? 0);
+			const arrayWidthPercentageTakenByElements = arrayElementsWidth / arrayViewBox.width;
+			const heapWidthLimit = arrayViewBox.width * arrayWidthPercentageTakenByElements * this.heapRelativeScale;
+			const heapHeightLimit = this.arrayRenderer.arraySettings.boxSize * this.heapMaxVerticalSizeInArrayMultiples;
+			const heapScale = Math.min(heapWidthLimit / heapViewBox.width, heapHeightLimit / heapViewBox.height);
 
-			const newHeapOrigin = new Point2D(
-				(resultViewBox.width - heapViewBox.width) / 2,
-				0
-			);
-			const heapShifts = newHeapOrigin.x != 0 && newHeapOrigin.y != 0;
+			const arrayStartY = (heapViewBox.height * heapScale) + this.spaceBetweenHeapAndArray + (-arrayViewBox.y);
 
-			const newArrayOrigin = new Point2D(
-				(resultViewBox.width - arrayViewBox.width) / 2,
-				heapViewBox.height + this.spaceBetweenHeapAndArray
-			);
+			resultViewBox.startX = arrayViewBox.x;
+			resultViewBox.startY = 0;
+			resultViewBox.width = arrayViewBox.width;
+			resultViewBox.height = arrayStartY + arrayViewBox.height - (-arrayViewBox.y);
 
 			for (const element of heap.svg.querySelectorAll("*")) {
 				if (element.id != "") {
 					element.id = `heap-${element.id}`;
-				}
-
-				if (heapShifts) {
-					this.updatePosition(element, newHeapOrigin);
 				}
 			}
 
@@ -111,22 +98,28 @@ export class SvgHeapAndArrayRenderer implements SvgRenderer {
 				if (element.id != "") {
 					element.id = `array-${element.id}`;
 				}
-
-				this.updatePosition(element, newArrayOrigin);
 			}
 
+			const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+			svg.setAttribute("viewBox", resultViewBox.toString());
+
 			const heapGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			svg.appendChild(heapGroup);
 			heapGroup.id = "heap";
 			heapGroup.append(...heap.svg.children);
 
+			const heapScaleTransform = svg.createSVGTransform();
+			heapScaleTransform.setScale(heapScale, heapScale);
+			heapGroup.transform.baseVal.appendItem(heapScaleTransform);
+
 			const arrayGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			svg.appendChild(arrayGroup);
 			arrayGroup.id = "array";
 			arrayGroup.append(...array.svg.children);
 
-			const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-			svg.appendChild(heapGroup);
-			svg.appendChild(arrayGroup);
-			svg.setAttribute("viewBox", resultViewBox.toString());
+			const arrayTranslateTransform = svg.createSVGTransform();
+			arrayTranslateTransform.setTranslate(0, arrayStartY);
+			arrayGroup.transform.baseVal.appendItem(arrayTranslateTransform);
 
 			return new SvgRenderResult(svg, null);
 		}
@@ -143,44 +136,5 @@ export class SvgHeapAndArrayRenderer implements SvgRenderer {
 
 	public redraw(): Promise<SvgRenderResult | null> {
 		return Promise.resolve(null);
-	}
-
-	private updatePosition(element: Element, newOrigin: Point2D) {
-		const config = [
-			new AttributeAndShift("x", newOrigin.x),
-			new AttributeAndShift("y", newOrigin.y),
-			new AttributeAndShift("cx", newOrigin.x),
-			new AttributeAndShift("cy", newOrigin.y),
-		];
-
-		for (const attribute of config) {
-			const currentValue = element.getAttribute(attribute.attributeName);
-			if (currentValue != null) {
-				const newValue = Number.parseFloat(currentValue) + attribute.shift;
-				element.setAttribute(attribute.attributeName, newValue.toString());
-			}
-		}
-
-		const pointsAttribute = element.getAttribute("points");
-		if (pointsAttribute != null) {
-			const pointsStrings = pointsAttribute.split(" ");
-			const points: Point2D[] = [];
-			let parseSuccessful = true;
-
-			for (const pointStr of pointsStrings) {
-				const point = Point2D.fromString(pointStr);
-				if (point == null) {
-					parseSuccessful = false;
-					break;
-				}
-				points.push(point);
-			}
-
-			if (parseSuccessful) {
-				const newPoints = points.map(point => new Point2D(point.x + newOrigin.x, point.y + newOrigin.y).toString());
-
-				element.setAttribute("points", newPoints.join(" "));
-			}
-		}
 	}
 }

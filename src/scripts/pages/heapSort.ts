@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const colors = getCurrentColorMap();
 
 	const arrayRenderer = new SvgArrayBoxRenderer(colors);
-	const heapAndArrayRenderer = new SvgHeapAndArrayRenderer(colors);
+	const heapAndArrayRenderer = new SvgHeapAndArrayRenderer(new SvgArrayBoxRenderer(colors, undefined, undefined, 1));
 
 	initSimulator(new HeapSort([]), heapAndArrayRenderer, [arrayRenderer, heapAndArrayRenderer]);
 });

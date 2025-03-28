@@ -266,9 +266,9 @@ export class HeapSort extends SortingAlgorithmArray {
 		if (this.last != undefined)
 			variables.push(new Variable("last", this.last, SymbolicColor.Variable_3));
 		if (this.root != undefined)
-			variables.push(new Variable("root", this.root, SymbolicColor.Variable_1));
+			variables.push(new Variable("root", this.root, SymbolicColor.Variable_2));
 		if (this.child != undefined)
-			variables.push(new Variable("child", this.child, SymbolicColor.Variable_2));
+			variables.push(new Variable("child", this.child, SymbolicColor.Variable_1));
 
 		return variables;
 	}

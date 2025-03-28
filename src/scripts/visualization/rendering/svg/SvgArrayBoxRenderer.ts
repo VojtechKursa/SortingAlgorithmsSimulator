@@ -41,10 +41,10 @@ class VariableRenderSettings {
 }
 
 export class SvgArrayBoxRenderer implements SvgRenderer {
-	private readonly arraySettings = new ArrayRenderSettings();
-	private readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
+	public readonly arraySettings = new ArrayRenderSettings();
+	public readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
 
-	private readonly oneVariableSpace = (
+	public readonly oneVariableVerticalSpace = (
 		this.variableSettings.chevronMargin +
 		this.variableSettings.chevronHeight +
 		this.variableSettings.textMarginBottom +
@@ -52,7 +52,13 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		this.variableSettings.textMarginTop
 	);
 
-	private currentArrayLength: number | undefined;
+	private _currentArrayLength: number | undefined;
+	public get currentArrayLength(): number | undefined {
+		return this._currentArrayLength;
+	}
+	protected set currentArrayLength(value: number) {
+		this._currentArrayLength = value;
+	}
 
 	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
 	private minY = this.defaultMinY;
@@ -76,12 +82,17 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		return "renderer-array";
 	}
 
+	public get minimumViewBoxTopMargin(): number {
+		return this.reservedVariablesSpace * this.oneVariableVerticalSpace;
+	}
+
 
 
 	public constructor(
 		colorMap: ColorMap,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
+		public reservedVariablesSpace: number = 0,
 	) {
 		this._colorMap = colorMap;
 
@@ -199,6 +210,9 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
+		if (step.final && !this.drawFinalVariables)
+			return;
+
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
 
@@ -249,7 +263,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		const variableIndex = variablesAboveElements[variable.drawAtIndex] ?? 0;
 
-		const chevronTop = -(variableIndex * this.oneVariableSpace) - this.variableSettings.chevronMargin - this.variableSettings.chevronHeight;
+		const chevronTop = -(variableIndex * this.oneVariableVerticalSpace) - this.variableSettings.chevronMargin - this.variableSettings.chevronHeight;
 		const chevronCenterX = (variable.drawAtIndex + 0.5) * this.arraySettings.boxSize;
 		const chevronX1 = chevronCenterX - (this.variableSettings.chevronWidth / 2);
 		const chevronX2 = chevronCenterX + (this.variableSettings.chevronWidth / 2);
@@ -304,7 +318,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		const startX = -this.arraySettings.horizontalMargin;
 		const endX = (this.currentArrayLength * this.arraySettings.boxSize) + this.arraySettings.horizontalMargin;
 
-		const startY = this.minY;
+		const startY = Math.min(this.minY, -this.minimumViewBoxTopMargin);
 		const endY = this.arraySettings.boxSize + (this.arraySettings.borderWidth / 2);
 
 		const width = endX - startX;
