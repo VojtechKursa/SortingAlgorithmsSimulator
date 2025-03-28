@@ -7,6 +7,8 @@ import { ColorMap } from "../../colors/ColorMap";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { DotLangInterface } from "./DotLangInterface";
+import { StepResultArrayHeapSort } from "../../../data/stepResults/StepResultArrayHeapSort";
+import { ReadOnlyHighlights } from "../../Highlights";
 
 class DotLangNode {
 	public constructor(
@@ -80,9 +82,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 	public constructor(colorMap: ColorMap) {
 		this._colorMap = colorMap;
 
-		this.resultMemory = new SvgRenderResult(
-			document.createElementNS("http://www.w3.org/2000/svg", "svg")
-		);
+		this.resultMemory = this.getFreshResultMemory();
 	}
 
 
@@ -91,17 +91,36 @@ export class SvgHeapRenderer implements SvgRenderer {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
-		if (this.lastRenderedStep != undefined) {
-			if (step.array != this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
-				await this.drawHeap(step);
+		let previousParametersDiffer: boolean = false;
+		if (step instanceof StepResultArrayHeapSort && this.lastRenderedStep instanceof StepResultArrayHeapSort) {
+			previousParametersDiffer = (
+				step.drawHeap != this.lastRenderedStep.drawHeap ||
+				step.endOfHeap != this.lastRenderedStep.endOfHeap
+			);
+		}
+
+		if (
+			this.lastRenderedStep == undefined ||
+			(
+				previousParametersDiffer ||
+				step.array != this.lastRenderedStep.array ||
+				step.arrayHighlights != this.lastRenderedStep.arrayHighlights
+			)
+		) {
+			if (step instanceof StepResultArrayHeapSort) {
+				if (step.drawHeap && step.endOfHeap > 0) {
+					await this.drawHeap(step.array.slice(0, step.endOfHeap), step.arrayHighlights);
+				} else {
+					this.resultMemory = this.getFreshResultMemory();
+				}
+			} else {
+				await this.drawHeap(step.array, step.arrayHighlights);
 			}
-		} else {
-			await this.drawHeap(step);
 		}
 
 		this.lastRenderedStep = step;
 
-		return this.resultMemory;
+		return this.resultMemory.clone();
 	}
 
 	public redraw(): Promise<SvgRenderResult | null> {
@@ -110,17 +129,27 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 
 
-	private async drawHeap(step: StepResultArray): Promise<void> {
+	private getFreshResultMemory(): SvgRenderResult {
+		return new SvgRenderResult(
+			document.createElementNS("http://www.w3.org/2000/svg", "svg")
+		);
+	}
+
+	private async drawHeap(array: readonly IndexedNumber[], highlights: ReadOnlyHighlights | null): Promise<void> {
 		const getHexColor = (color: SymbolicColor) => this.colorMap.get(color).toString({ format: "hex" });
 
 		// Build array of Nodes from array
-		const nodeArray = step.array.map(number => new DotLangNode(number));
+		const nodeArray = array.map(number => new DotLangNode(number));
 
 		// Add highlights to Nodes as defined in arrayHighlights
-		if (step.arrayHighlights != null) {
-			for (const highlight of step.arrayHighlights) {
+		if (highlights != null) {
+			for (const highlight of highlights) {
+				const node = nodeArray[highlight[0]];
+				if (node == undefined)
+					continue;
+
 				const color = this.colorMap.get(highlight[1]);
-				nodeArray[highlight[0]].backgroundColor = color;
+				node.backgroundColor = color;
 			}
 		}
 

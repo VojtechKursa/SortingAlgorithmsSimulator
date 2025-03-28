@@ -6,6 +6,7 @@ import { BubbleSortWithLockProperties } from "./sorts/BubbleSortWithLockProperti
 import { SelectSortProperties } from "./sorts/SelectSortProperties";
 import { InsertSortProperties } from "./sorts/InsertSortProperties";
 import { QuickSortProperties } from "./sorts/QuickSortProperties";
+import { HeapSortProperties } from "./sorts/HeapSortProperties";
 
 const sortFamilies: SortFamilyProperties[] = [
 	{
@@ -81,6 +82,23 @@ const sortFamilies: SortFamilyProperties[] = [
 		inPlace: null,
 		sorts: [
 			QuickSortProperties
+		]
+	},
+	{
+		name: "Heap sort",
+		nameMachine: "heapSort",
+		shortDescription: HeapSortProperties.shortDescription,
+		longDescription: HeapSortProperties.longDescription,
+		timeComplexity: {
+			best: Complexity.Linearithmic,
+			average: Complexity.Linearithmic,
+			worst: Complexity.Linearithmic
+		},
+		spaceComplexity: Complexity.Constant,
+		stable: false,
+		inPlace: true,
+		sorts: [
+			HeapSortProperties
 		]
 	}
 ];

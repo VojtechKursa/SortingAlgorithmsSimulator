@@ -128,7 +128,7 @@ export class VisualizationOptionsController {
 			}
 		});
 
-		this.rendererSelector.addEventListener("selectionchange", () => this.rendererSelectorChangedHandler());
+		this.rendererSelector.addEventListener("change", () => this.rendererSelectorChangedHandler());
 	}
 
 	/**
