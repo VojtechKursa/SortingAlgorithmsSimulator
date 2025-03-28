@@ -25,7 +25,7 @@ export class HeapSort extends SortingAlgorithmArray {
 	protected child: number | undefined;
 
 	protected drawArray: boolean = true;
-	protected drawHeap: boolean = false;
+	protected drawHeap: boolean = true;
 
 	public constructor(input: number[]) {
 		super(input);
@@ -129,7 +129,6 @@ export class HeapSort extends SortingAlgorithmArray {
 		yield this.makeCodeStepResult(1);
 
 		yield this.makeFullStepResult(StepKind.Significant, "Start processing input array into a heap", 2);
-		this.drawHeap = true;
 		this.beforeCall("makeHeap");
 		for (const step of this.makeHeap(count)) {
 			yield step;
@@ -267,7 +266,7 @@ export class HeapSort extends SortingAlgorithmArray {
 
 		this.callStack = new CallStack();
 		this.drawArray = true;
-		this.drawHeap = false;
+		this.drawHeap = true;
 	}
 
 	protected resetVariables(): void {
