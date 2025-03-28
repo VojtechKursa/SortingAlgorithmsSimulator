@@ -313,7 +313,7 @@ export class HeapSort extends SortingAlgorithmArray {
 			"\tfor last := count-1 to 1 step -1",
 			"\t\tswap(A[last], A[0])",
 			"\t\tsiftDown(A, 0, last)",
-			"\tend while",
+			"\tend for",
 			"end function",
 			"",
 			"function parent(i: int) = floor((i-1) / 2)",
