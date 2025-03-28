@@ -383,6 +383,10 @@ body.vertical2 {
 			flex-grow: 1;
 
 			align-content: start;
+
+			#canvas {
+				max-height: 60vh;
+			}
 		}
 
 		#step_description {
