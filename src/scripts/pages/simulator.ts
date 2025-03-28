@@ -24,6 +24,7 @@ import { VisualizationOptionsController } from "../controllers/VisualizationOpti
 import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
 import { ColorMap } from "../visualization/colors/ColorMap";
 import { SvgArrayBoxRenderer } from "../visualization/rendering/svg/SvgArrayBoxRenderer";
+import { SvgArrayBarChartRenderer } from "../visualization/rendering/svg/SvgBarChartRenderer";
 
 
 
@@ -36,6 +37,13 @@ export function getCurrentColorMap(): ColorMap {
 	}
 
 	return colors.currentColorMap;
+}
+
+export function getDefaultRenderers(colorMap: ColorMap): SvgRenderer[] {
+	const boxRenderer = new SvgArrayBoxRenderer(colorMap);
+	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap);
+
+	return [barChartRenderer, boxRenderer];
 }
 
 export function initSimulator(
@@ -88,8 +96,16 @@ export function initSimulator(
 			document.body.setAttribute("data-bs-theme", "dark");
 		}
 
-		if (defaultRenderer == undefined) {
-			defaultRenderer = new SvgArrayBoxRenderer(colors.currentColorMap);
+		if (defaultRenderer == undefined || availableRenderers == undefined) {
+			const renderers = getDefaultRenderers(colors.currentColorMap);
+
+			if (defaultRenderer == undefined) {
+				defaultRenderer = renderers[0];
+			}
+
+			if (availableRenderers == undefined) {
+				availableRenderers = renderers;
+			}
 		}
 
 		let stepDescriptionElement = document.getElementById("step_description") as HTMLDivElement;
@@ -101,7 +117,7 @@ export function initSimulator(
 		callStackController = new CallStackController(callStackWrapper);
 
 		visualizationOptionsWrapper = document.getElementById("visualization_options_wrapper") as HTMLDivElement;
-		let visualizationOptionsController = new VisualizationOptionsController(visualizationOptionsWrapper, availableRenderers ?? [defaultRenderer], defaultRenderer);
+		let visualizationOptionsController = new VisualizationOptionsController(visualizationOptionsWrapper, availableRenderers, defaultRenderer);
 
 		let svgDisplayVisitor = new HtmlSvgDisplayHandler(defaultRenderer, output);
 

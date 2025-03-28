@@ -6,7 +6,7 @@ import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResul
 import { ColorMap } from "../../colors/ColorMap";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
-import { DotLangInterface } from "./DotLangInterface";
+import { DotLangInterface } from "./utils/DotLangInterface";
 import { StepResultArrayHeapSort } from "../../../data/stepResults/StepResultArrayHeapSort";
 import { ReadOnlyHighlights } from "../../Highlights";
 

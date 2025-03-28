@@ -323,7 +323,13 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 		if (this.svgOutput.parentElement == undefined)
 			return;
 
-		if (svgResult.alignment == null || document.body.classList.contains(bodyVertical1LayoutClass)) {
+		const parent = this.svgOutput.parentElement;
+		const parentRatio = parent.clientWidth / parent.clientHeight;
+		const svgViewBox = svgResult.svg.viewBox.baseVal;
+		const svgRatio = svgViewBox.width / svgViewBox.height;
+		const heightLimited = svgRatio < parentRatio;
+
+		if (svgResult.alignment == null || heightLimited) {
 			this.svgOutput.style.marginTop = "";
 			this.svgOutput.parentElement.style.alignContent = "center";
 			return;
@@ -331,10 +337,7 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 
 		this.svgOutput.parentElement.style.alignContent = "";
 
-		let currentParentHeight = this.svgOutput.parentElement.clientHeight;
-		if (currentParentHeight == undefined)
-			return;
-
+		let currentParentHeight = parent.clientHeight;
 		let lastParentHeight = undefined;
 
 		while (currentParentHeight != lastParentHeight) {

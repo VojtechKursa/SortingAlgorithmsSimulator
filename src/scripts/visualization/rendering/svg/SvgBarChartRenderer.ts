@@ -10,21 +10,30 @@ import { Point2D } from "../../../data/graphical/Point2D";
 import { FontProperties } from "./utils/FontProperties";
 import { getOneVariableVerticalSpace, VariableRenderSettings } from "./utils/VariableRendering";
 
-class ArrayRenderSettings {
+class BarChartRenderSettings {
+	public readonly barHeightScale = this.chartHeight - this.minimumBarHeight;
+	public readonly mainFontHeight = this.fontMain.fontSize * FontProperties.fontSizeCorrectionMultiplier;
+
 	public constructor(
-		public readonly boxSize: number = 10,
+		public readonly barWidth: number = 10,
+		public readonly minimumBarHeight: number = 10,
+		public readonly chartHeight: number = 100,
 		public readonly horizontalMargin: number = 10,
 		public readonly borderWidth: number = 0.5,
 		public readonly fontMain: FontProperties = new FontProperties(4, 0.5),
 		public readonly fontIndex: FontProperties = new FontProperties(2.5, 0.5),
-		public readonly indexRightMargin: number = 1,
-		public readonly indexBottomMargin: number = 1
+		public readonly textTopMargin: number = 5,
+		public readonly textBottomMargin: number = 2,
+		public readonly indexHorizontalMargin: number = 1,
+		public readonly indexTopMargin: number = 2.8,
+		public readonly indexBottomMargin: number = 1,
+		public readonly mainTextMinimumSeparation: number = 1,
 	) { }
 }
 
-export class SvgArrayBoxRenderer implements SvgRenderer {
-	public readonly arraySettings = new ArrayRenderSettings();
-	public readonly variableSettings = new VariableRenderSettings(this.arraySettings.boxSize * 0.8);
+export class SvgArrayBarChartRenderer implements SvgRenderer {
+	public readonly renderSettings = new BarChartRenderSettings();
+	public readonly variableSettings = new VariableRenderSettings(this.renderSettings.barWidth * 0.8, undefined, undefined, undefined, undefined, 0, 2.5);
 
 	public readonly oneVariableVerticalSpace = getOneVariableVerticalSpace(this.variableSettings);
 
@@ -36,11 +45,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		this._currentArrayLength = value;
 	}
 
-	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
-	private minY = this.defaultMinY;
-
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
+
+	private readonly defaultMaxY = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
+	private maxY = this.defaultMaxY;
 
 	private _colorMap: ColorMap;
 	public get colorMap(): ColorMap {
@@ -57,15 +66,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 	}
 
 	public get displayName(): string {
-		return "Array";
+		return "Bar chart";
 	}
 
 	public get machineName(): string {
-		return "renderer-array";
-	}
-
-	public get minimumViewBoxTopMargin(): number {
-		return this.reservedVariablesSpace * this.oneVariableVerticalSpace;
+		return "renderer-bar_chart";
 	}
 
 
@@ -74,13 +79,12 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		colorMap: ColorMap,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		public reservedVariablesSpace: number = 0,
 	) {
 		this._colorMap = colorMap;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
-			new AlignmentData(AlignmentType.FromBottom, (this.arraySettings.boxSize + this.arraySettings.borderWidth) / 2, false)
+			new AlignmentData(AlignmentType.FromTop, this.renderSettings.chartHeight / 2, false)
 		);
 	}
 
@@ -90,12 +94,12 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		if (!(step instanceof StepResultArray))
 			throw new UnsupportedStepResultError(["StepResultArray"]);
 
-		if (this.lastRenderedStep != undefined) {
-			if (step.array != this.lastRenderedStep.array || step.arrayHighlights != this.lastRenderedStep.arrayHighlights) {
-				this.drawArray(step);
-			}
-		} else {
-			this.drawArray(step);
+		if (
+			this.lastRenderedStep == undefined ||
+			step.array != this.lastRenderedStep.array ||
+			step.arrayHighlights != this.lastRenderedStep.arrayHighlights
+		) {
+			this.drawChart(step);
 		}
 
 		this.drawVariables(step);
@@ -113,15 +117,39 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 
 
-	private drawArray(step: StepResultArray): void {
+	private getBarTop(scale: number): number {
+		return this.renderSettings.barHeightScale * (1 - scale);
+	}
+
+	private drawChart(step: StepResultArray): void {
 		const output = this.resultMemory.svg;
 
 		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
+
+		if (step.array.length <= 0)
+			return;
+
+		let arrayMin = step.array[0].value;
+		let arrayMax = step.array[0].value;
+		for (const element of step.array) {
+			if (element.value < arrayMin)
+				arrayMin = element.value;
+			if (element.value > arrayMax)
+				arrayMax = element.value;
+		}
+		let shiftBy = arrayMin < 0 ? -arrayMin : 0;
+		if (shiftBy > 0) {
+			arrayMin += shiftBy;
+			arrayMax += shiftBy;
+		}
+		const range = arrayMax - arrayMin;
+		const barScales = step.array.map(val => (val.value + shiftBy - arrayMin) / range);
 
 		this.currentArrayLength = step.array.length;
 
 		for (let i = 0; i < step.array.length; i++) {
 			const item = step.array[i];
+			const scale = barScales[i];
 
 			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 			group.classList.add(RendererClasses.elementWrapperClass);
@@ -129,55 +157,78 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 				group.id = `elem_${item.id}`;
 			}
 
-			const rectX = i * this.arraySettings.boxSize;
-			const rectY = 0;
+			const rectX = i * this.renderSettings.barWidth;
+			const rectY = this.getBarTop(scale);
 
 			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 			rect.setAttribute("x", rectX.toString());
 			rect.setAttribute("y", rectY.toString());
-			rect.setAttribute("height", this.arraySettings.boxSize.toString());
-			rect.setAttribute("width", this.arraySettings.boxSize.toString());
+			rect.setAttribute("height", (this.renderSettings.chartHeight - rectY).toString());
+			rect.setAttribute("width", this.renderSettings.barWidth.toString());
 			rect.setAttribute("stroke", this.colorMap.get(SymbolicColor.Element_Border).toString());
-			rect.setAttribute("stroke-width", `${this.arraySettings.borderWidth}px`);
+			rect.setAttribute("stroke-width", `${this.renderSettings.borderWidth}px`);
 			rect.setAttribute("fill", this.colorMap.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
 			if (group.id != "") {
 				rect.id = `${group.id}_rect`;
 			}
+			group.appendChild(rect);
 
-			const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			text.setAttribute("x", (rectX + (this.arraySettings.boxSize / 2)).toString());
-			text.setAttribute("y", (rectY + (this.arraySettings.boxSize / 2)).toString());
-			text.setAttribute("font-size", `${this.arraySettings.fontMain.fontSize}px`);
-			text.setAttribute("stroke-width", `${this.arraySettings.fontMain.strokeWidth}px`);
-			text.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
-			text.setAttribute("dominant-baseline", "central");
-			text.setAttribute("text-anchor", "middle");
-			text.textContent = item.value.toString();
-			text.classList.add(RendererClasses.elementValueClass);
+			const textBottomY = this.renderSettings.chartHeight - this.renderSettings.textBottomMargin;
+			const textTopY = rectY + this.renderSettings.textTopMargin;
+			const drawTop = (textTopY + this.renderSettings.mainTextMinimumSeparation) < (textBottomY - this.renderSettings.mainFontHeight);
+
+			const textBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
+			textBottom.setAttribute("x", (rectX + (this.renderSettings.barWidth / 2)).toString());
+			textBottom.setAttribute("y", textBottomY.toString());
+			textBottom.setAttribute("font-size", `${this.renderSettings.fontMain.fontSize}px`);
+			textBottom.setAttribute("stroke-width", `${this.renderSettings.fontMain.strokeWidth}px`);
+			textBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
+			textBottom.setAttribute("dominant-baseline", "text-bottom");
+			textBottom.setAttribute("text-anchor", "middle");
+			textBottom.textContent = item.value.toString();
+			textBottom.classList.add(RendererClasses.elementValueClass);
 			if (group.id != "") {
-				text.id = `${group.id}_text`;
+				textBottom.id = `${group.id}_text-bottom`;
+			}
+			group.appendChild(textBottom);
+
+
+			if (drawTop) {
+				const textTop = textBottom.cloneNode(true) as SVGTextElement;
+				textTop.setAttribute("y", textTopY.toString());
+				textTop.setAttribute("dominant-baseline", "text-top");
+				if (group.id != "") {
+					textTop.id = `${group.id}_text-top`;
+				}
+				group.appendChild(textTop);
 			}
 
-			group.appendChild(rect);
-			group.appendChild(text);
-
 			if (item.index != null) {
-				const index = document.createElementNS("http://www.w3.org/2000/svg", "text");
-				index.setAttribute("x", (rectX + this.arraySettings.boxSize - this.arraySettings.indexRightMargin).toString());
-				index.setAttribute("y", (rectY + this.arraySettings.boxSize - this.arraySettings.indexBottomMargin).toString());
-				index.setAttribute("font-size", `${this.arraySettings.fontIndex.fontSize}px`);
-				index.setAttribute("stroke-width", `${this.arraySettings.fontIndex.strokeWidth}px`);
-				index.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
-				index.setAttribute("dominant-baseline", "text-bottom");
-				index.setAttribute("text-anchor", "end");
-				index.textContent = item.index.toString();
-				index.classList.add(RendererClasses.elementIndexClass);
+				const indexBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
+				indexBottom.setAttribute("x", (rectX + this.renderSettings.barWidth - this.renderSettings.indexHorizontalMargin).toString());
+				indexBottom.setAttribute("y", (this.renderSettings.chartHeight - this.renderSettings.indexBottomMargin).toString());
+				indexBottom.setAttribute("font-size", `${this.renderSettings.fontIndex.fontSize}px`);
+				indexBottom.setAttribute("stroke-width", `${this.renderSettings.fontIndex.strokeWidth}px`);
+				indexBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
+				indexBottom.setAttribute("dominant-baseline", "text-bottom");
+				indexBottom.setAttribute("text-anchor", "end");
+				indexBottom.textContent = item.index.toString();
+				indexBottom.classList.add(RendererClasses.elementIndexClass);
 				if (group.id != "") {
-					index.id = `${group.id}_index`;
+					indexBottom.id = `${group.id}_index-bottom`;
 				}
+				group.appendChild(indexBottom);
 
-				group.appendChild(index);
+				if (drawTop) {
+					const indexTop = indexBottom.cloneNode(true) as SVGTextElement;
+					indexTop.setAttribute("y", (rectY + this.renderSettings.indexTopMargin).toString());
+					indexTop.setAttribute("dominant-baseline", "text-top");
+					if (group.id != "") {
+						indexTop.id = `${group.id}_index-top`;
+					}
+					group.appendChild(indexTop);
+				}
 			}
 
 			output.appendChild(group);
@@ -199,16 +250,16 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		this.minY = this.defaultMinY;
+		this.maxY = this.defaultMaxY;
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();
 
 			if (drawInformation != null) {
-				const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 1);
+				const variableMaxY = this.drawVariable(drawInformation, variablesAboveElements, output, 1);
 
-				if (variableMinY != null && variableMinY < this.minY) {
-					this.minY = variableMinY;
+				if (variableMaxY != null && variableMaxY > this.maxY) {
+					this.maxY = variableMaxY;
 				}
 			}
 		});
@@ -221,10 +272,10 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 					const drawInformation = variable.getDrawInformation();
 
 					if (drawInformation != null) {
-						const variableMinY = this.drawVariable(drawInformation, variablesAboveElements, output, 0.5);
+						const variableMaxY = this.drawVariable(drawInformation, variablesAboveElements, output, 0.5);
 
-						if (variableMinY != null && variableMinY < this.minY) {
-							this.minY = variableMinY;
+						if (variableMaxY != null && variableMaxY > this.maxY) {
+							this.maxY = variableMaxY;
 						}
 					}
 				});
@@ -245,15 +296,16 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		const variableIndex = variablesAboveElements[variable.drawAtIndex] ?? 0;
 
-		const chevronTop = -(variableIndex * this.oneVariableVerticalSpace) - this.variableSettings.chevronMargin - this.variableSettings.chevronHeight;
-		const chevronCenterX = (variable.drawAtIndex + 0.5) * this.arraySettings.boxSize;
+		const chevronTop = this.renderSettings.chartHeight + this.variableSettings.chevronMargin + (variableIndex * this.oneVariableVerticalSpace);
+		const chevronBottom = chevronTop + this.variableSettings.chevronHeight;
+		const chevronCenterX = (variable.drawAtIndex + 0.5) * this.renderSettings.barWidth;
 		const chevronX1 = chevronCenterX - (this.variableSettings.chevronWidth / 2);
 		const chevronX2 = chevronCenterX + (this.variableSettings.chevronWidth / 2);
 
 		const points = new Array<Point2D>();
-		points.push(new Point2D(chevronX1, chevronTop));
-		points.push(new Point2D(chevronX2, chevronTop));
-		points.push(new Point2D(chevronCenterX, chevronTop + this.variableSettings.chevronHeight));
+		points.push(new Point2D(chevronX1, chevronBottom));
+		points.push(new Point2D(chevronX2, chevronBottom));
+		points.push(new Point2D(chevronCenterX, chevronTop));
 
 		const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 		chevron.id = `${group.id}_chevron`;
@@ -266,19 +318,19 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		color.alpha *= alphaFactor;
 		chevron.setAttribute("fill", color.toString());
 
-		const chevronBorderTop = chevronTop - (this.variableSettings.chevronStrokeWidth / 2);
+		const chevronBorderBottom = chevronBottom + (this.variableSettings.chevronStrokeWidth / 2);
 
 		const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 		text.id = `${group.id}_text`;
 		text.textContent = variable.variableName;
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", chevronCenterX.toString());
-		text.setAttribute("y", (chevronBorderTop - this.variableSettings.textMarginBottom).toString());
+		text.setAttribute("y", (chevronBorderBottom + this.variableSettings.textMarginTop).toString());
 		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
 		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
 		text.setAttribute("fill", this.colorMap.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
-		text.setAttribute("dominant-baseline", "text-bottom");
+		text.setAttribute("dominant-baseline", "text-top");
 
 		group.appendChild(chevron);
 		group.appendChild(text);
@@ -287,7 +339,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		variablesAboveElements[variable.drawAtIndex] = variableIndex + 1;
 
-		return chevronBorderTop - this.variableSettings.textMarginBottom - this.variableSettings.textFont.fontSize - this.variableSettings.textMarginTop;
+		return chevronBorderBottom + this.variableSettings.textMarginTop + this.variableSettings.textFont.fontSize + this.variableSettings.textMarginBottom;
 	}
 
 	private adjustViewBox(): boolean {
@@ -297,11 +349,11 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		if (this.currentArrayLength == undefined)
 			return false;
 
-		const startX = -this.arraySettings.horizontalMargin;
-		const endX = (this.currentArrayLength * this.arraySettings.boxSize) + this.arraySettings.horizontalMargin;
+		const startX = -this.renderSettings.horizontalMargin;
+		const endX = (this.currentArrayLength * this.renderSettings.barWidth) + this.renderSettings.horizontalMargin;
 
-		const startY = Math.min(this.minY, -this.minimumViewBoxTopMargin);
-		const endY = this.arraySettings.boxSize + (this.arraySettings.borderWidth / 2);
+		const startY = -this.renderSettings.borderWidth / 2;
+		const endY = this.maxY;
 
 		const width = endX - startX;
 		const height = endY - startY;
