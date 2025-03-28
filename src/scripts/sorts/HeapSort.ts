@@ -139,6 +139,7 @@ export class HeapSort extends SortingAlgorithmArray {
 		for (this.last = count - 1; this.last > 0; this.last--) {
 			yield this.makeCodeStepResult(3, "Check if the algorithm is finished");
 
+			this.swapCurrent(this.last, 0);
 			yield this.makeFullStepResult(StepKind.Algorithmic, "Swap root to the end of the heap", 4, HeapSortContext.SwapLastToRoot, HighlightState.OrderSwapped);
 
 			yield this.makeFullStepResult(StepKind.Significant, "Move current root to correct position", 5);
@@ -209,6 +210,7 @@ export class HeapSort extends SortingAlgorithmArray {
 			yield this.makeFullStepResult(StepKind.Significant, "Find bigger child node", 20, HeapSortContext.CompareChildren, HighlightState.Selected);
 
 			if (((this.child + 1) < this.last) && (this.current[this.child] < this.current[this.child + 1])) {
+				this.child = this.child + 1;
 				yield this.makeFullStepResult(StepKind.Algorithmic, "Right child node is bigger, select it", 21, HeapSortContext.CompareChildren, HighlightState.OrderSwapped);
 
 				yield this.makeCodeStepResult(22);
