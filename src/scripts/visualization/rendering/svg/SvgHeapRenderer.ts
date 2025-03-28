@@ -105,7 +105,7 @@ export class SvgHeapRenderer implements SvgRenderer {
 
 		this.lastRenderedStep = step;
 
-		return this.resultMemory;
+		return this.resultMemory.clone();
 	}
 
 	public redraw(): Promise<SvgRenderResult | null> {
