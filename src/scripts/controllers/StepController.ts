@@ -105,6 +105,7 @@ class StepControllerElementary {
 		const label = document.createElement("div");
 		label.textContent = `${StepKindHelper.toString(stepKind).displayName.charAt(0)}:`;
 		label.classList.add(StepControllerClasses.labelClass);
+		label.title = StepKindHelper.toString(stepKind).displayName;
 
 		buttonGroup.appendChild(this.backButton);
 		buttonGroup.appendChild(this.stepDisplay);
