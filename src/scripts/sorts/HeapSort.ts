@@ -26,13 +26,18 @@ export class HeapSort extends SortingAlgorithmArray {
 
 	protected drawArray: boolean = true;
 	protected drawHeap: boolean = true;
+	protected lastIsOrdered: boolean = false;
 
 	public constructor(input: number[]) {
 		super(input);
 	}
 
 	protected get endOfHeap(): number {
-		return this.last ?? this.current.length;
+		if (this.last != undefined) {
+			return this.lastIsOrdered ? this.last : this.last + 1;
+		} else {
+			return this.current.length;
+		}
 	}
 
 	protected makeFullStepResult(
@@ -78,8 +83,8 @@ export class HeapSort extends SortingAlgorithmArray {
 						highlights.set(this.root, SymbolicColor.Element_OrderCorrect);
 						break;
 					case HighlightState.OrderSwapped:
-						highlights.set(this.child, SymbolicColor.Element_OrderIncorrect);
 						highlights.set(this.root, SymbolicColor.Element_OrderIncorrect);
+						highlights.set(this.parent(this.root), SymbolicColor.Element_OrderIncorrect);
 						break;
 				}
 				break;
@@ -96,8 +101,8 @@ export class HeapSort extends SortingAlgorithmArray {
 						highlights.set(this.child + 1, SymbolicColor.Element_OrderCorrect);
 						break;
 					case HighlightState.OrderSwapped:
+						highlights.set(this.child - 1, SymbolicColor.Element_OrderIncorrect);
 						highlights.set(this.child, SymbolicColor.Element_OrderIncorrect);
-						highlights.set(this.child + 1, SymbolicColor.Element_OrderIncorrect);
 						break;
 				}
 				break;
@@ -120,6 +125,10 @@ export class HeapSort extends SortingAlgorithmArray {
 		return StepResultArrayHeapSort.fromStepResultArray(super.makeCodeStepResult(highlightedLines, text, this.getVariables()), this.endOfHeap, true, true);
 	}
 
+	protected parent(index: number): number {
+		return Math.floor((index - 1) / 2);
+	}
+
 	protected override * stepForwardArray(): Generator<StepResultArrayHeapSort> {
 		this.callStack.currentFunctionName = "heapSort";
 		yield this.makeCodeStepResult(0, "Start Heap Sort");
@@ -137,9 +146,11 @@ export class HeapSort extends SortingAlgorithmArray {
 		yield this.makeFullStepResult(StepKind.Significant, "Input array is now a heap", 2);
 
 		for (this.last = count - 1; this.last > 0; this.last--) {
+			this.lastIsOrdered = false;
 			yield this.makeCodeStepResult(3, "Check if the algorithm is finished");
 
 			this.swapCurrent(this.last, 0);
+			this.lastIsOrdered = true;
 			yield this.makeFullStepResult(StepKind.Algorithmic, "Swap root to the end of the heap", 4, HeapSortContext.SwapLastToRoot, HighlightState.OrderSwapped);
 
 			yield this.makeFullStepResult(StepKind.Significant, "Move current root to correct position", 5);
@@ -161,11 +172,11 @@ export class HeapSort extends SortingAlgorithmArray {
 		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted", 7, undefined, undefined, true);
 	}
 
-	protected parent(index: number): [StepResultArrayHeapSort, number] {
-		return [this.makeCodeStepResult(9, `Calculate parent of element on index ${index}`), Math.floor((index - 1) / 2)];
+	protected parentStep(index: number): [StepResultArrayHeapSort, number] {
+		return [this.makeCodeStepResult(9, `Calculate parent of element on index ${index}`), this.parent(index)];
 	}
 
-	protected left(index: number): [StepResultArrayHeapSort, number] {
+	protected leftStep(index: number): [StepResultArrayHeapSort, number] {
 		return [this.makeCodeStepResult(10, `Calculate left child of element on index ${index}`), 2 * index + 1];
 	}
 
@@ -173,7 +184,7 @@ export class HeapSort extends SortingAlgorithmArray {
 		this.count = count;
 
 		yield this.makeCodeStepResult(13);
-		const parentResult = this.parent(this.count - 1);
+		const parentResult = this.parentStep(this.count - 1);
 		yield parentResult[0];
 
 		for (this.start = parentResult[1]; this.start >= 0; this.start--) {
@@ -201,7 +212,7 @@ export class HeapSort extends SortingAlgorithmArray {
 		this.last = last;
 
 		let left: [StepResultArrayHeapSort, number];
-		while ((left = (this.left(this.root)))[1] < this.last) {
+		while ((left = (this.leftStep(this.root)))[1] < this.last) {
 			yield this.makeCodeStepResult(19);
 			yield left[0];
 			this.child = left[1];
@@ -211,22 +222,21 @@ export class HeapSort extends SortingAlgorithmArray {
 
 			if (((this.child + 1) < this.last) && (this.current[this.child] < this.current[this.child + 1])) {
 				this.child = this.child + 1;
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Right child node is bigger, select it", 21, HeapSortContext.CompareChildren, HighlightState.OrderSwapped);
+				yield this.makeFullStepResult(StepKind.Significant, "Right child node is bigger, select it", 21, HeapSortContext.CompareChildren, HighlightState.OrderSwapped);
 
 				yield this.makeCodeStepResult(22);
 			}
 			else {
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Left child node is bigger", 22, HeapSortContext.CompareChildren, HighlightState.OrderCorrect);
+				yield this.makeFullStepResult(StepKind.Significant, "Left child node is bigger", 22, HeapSortContext.CompareChildren, HighlightState.OrderCorrect);
 			}
 
 			yield this.makeFullStepResult(StepKind.Significant, "Compare the selected child node with it's parent", 23, HeapSortContext.CompareChildAndParent, HighlightState.Selected);
 
 			if (this.current[this.root] < this.current[this.child]) {
 				this.swapCurrent(this.root, this.child);
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Parent is smaller than it's child, swap them and descend one level", 24, HeapSortContext.CompareChildAndParent, HighlightState.OrderSwapped);
-
 				this.root = this.child;
-				yield this.makeCodeStepResult(25);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "Parent is smaller than it's child, swap them and descend one level", [24, 25], HeapSortContext.CompareChildAndParent, HighlightState.OrderSwapped);
+
 				yield this.makeCodeStepResult(28);
 			}
 			else {
@@ -269,6 +279,7 @@ export class HeapSort extends SortingAlgorithmArray {
 		this.callStack = new CallStack();
 		this.drawArray = true;
 		this.drawHeap = true;
+		this.lastIsOrdered = false;
 	}
 
 	protected resetVariables(): void {
