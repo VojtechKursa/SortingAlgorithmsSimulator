@@ -76,6 +76,12 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 	}
 	public set colorMap(value: ColorMap) {
 		this._colorMap = value;
+
+		if (this.lastRenderedStep != undefined) {
+			const lastRenderedStep = this.lastRenderedStep;
+			this.lastRenderedStep = undefined;
+			this.render(lastRenderedStep);
+		}
 	}
 
 	public get displayName(): string {
