@@ -122,7 +122,7 @@ export class HeapSort extends SortingAlgorithmArray {
 
 	protected override * stepForwardArray(): Generator<StepResultArrayHeapSort> {
 		this.callStack.currentFunctionName = "heapSort";
-		yield this.makeCodeStepResult(0, "Enter facade function");
+		yield this.makeCodeStepResult(0, "Start Heap Sort");
 
 		const count = this.current.length;
 		this.count = count;
@@ -137,72 +137,63 @@ export class HeapSort extends SortingAlgorithmArray {
 		this.returnFromFunction();
 		yield this.makeFullStepResult(StepKind.Significant, "Input array is now a heap", 2);
 
-		this.last = count - 1;
-		yield this.makeCodeStepResult(3);
+		for (this.last = count - 1; this.last > 0; this.last--) {
+			yield this.makeCodeStepResult(3, "Check if the algorithm is finished");
 
-		while (this.last > 0) {
-			yield this.makeCodeStepResult(4, "Check if the algorithm is finished");
+			yield this.makeFullStepResult(StepKind.Algorithmic, "Swap root to the end of the heap", 4, HeapSortContext.SwapLastToRoot, HighlightState.OrderSwapped);
 
-			yield this.makeFullStepResult(StepKind.Algorithmic, "Swap root to the end of the heap", 5, HeapSortContext.SwapLastToRoot, HighlightState.OrderSwapped);
-
-			yield this.makeFullStepResult(StepKind.Significant, "Move current root to correct position", 6);
+			yield this.makeFullStepResult(StepKind.Significant, "Move current root to correct position", 5);
 			const siftDown = this.siftDown(0, this.last);
 			this.beforeCall("siftDown");
 			for (const step of siftDown) {
 				yield step;
 			}
 			this.returnFromFunction();
-			yield this.makeFullStepResult(StepKind.Significant, "New root has been moved to the correct position", 6);
+			yield this.makeFullStepResult(StepKind.Significant, "New root has been moved to the correct position", 5);
 
-			this.last--;
-			yield this.makeCodeStepResult(7, `Element on index ${this.last} is now in it's sorted position`);
-			yield this.makeCodeStepResult(8);
+			yield this.makeCodeStepResult(6, `Element on index ${this.last} is now in it's sorted position`);
 		}
 
-		yield this.makeCodeStepResult(4, "Check if the algorithm is finished");
-		yield this.makeCodeStepResult(8, "Algorithm is finished");
+		yield this.makeCodeStepResult(3, "Check if the algorithm is finished");
+		yield this.makeCodeStepResult(6, "Algorithm is finished");
 
 		this.drawHeap = false;
-		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted", 9, undefined, undefined, true);
+		yield this.makeFullStepResult(StepKind.Algorithmic, "Array is sorted", 7, undefined, undefined, true);
 	}
 
 	protected parent(index: number): [StepResultArrayHeapSort, number] {
-		return [this.makeCodeStepResult(11, `Calculate parent of element on index ${index}`), Math.floor((index - 1) / 2)];
+		return [this.makeCodeStepResult(9, `Calculate parent of element on index ${index}`), Math.floor((index - 1) / 2)];
 	}
 
 	protected left(index: number): [StepResultArrayHeapSort, number] {
-		return [this.makeCodeStepResult(12, `Calculate left child of element on index ${index}`), 2 * index + 1];
+		return [this.makeCodeStepResult(10, `Calculate left child of element on index ${index}`), 2 * index + 1];
 	}
 
 	protected * makeHeap(count: number): Generator<StepResultArrayHeapSort> {
 		this.count = count;
 
-		yield this.makeCodeStepResult(15);
+		yield this.makeCodeStepResult(13);
 		const parentResult = this.parent(this.count - 1);
 		yield parentResult[0];
-		this.start = parentResult[1];
-		yield this.makeCodeStepResult(15);
 
-		while (this.start >= 0) {
-			yield this.makeCodeStepResult(16);
+		for (this.start = parentResult[1]; this.start >= 0; this.start--) {
+			yield this.makeCodeStepResult(13);
 
-			yield this.makeFullStepResult(StepKind.Significant, `Move element on index ${this.start} to it's correct position in heap`, 17);
+			yield this.makeFullStepResult(StepKind.Significant, `Move element on index ${this.start} to it's correct position in heap`, 14);
 			const siftDown = this.siftDown(this.start, this.count);
 			this.beforeCall("siftDown");
 			for (const step of siftDown) {
 				yield step;
 			}
 			this.returnFromFunction();
-			yield this.makeFullStepResult(StepKind.Significant, `Element is now in correct position in the heap`, 17);
+			yield this.makeFullStepResult(StepKind.Significant, `Element is now in correct position in the heap`, 14);
 
-			this.start--;
-			yield this.makeCodeStepResult(18);
-			yield this.makeCodeStepResult(19);
+			yield this.makeCodeStepResult(15);
 		}
 
+		yield this.makeCodeStepResult(13);
+		yield this.makeCodeStepResult(15, "Array is now a heap");
 		yield this.makeCodeStepResult(16);
-		yield this.makeCodeStepResult(19, "Array is now a heap");
-		yield this.makeCodeStepResult(20);
 	}
 
 	protected * siftDown(root: number, last: number): Generator<StepResultArrayHeapSort> {
@@ -211,45 +202,47 @@ export class HeapSort extends SortingAlgorithmArray {
 
 		let left: [StepResultArrayHeapSort, number];
 		while ((left = (this.left(this.root)))[1] < this.last) {
-			yield this.makeCodeStepResult(23);
+			yield this.makeCodeStepResult(19);
 			yield left[0];
 			this.child = left[1];
-			yield this.makeCodeStepResult(23);
+			yield this.makeCodeStepResult(19);
 
-			yield this.makeFullStepResult(StepKind.Significant, "Find bigger child node", 24, HeapSortContext.CompareChildren, HighlightState.Selected);
+			yield this.makeFullStepResult(StepKind.Significant, "Find bigger child node", 20, HeapSortContext.CompareChildren, HighlightState.Selected);
 
 			if (((this.child + 1) < this.last) && (this.current[this.child] < this.current[this.child + 1])) {
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Right child node is bigger, select it", 25, HeapSortContext.CompareChildren, HighlightState.OrderSwapped);
-				yield this.makeCodeStepResult(26);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "Right child node is bigger, select it", 21, HeapSortContext.CompareChildren, HighlightState.OrderSwapped);
+
+				yield this.makeCodeStepResult(22);
 			}
 			else {
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Left child node is bigger", 26, HeapSortContext.CompareChildren, HighlightState.OrderCorrect);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "Left child node is bigger", 22, HeapSortContext.CompareChildren, HighlightState.OrderCorrect);
 			}
 
-			yield this.makeFullStepResult(StepKind.Significant, "Compare the selected child node with it's parent", 27, HeapSortContext.CompareChildAndParent, HighlightState.Selected);
+			yield this.makeFullStepResult(StepKind.Significant, "Compare the selected child node with it's parent", 23, HeapSortContext.CompareChildAndParent, HighlightState.Selected);
 
 			if (this.current[this.root] < this.current[this.child]) {
 				this.swapCurrent(this.root, this.child);
-				this.root = this.child;
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Parent is smaller than it's child, swap them and descend one level", [28, 29], HeapSortContext.CompareChildAndParent, HighlightState.OrderSwapped);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "Parent is smaller than it's child, swap them and descend one level", 24, HeapSortContext.CompareChildAndParent, HighlightState.OrderSwapped);
 
-				yield this.makeCodeStepResult(32);
+				this.root = this.child;
+				yield this.makeCodeStepResult(25);
+				yield this.makeCodeStepResult(28);
 			}
 			else {
-				yield this.makeCodeStepResult(30);
-				yield this.makeFullStepResult(StepKind.Algorithmic, "Selected node is in correct position in the heap", 31, HeapSortContext.CompareChildAndParent, HighlightState.OrderCorrect);
+				yield this.makeCodeStepResult(26);
+				yield this.makeFullStepResult(StepKind.Algorithmic, "Selected node is in correct position in the heap", 27, HeapSortContext.CompareChildAndParent, HighlightState.OrderCorrect);
 				return;
 			}
 
-			yield this.makeCodeStepResult(33);
+			yield this.makeCodeStepResult(29);
 		}
 
-		yield this.makeCodeStepResult(23);
+		yield this.makeCodeStepResult(19);
 		yield left[0];
 		this.child = left[1];
-		yield this.makeCodeStepResult(23);
-		yield this.makeCodeStepResult(33);
-		yield this.makeCodeStepResult(35);
+		yield this.makeCodeStepResult(19);
+		yield this.makeCodeStepResult(29);
+		yield this.makeCodeStepResult(30);
 	}
 
 	protected getVariables(): Variable[] {
@@ -318,23 +311,19 @@ export class HeapSort extends SortingAlgorithmArray {
 			"function heapSort(A: array)",
 			"\tcount = len(A)",
 			"\tmakeHeap(A, count)",
-			"\tlast := count - 1",
-			"\twhile last > 0",
+			"\tfor last := count-1 to 1 step -1",
 			"\t\tswap(A[last], A[0])",
 			"\t\tsiftDown(A, 0, last)",
-			"\t\tlast := last - 1",
 			"\tend while",
 			"end function",
 			"",
 			"function parent(i: int) = floor((i-1) / 2)",
-			"function left(i: int) = 2 * i + 1",
+			"function left(i: int) = 2*i + 1",
 			"",
 			"function makeHeap(A: array, count: int)",
-			"\tstart := parent(count - 1)",
-			"\twhile start >= 0",
+			"\tfor start := parent(count - 1) to 0 step -1",
 			"\t\tsiftDown(A, start, count)",
-			"\t\tstart := start - 1",
-			"\tend while",
+			"\tend for",
 			"end function",
 			"",
 			"function siftDown(A: array, root: int, last: int)",
