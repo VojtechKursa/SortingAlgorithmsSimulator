@@ -14,7 +14,6 @@ class ArrayRenderSettings {
 	public constructor(
 		public readonly boxSize: number = 10,
 		public readonly horizontalMargin: number = 10,
-		public readonly verticalMargin: number = 10,
 		public readonly borderWidth: number = 0.5,
 		public readonly fontMain: FontProperties = new FontProperties(4, 0.5),
 		public readonly fontIndex: FontProperties = new FontProperties(2.5, 0.5),
