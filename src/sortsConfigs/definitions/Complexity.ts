@@ -16,6 +16,16 @@ export function getComplexityString(complexity: Complexity): string {
 	}
 }
 
+export function getComplexityHTML(complexity: Complexity): string {
+	switch (complexity) {
+		case Complexity.Constant: return "O(1)";
+		case Complexity.Logarithmic: return "O(log n)";
+		case Complexity.Linear: return "O(n)";
+		case Complexity.Linearithmic: return "O(n log n)";
+		case Complexity.Quadratic: return "O(n<sup>2</sup>)";
+	}
+}
+
 export type ComplexityRange = {
 	readonly min: Complexity;
 	readonly max: Complexity;
