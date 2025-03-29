@@ -105,3 +105,49 @@
 .breadcrumb {
 	@include margin-vertical(0.5rem);
 }
+
+.algorithm_description-dialog {
+	min-width: 350px;
+	max-width: var(--bs-breakpoint-lg);
+	width: 90%;
+
+	> * {
+		@include margin-vertical(2rem);
+
+		&:first-child {
+			margin-top: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.table-wrapper.row {
+		padding-right: 0;
+	}
+
+	.table-name {
+		align-content: center;
+	}
+
+	.table-value {
+		align-content: center;
+	}
+
+	.buttons_wrapper {
+		display: flex;
+		flex-wrap: nowrap;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+
+		> * {
+			flex-grow: 1;
+			max-width: 25%;
+
+			@media (max-width: 992px) {
+				max-width: 50%;
+			}
+		}
+	}
+}
