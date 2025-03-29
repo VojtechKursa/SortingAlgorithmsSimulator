@@ -7,6 +7,7 @@ import { SelectSortProperties } from "./sorts/SelectSortProperties";
 import { InsertSortProperties } from "./sorts/InsertSortProperties";
 import { QuickSortProperties } from "./sorts/QuickSortProperties";
 import { HeapSortProperties } from "./sorts/HeapSortProperties";
+import { MergeSortProperties } from "./sorts/MergeSortProperties";
 
 const sortFamilies: SortFamilyProperties[] = [
 	{
@@ -99,6 +100,29 @@ const sortFamilies: SortFamilyProperties[] = [
 		inPlace: true,
 		sorts: [
 			HeapSortProperties
+		]
+	},
+	{
+		name: "Merge sort",
+		nameMachine: "mergeSort",
+		shortDescription: MergeSortProperties.shortDescription,
+		longDescription: MergeSortProperties.longDescription,
+		timeComplexity: {
+			worst: Complexity.Linearithmic,
+			average: Complexity.Linearithmic,
+			best: {
+				min: Complexity.Linear,
+				max: Complexity.Linearithmic
+			}
+		},
+		spaceComplexity: {
+			min: Complexity.Constant,
+			max: Complexity.Linear
+		},
+		stable: true,
+		inPlace: null,
+		sorts: [
+			MergeSortProperties
 		]
 	}
 ];
