@@ -97,14 +97,18 @@ export function initSimulator(
 		}
 
 		if (defaultRenderer == undefined || availableRenderers == undefined) {
-			const renderers = getDefaultRenderers(colors.currentColorMap);
+			const defaultRenderers = getDefaultRenderers(colors.currentColorMap);
 
 			if (defaultRenderer == undefined) {
-				defaultRenderer = renderers[0];
+				if (availableRenderers != undefined && availableRenderers.length > 0) {
+					defaultRenderer = availableRenderers[0];
+				} else {
+					defaultRenderer = defaultRenderers[0];
+				}
 			}
 
 			if (availableRenderers == undefined) {
-				availableRenderers = renderers;
+				availableRenderers = defaultRenderers;
 			}
 		}
 
