@@ -36,7 +36,7 @@ export class StepResultArray extends StepResult {
 		array: readonly IndexedNumber[],
 		arrayHighlights: ReadOnlyHighlights | null = null,
 		description: string = "",
-		highlightedCodeLines?: ReadOnlyHighlights | number | number[],
+		highlightedCodeLines?: ReadOnlyHighlights | number | readonly number[],
 		variables?: readonly Variable[],
 		final?: boolean,
 		stack?: CallStack | CallStackFrozen,
