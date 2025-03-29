@@ -73,20 +73,25 @@ export class StepResultArray extends StepResult {
 		if (step instanceof StepResultArray) {
 			let arrayEquals = true;
 
-			if (step.array.length == this.array.length) {
-				for (let i = 0; i < step.array.length; i++) {
-					if (!IndexedNumber.equals(step.array[i], this.array[i])) {
-						arrayEquals = false;
-						break;
+			if (step.array != this.array) {
+				if (step.array.length == this.array.length) {
+					for (let i = 0; i < step.array.length; i++) {
+						if (!IndexedNumber.equals(step.array[i], this.array[i])) {
+							arrayEquals = false;
+							break;
+						}
+					}
+
+					if (arrayEquals) {
+						this.array = step.array;
 					}
 				}
-
-				if (arrayEquals) {
-					this.array = step.array;
+				else {
+					arrayEquals = false;
 				}
 			}
 
-			if (arrayEquals && step.arrayHighlights != null && this.arrayHighlights != null && step.arrayHighlights.size == this.arrayHighlights.size) {
+			if (step.arrayHighlights != this.arrayHighlights && arrayEquals && step.arrayHighlights != null && this.arrayHighlights != null && step.arrayHighlights.size == this.arrayHighlights.size) {
 				let highlightsEqual = true;
 
 				for (const highlight of this.arrayHighlights) {

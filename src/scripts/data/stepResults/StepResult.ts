@@ -72,6 +72,9 @@ export abstract class StepResult {
 		if (this.stack == undefined || stack == undefined)
 			return;
 
+		if (stack == this.stack)
+			return;
+
 		const localStack = stack instanceof CallStack ? stack.freeze() : stack;
 
 		if (CallStackFrozen.equal(this.stack, localStack))
