@@ -48,8 +48,12 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
 
-	private readonly defaultMaxY = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
-	private maxY = this.defaultMaxY;
+	private readonly defaultMaxYNoVariables = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
+	private get defaultMaxY(): number {
+		return this.defaultMaxYNoVariables + this.reservedVariablesSpace * this.oneVariableVerticalSpace;
+	}
+
+	private maxY: number;
 
 	private _colorMap: ColorMap;
 	public get colorMap(): ColorMap {
@@ -77,10 +81,13 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 
 	public constructor(
 		colorMap: ColorMap,
+		public reservedVariablesSpace: number = 0,
+		public reserveVariablesSpaceWithNoVariables: boolean = false,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
 	) {
 		this._colorMap = colorMap;
+		this.maxY = this.defaultMaxY;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -243,14 +250,20 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 
 		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
-		if (step.final && !this.drawFinalVariables)
+		if (step.final && !this.drawFinalVariables) {
+			this.maxY = this.defaultMaxYNoVariables;
 			return;
+		}
 
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		this.maxY = this.defaultMaxY;
+		if (step.variables.length > 0 || this.reserveVariablesSpaceWithNoVariables) {
+			this.maxY = this.defaultMaxY;
+		} else {
+			this.maxY = this.defaultMaxYNoVariables;
+		}
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();

@@ -36,8 +36,12 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		this._currentArrayLength = value;
 	}
 
-	private readonly defaultMinY = -this.arraySettings.borderWidth / 2;
-	private minY = this.defaultMinY;
+	private readonly defaultMinYNoVariables = -this.arraySettings.borderWidth / 2;
+	private get defaultMinY(): number {
+		return this.defaultMinYNoVariables - this.minimumViewBoxTopMargin;
+	}
+
+	private minY: number;
 
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
@@ -72,11 +76,13 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 	public constructor(
 		colorMap: ColorMap,
+		public reservedVariablesSpace: number = 0,
+		public reserveVariablesSpaceWithNoVariables: boolean = false,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
-		public reservedVariablesSpace: number = 0,
 	) {
 		this._colorMap = colorMap;
+		this.minY = this.defaultMinY;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -192,14 +198,20 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 
 		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
-		if (step.final && !this.drawFinalVariables)
+		if (step.final && !this.drawFinalVariables) {
+			this.minY = this.defaultMinYNoVariables;
 			return;
+		}
 
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		this.minY = this.defaultMinY;
+		if (step.variables.length > 0 || this.reserveVariablesSpaceWithNoVariables) {
+			this.minY = this.defaultMinY;
+		} else {
+			this.minY = this.defaultMinYNoVariables;
+		}
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();
@@ -300,7 +312,7 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 		const startX = -this.arraySettings.horizontalMargin;
 		const endX = (this.currentArrayLength * this.arraySettings.boxSize) + this.arraySettings.horizontalMargin;
 
-		const startY = Math.min(this.minY, -this.minimumViewBoxTopMargin);
+		const startY = this.minY;
 		const endY = this.arraySettings.boxSize + (this.arraySettings.borderWidth / 2);
 
 		const width = endX - startX;
