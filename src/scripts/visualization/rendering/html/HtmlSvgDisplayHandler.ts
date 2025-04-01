@@ -1,3 +1,4 @@
+import { SvgViewBox } from "../../../data/graphical/SvgViewBox";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { ColorMap } from "../../colors/ColorMap";
 import { StepDisplayHandler } from "../StepDisplayHandler";
@@ -255,12 +256,22 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 			return svg;
 		}
 
+		if (this.lastRenderResult == undefined) {
+			return svg;
+		}
+
 		this.lastRenderMemory = this.buildLastRenderMemory();
 		if (this.lastRenderMemory == undefined) {
 			return svg;
 		}
 
 		const animatedSVG = svg.cloneNode(true) as SVGSVGElement;
+
+		const originalViewBox = SvgViewBox.fromViewBox(this.lastRenderResult.svg.viewBox.baseVal);
+		const newViewBox = SvgViewBox.fromViewBox(svg.viewBox.baseVal);
+		if (!SvgViewBox.valuesEqual(originalViewBox, newViewBox)) {
+			this.attachAnimationToElement(animatedSVG, "viewBox", originalViewBox.toString(), newViewBox.toString());
+		}
 
 		const currentAnimatable = this.getAnimatableElements(animatedSVG);
 
@@ -277,21 +288,25 @@ export class HtmlSvgDisplayHandler implements StepDisplayHandler {
 				continue;
 
 			for (const difference of differences) {
-				const animateElement = document.createElementNS("http://www.w3.org/2000/svg", "animate");
-
-				animateElement.setAttribute("begin", "indefinite");
-				animateElement.setAttribute("dur", `${this.animationDurationSeconds}s`);
-				animateElement.setAttribute("fill", "freeze");
-
-				animateElement.setAttribute("attributeName", difference.property);
-				animateElement.setAttribute("from", difference.originalValue);
-				animateElement.setAttribute("to", difference.newValue);
-
-				currentElement.appendChild(animateElement);
+				this.attachAnimationToElement(currentElement, difference.property, difference.originalValue, difference.newValue);
 			}
 		}
 
 		return animatedSVG;
+	}
+
+	private attachAnimationToElement(element: SVGElement, property: string, from: string, to: string) {
+		const animateElement = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+
+		animateElement.setAttribute("begin", "indefinite");
+		animateElement.setAttribute("dur", `${this.animationDurationSeconds}s`);
+		animateElement.setAttribute("fill", "freeze");
+
+		animateElement.setAttribute("attributeName", property);
+		animateElement.setAttribute("from", from);
+		animateElement.setAttribute("to", to);
+
+		element.appendChild(animateElement);
 	}
 
 	/**
