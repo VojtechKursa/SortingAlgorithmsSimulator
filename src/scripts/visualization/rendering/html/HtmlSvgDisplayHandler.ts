@@ -1,6 +1,5 @@
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { ColorMap } from "../../colors/ColorMap";
-import { bodyVertical1LayoutClass } from "../../css/LayoutClasses";
 import { StepDisplayHandler } from "../StepDisplayHandler";
 import { AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 
@@ -27,6 +26,8 @@ class AnimatablePropertyMap {
 			case "rect":
 				this.addAttribute(element, "x");
 				this.addAttribute(element, "y");
+				this.addAttribute(element, "width");
+				this.addAttribute(element, "height");
 				break;
 			case "polygon":
 				this.addAttribute(element, "points");
