@@ -149,8 +149,14 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			arrayMin += shiftBy;
 			arrayMax += shiftBy;
 		}
+
 		const range = arrayMax - arrayMin;
-		const barScales = step.array.map(val => (val.value + shiftBy - arrayMin) / range);
+		let barScales: readonly number[];
+		if (arrayMin != arrayMax) {
+			barScales = step.array.map(val => (val.value + shiftBy - arrayMin) / range);
+		} else {
+			barScales = step.array.map(() => 1);
+		}
 
 		this.currentArrayLength = step.array.length;
 
