@@ -39,9 +39,9 @@ export function getCurrentColorMap(): ColorMap {
 	return colors.currentColorMap;
 }
 
-export function getDefaultRenderers(colorMap: ColorMap): SvgRenderer[] {
-	const boxRenderer = new SvgArrayBoxRenderer(colorMap);
-	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap);
+export function getDefaultRenderers(colorMap: ColorMap, reservedVariableSpace: number | undefined = undefined): SvgRenderer[] {
+	const boxRenderer = new SvgArrayBoxRenderer(colorMap, reservedVariableSpace);
+	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap, reservedVariableSpace);
 
 	return [barChartRenderer, boxRenderer];
 }

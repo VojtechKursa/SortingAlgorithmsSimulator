@@ -250,7 +250,7 @@ export class MergeSort extends SortingAlgorithm {
 		yield this.makeCodeStepResult(34, "Merge complete");
 	}
 
-	protected static getNumberFromQueue(queue: IndexedNumber[]): IndexedNumber {
+	protected static getNumberFromQueue<T>(queue: T[]): T {
 		const element = queue.shift();
 		if (element == undefined)
 			throw new EmptyQueueError();

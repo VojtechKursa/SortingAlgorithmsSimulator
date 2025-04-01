@@ -5,7 +5,7 @@ import { getCurrentColorMap, getDefaultRenderers, initSimulator } from "./simula
 document.addEventListener("DOMContentLoaded", () => {
 	const colors = getCurrentColorMap();
 
-	const defaultRenderers = getDefaultRenderers(colors);
+	const defaultRenderers = getDefaultRenderers(colors, 2);
 	const renderers: SvgMultiArrayRenderer[] = [];
 
 	for (const renderer of defaultRenderers) {
