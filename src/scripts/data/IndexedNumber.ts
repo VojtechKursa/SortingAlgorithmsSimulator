@@ -43,7 +43,12 @@ export class IndexedNumber {
 	 * @returns Whether the 2 numbers are equal
 	 */
 	public static equals(number1: IndexedNumber, number2: IndexedNumber): boolean {
-		return number1.id === number2.id && number1.value === number2.value && number1.index === number2.index;
+		return (
+			number1.id === number2.id &&
+			number1.value === number2.value &&
+			number1.index === number2.index &&
+			number1.duplicated == number2.duplicated
+		);
 	}
 
 	// Simplifies comparisons ("IndexedNumber > IndexedNumber" instead of "IndexedNumber.value > IndexedNumber.value")
