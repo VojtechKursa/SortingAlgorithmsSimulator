@@ -42,6 +42,14 @@ export class MergeSort extends SortingAlgorithm {
 		this.lastFullStep = this.getInitialStepResult();
 	}
 
+	protected static setDuplicatesAsUnimportant(array: IndexedNumber[], highlights: Highlights) {
+		for (let i = 0; i < array.length; i++) {
+			if (array[i].duplicated) {
+				highlights.set(i, SymbolicColor.Element_Unimportant);
+			}
+		}
+	}
+
 	protected makeFullStepResult(
 		stepKind: StepKind.Algorithmic | StepKind.Significant,
 		description: string,
@@ -51,6 +59,7 @@ export class MergeSort extends SortingAlgorithm {
 	): StepResultMultiArray {
 		const mainHighlights = new Map<number, SymbolicColor>();
 		const arrays: AnnotatedArray[] = [new AnnotatedArray(this.array, mainHighlights, this.getVariables(), final ? undefined : this.mainArrayName)];
+		MergeSort.setDuplicatesAsUnimportant(this.array, mainHighlights);
 
 		if (final) {
 			for (let i = 0; i < this.input.length; i++) {
@@ -62,11 +71,13 @@ export class MergeSort extends SortingAlgorithm {
 			if (this.leftQueue != undefined) {
 				leftHighlights = new Map<number, SymbolicColor>();
 				arrays.push(new AnnotatedArray(this.leftQueue, leftHighlights, [], this.leftQueueName));
+				MergeSort.setDuplicatesAsUnimportant(this.leftQueue, leftHighlights);
 			}
 			let rightHighlights: Highlights | undefined;
 			if (this.rightQueue != undefined) {
 				rightHighlights = new Map<number, SymbolicColor>();
 				arrays.push(new AnnotatedArray(this.rightQueue, rightHighlights, [], this.rightQueueName));
+				MergeSort.setDuplicatesAsUnimportant(this.rightQueue, rightHighlights);
 			}
 
 			if (state != undefined) {
