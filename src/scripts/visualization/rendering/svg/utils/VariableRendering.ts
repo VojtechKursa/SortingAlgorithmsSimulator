@@ -16,7 +16,7 @@ export function getOneVariableVerticalSpace(variableSettings: VariableRenderSett
 	return variableSettings.chevronMargin +
 		variableSettings.chevronHeight +
 		variableSettings.textMarginBottom +
-		(variableSettings.textFont.fontSize * FontProperties.fontSizeCorrectionMultiplier) +
+		variableSettings.textFont.fontSize +
 		variableSettings.textMarginTop
 	;
 }
