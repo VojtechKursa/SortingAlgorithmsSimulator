@@ -190,7 +190,7 @@ export class SvgMainAndSubArraysRenderer implements SvgRenderer, HasRangeOfValue
 
 		const labelPresent = mainRender.label != undefined;
 		if (labelPresent) {
-			group.appendChild(this.createLabel(centerX, this.renderSettings.labelSettings.marginTop, mainRender.label));
+			group.appendChild(this.createLabel(centerX, this.renderSettings.labelSettings.marginTop, mainRender.label, "label-main"));
 		}
 
 		const viewBox = mainRender.render.svg.viewBox.baseVal;
@@ -230,7 +230,7 @@ export class SvgMainAndSubArraysRenderer implements SvgRenderer, HasRangeOfValue
 
 		if (subRender.label != undefined) {
 			const centerLineX = baseX + (viewBox.width / 2);
-			group.appendChild(this.createLabel(centerLineX, labelBaseY + this.renderSettings.labelSettings.marginTop, subRender.label))
+			group.appendChild(this.createLabel(centerLineX, labelBaseY + this.renderSettings.labelSettings.marginTop, subRender.label, `label-subgroup-${subRender.label}`))
 		}
 
 		const alignment = subRender.render.alignment;
@@ -257,8 +257,11 @@ export class SvgMainAndSubArraysRenderer implements SvgRenderer, HasRangeOfValue
 		return group;
 	}
 
-	private createLabel(xPos: number, yPos: number, labelText: string): SVGTextElement {
+	private createLabel(xPos: number, yPos: number, labelText: string, id: string | undefined = undefined): SVGTextElement {
 		const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+		if (id != undefined)
+			label.id = id;
 
 		label.textContent = labelText;
 
