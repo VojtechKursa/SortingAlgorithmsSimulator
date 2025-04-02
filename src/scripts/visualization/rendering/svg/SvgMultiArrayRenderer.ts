@@ -1,4 +1,4 @@
-import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { HasRangeOfValues, supportsRange, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { FontProperties } from "./utils/FontProperties";
 import { SvgViewBox } from "../../../data/graphical/SvgViewBox";
 import { Point2D } from "../../../data/graphical/Point2D";
@@ -29,7 +29,7 @@ class SvgMultiArrayRendererSettings {
 	) { }
 }
 
-export class SvgMultiArrayRenderer implements SvgRenderer {
+export class SvgMultiArrayRenderer implements SvgRenderer, HasRangeOfValues {
 	private readonly renderSettings: SvgMultiArrayRendererSettings = new SvgMultiArrayRendererSettings();
 
 	public get colorMap(): ColorMap {
@@ -45,6 +45,12 @@ export class SvgMultiArrayRenderer implements SvgRenderer {
 
 	public get machineName(): string {
 		return `renderer-multiple-${this.underlyingRenderer.machineName}`;
+	}
+
+	public setRangeOfValues(min: number | undefined, max: number | undefined): void {
+		if (supportsRange(this.underlyingRenderer)) {
+			this.underlyingRenderer.setRangeOfValues(min, max);
+		}
 	}
 
 

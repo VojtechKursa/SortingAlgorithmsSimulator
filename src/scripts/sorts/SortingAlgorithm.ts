@@ -3,6 +3,19 @@ import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
 import { StepResult } from "../data/stepResults/StepResult";
 
 /**
+ * A class representing a result of indexing an array of numbers into an array of {@link IndexedNumber}
+ *
+ * @see IndexedNumber
+ */
+class IndexingResult {
+	public constructor(
+		public readonly indexedArray: IndexedNumber[],
+		public readonly minValue: number | undefined,
+		public readonly maxValue: number | undefined,
+	) { }
+}
+
+/**
  * A class for storing temporary data during indexing of an array of numbers into an array of IndexedNumbers.
  *
  * @see {@link IndexedNumber}
@@ -76,6 +89,24 @@ export abstract class SortingAlgorithm {
 		this._input = value;
 	}
 
+	/**
+	 * The minimum of the input array
+	*/
+	private minValue: number | undefined;
+
+	/**
+	 * The maximum of the input array
+	 */
+	private maxValue: number | undefined;
+
+	/**
+	 * Gets the range of values in the input array
+	 */
+	public get rangeOfValues(): [number | undefined, number | undefined] {
+		return [this.minValue, this.maxValue];
+	}
+
+
 
 	/**
 	 * The final step result of the algorithm.
@@ -91,7 +122,12 @@ export abstract class SortingAlgorithm {
 	 * @param input - The input array for the algorithm.
 	 */
 	protected constructor(input: readonly number[]) {
-		this._input = SortingAlgorithm.indexInput(input);
+		const indexingResult = SortingAlgorithm.indexInput(input);
+
+		this._input = indexingResult.indexedArray;
+		this.minValue = indexingResult.minValue;
+		this.maxValue = indexingResult.maxValue;
+
 		this.finalStepResult = null;
 
 		this.generator = this.stepForwardInternal();
@@ -112,7 +148,11 @@ export abstract class SortingAlgorithm {
 	 * @param input - The input array for the algorithm.
 	 */
 	public setInput(input: readonly number[]): void {
-		this.input = SortingAlgorithm.indexInput(input);
+		const indexingResult = SortingAlgorithm.indexInput(input);
+
+		this.input = indexingResult.indexedArray;
+		this.minValue = indexingResult.minValue;
+		this.maxValue = indexingResult.maxValue;
 
 		this.reset();
 	}
@@ -122,18 +162,27 @@ export abstract class SortingAlgorithm {
 	 *
 	 * @param input - The input array to index.
 	 *
-	 * @returns The input array, indexed as an array of IndexedNumber.
+	 * @returns The input array, indexed as an array of IndexedNumber along with the minimum and maximum values in the array.
 	 *
 	 * @see {@link IndexedNumber}
 	 */
-	private static indexInput(input: readonly number[]): IndexedNumber[] {
+	private static indexInput(input: readonly number[]): IndexingResult {
 		let indexes = new Map<number, IndexingData>();
 		let result = new Array<MutableIndexedNumber>();
 		let idCounter = 0;
+		let min: number | undefined = undefined;
+		let max: number | undefined = undefined;
 
 		for (const num of input) {
 			let indexData = indexes.get(num);
 			let indexedNumber: MutableIndexedNumber;
+
+			if (min == undefined || num < min) {
+				min = num;
+			}
+			if (max == undefined || num > max) {
+				max = num;
+			}
 
 			if (indexData == undefined) {
 				indexedNumber = new MutableIndexedNumber(idCounter, num, null);
@@ -152,7 +201,7 @@ export abstract class SortingAlgorithm {
 			idCounter++;
 		}
 
-		return result.map(value => value.freeze());
+		return new IndexingResult(result.map(value => value.freeze()), min, max);
 	}
 
 	/**

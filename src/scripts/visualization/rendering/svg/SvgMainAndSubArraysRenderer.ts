@@ -1,4 +1,4 @@
-import { SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { HasRangeOfValues, supportsRange, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { FontProperties } from "./utils/FontProperties";
 import { Point2D } from "../../../data/graphical/Point2D";
 import { AnnotatedSvgRenderResult, CollectRendersResult, MultiArrayHelper, RepositionMode } from "./utils/MultiArrayUtils";
@@ -35,7 +35,7 @@ export const enum OverSizeBehavior {
 	Center,
 }
 
-export class SvgMainAndSubArraysRenderer implements SvgRenderer {
+export class SvgMainAndSubArraysRenderer implements SvgRenderer, HasRangeOfValues {
 	private readonly renderSettings: SvgMainAndSubArraysRendererSettings = new SvgMainAndSubArraysRendererSettings();
 
 	private readonly _displayName: string;
@@ -56,6 +56,19 @@ export class SvgMainAndSubArraysRenderer implements SvgRenderer {
 
 	public get colorMap(): ColorMap {
 		return this.mainRenderer.colorMap;
+	}
+
+	public setRangeOfValues(min: number | undefined, max: number | undefined): void {
+		const renderers = [this.mainRenderer];
+		if (this.mainRenderer != this.subRenderer) {
+			renderers.push(this.subRenderer);
+		}
+
+		for (const renderer of renderers) {
+			if (supportsRange(renderer)) {
+				renderer.setRangeOfValues(min, max);
+			}
+		}
 	}
 
 

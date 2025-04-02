@@ -125,3 +125,38 @@ export interface SvgRenderer {
 	 */
 	redraw(): Promise<SvgRenderResult | null>;
 }
+
+/**
+ * An interface for classes that have settable range of values.
+ */
+export interface HasRangeOfValues {
+	/**
+	 * Set the range of possible values for this object.
+	 *
+	 * @param min The minimum value.
+	 * @param max The maximum value.
+	 */
+	setRangeOfValues(min: number | undefined, max: number | undefined): void;
+}
+
+/**
+ * Determines whether the passed {@link object} implements interface {@link HasRangeOfValues}.
+ *
+ * @param object The object to check.
+ * @returns True if the passed {@link object} has a signature compatible with the interface {@link HasRangeOfValues}. Otherwise false.
+ *
+ * @see HasRangeOfValues
+ */
+export function supportsRange(object: any): object is HasRangeOfValues {
+	const rangeOfValues = object.setRangeOfValues;
+	if (rangeOfValues == undefined)
+		return false;
+
+	if (typeof rangeOfValues !== "function")
+		return false;
+
+	if (rangeOfValues.length != 2)
+		return false;
+
+	return true;
+}

@@ -3,7 +3,7 @@ import { ColorMap } from "../../colors/ColorMap";
 import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
-import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { AlignmentData, AlignmentType, HasRangeOfValues, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { Point2D } from "../../../data/graphical/Point2D";
@@ -31,7 +31,7 @@ class BarChartRenderSettings {
 	) { }
 }
 
-export class SvgArrayBarChartRenderer implements SvgRenderer {
+export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 	public readonly renderSettings = new BarChartRenderSettings();
 	public readonly variableSettings = new VariableRenderSettings(this.renderSettings.barWidth * 0.8, undefined, undefined, undefined, undefined, 0, 2.5);
 
@@ -75,6 +75,14 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 
 	public get machineName(): string {
 		return "renderer-bar_chart";
+	}
+
+	protected rangeMin: number | undefined = undefined;
+	protected rangeMax: number | undefined = undefined;
+
+	public setRangeOfValues(min: number | undefined, max: number | undefined): void {
+		this.rangeMin = min;
+		this.rangeMax = max;
 	}
 
 
@@ -136,14 +144,27 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 		if (step.array.length <= 0)
 			return;
 
-		let arrayMin = step.array[0].value;
-		let arrayMax = step.array[0].value;
-		for (const element of step.array) {
-			if (element.value < arrayMin)
-				arrayMin = element.value;
-			if (element.value > arrayMax)
-				arrayMax = element.value;
+		let arrayMin: number = 0;
+		let arrayMax: number = 0;
+		if (this.rangeMin == undefined || this.rangeMax == undefined) {
+			arrayMin = step.array[0].value;
+			arrayMax = step.array[0].value;
+
+			for (const element of step.array) {
+				if (element.value < arrayMin)
+					arrayMin = element.value;
+				if (element.value > arrayMax)
+					arrayMax = element.value;
+			}
 		}
+
+		if (this.rangeMin != undefined) {
+			arrayMin = this.rangeMin;
+		}
+		if (this.rangeMax != undefined) {
+			arrayMax = this.rangeMax;
+		}
+
 		let shiftBy = arrayMin < 0 ? -arrayMin : 0;
 		if (shiftBy > 0) {
 			arrayMin += shiftBy;
