@@ -16,7 +16,7 @@ class SvgSubRendererLabelSettings {
 	public constructor(
 		public readonly font: FontProperties = new FontProperties(4, 0.5),
 		public readonly marginTop: number = 2,
-		public readonly marginBottom: number = 2,
+		public readonly marginBottom: number = 4,
 	) {
 		this.totalLabelHeight = marginTop + (font.fontSize * FontProperties.fontSizeCorrectionMultiplier) + marginBottom;
 	}
