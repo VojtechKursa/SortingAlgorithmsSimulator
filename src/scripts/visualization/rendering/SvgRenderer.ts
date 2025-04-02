@@ -30,6 +30,33 @@ export class AlignmentData {
 		public readonly centerLine: number,
 		public readonly centerLineInPx: boolean,
 	) { }
+
+	/**
+	 * Returns Y coordinate of a line to which the image this alignment data is associated with should be aligned.
+	 * @param viewBoxHeight The height of the SVG viewBox of the image.
+	 * @param pointToPixelRatio The svg point to pixel ratio of the rendered image if center line is in pixels.
+	 * 		If {@link centerLineInPx} is true and the ratio is undefined, an error is thrown.
+	 *
+	 * @returns The Y coordinate of a line to which the image this alignment data is associated with should be aligned.
+	 */
+	public getLocalAlignmentLine(viewBoxHeight: number, pointToPixelRatio: number | undefined = undefined): number {
+		let centerLine = this.centerLine;
+
+		if (this.centerLineInPx) {
+			if (pointToPixelRatio == undefined) {
+				throw new Error("Alignment line requested on alignment data where center line is in pixels, but point to pixel ratio is undefined");
+			} else {
+				centerLine /= pointToPixelRatio;
+			}
+		}
+
+		switch (this.alignmentType) {
+			case AlignmentType.FromTop:
+				return centerLine;
+			case AlignmentType.FromBottom:
+				return viewBoxHeight - centerLine;
+		}
+	}
 }
 
 /**
