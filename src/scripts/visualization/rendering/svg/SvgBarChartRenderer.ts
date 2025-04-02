@@ -141,6 +141,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 
 		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
+		this.currentArrayLength = step.array.length;
+
 		if (step.array.length <= 0)
 			return;
 
@@ -178,8 +180,6 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 		} else {
 			barScales = step.array.map(() => 1);
 		}
-
-		this.currentArrayLength = step.array.length;
 
 		for (let i = 0; i < step.array.length; i++) {
 			const item = step.array[i];
