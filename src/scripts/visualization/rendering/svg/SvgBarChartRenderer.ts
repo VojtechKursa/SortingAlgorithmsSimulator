@@ -179,7 +179,7 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			rect.setAttribute("height", (this.renderSettings.chartHeight - rectY).toString());
 			rect.setAttribute("width", this.renderSettings.barWidth.toString());
 			rect.setAttribute("stroke", this.colorMap.get(SymbolicColor.Element_Border).toString());
-			rect.setAttribute("stroke-width", `${this.renderSettings.borderWidth}px`);
+			rect.setAttribute("stroke-width", this.renderSettings.borderWidth.toString());
 			rect.setAttribute("fill", this.colorMap.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
 			if (group.id != "") {
@@ -194,8 +194,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			const textBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
 			textBottom.setAttribute("x", (rectX + (this.renderSettings.barWidth / 2)).toString());
 			textBottom.setAttribute("y", textBottomY.toString());
-			textBottom.setAttribute("font-size", `${this.renderSettings.fontMain.fontSize}px`);
-			textBottom.setAttribute("stroke-width", `${this.renderSettings.fontMain.strokeWidth}px`);
+			textBottom.setAttribute("font-size", this.renderSettings.fontMain.fontSize.toString());
+			textBottom.setAttribute("stroke-width", this.renderSettings.fontMain.strokeWidth.toString());
 			textBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 			textBottom.setAttribute("dominant-baseline", "text-bottom");
 			textBottom.setAttribute("text-anchor", "middle");
@@ -221,8 +221,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 				const indexBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
 				indexBottom.setAttribute("x", (rectX + this.renderSettings.barWidth - this.renderSettings.indexHorizontalMargin).toString());
 				indexBottom.setAttribute("y", (this.renderSettings.chartHeight - this.renderSettings.indexBottomMargin).toString());
-				indexBottom.setAttribute("font-size", `${this.renderSettings.fontIndex.fontSize}px`);
-				indexBottom.setAttribute("stroke-width", `${this.renderSettings.fontIndex.strokeWidth}px`);
+				indexBottom.setAttribute("font-size", this.renderSettings.fontIndex.fontSize.toString());
+				indexBottom.setAttribute("stroke-width", this.renderSettings.fontIndex.strokeWidth.toString());
 				indexBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 				indexBottom.setAttribute("dominant-baseline", "text-bottom");
 				indexBottom.setAttribute("text-anchor", "end");
@@ -345,8 +345,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", chevronCenterX.toString());
 		text.setAttribute("y", (chevronBorderBottom + this.variableSettings.textMarginTop).toString());
-		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
-		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
+		text.setAttribute("font-size", this.variableSettings.textFont.fontSize.toString());
+		text.setAttribute("stroke-width", this.variableSettings.textFont.strokeWidth.toString());
 		text.setAttribute("fill", this.colorMap.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
 		text.setAttribute("dominant-baseline", "text-top");
