@@ -134,6 +134,9 @@ export class SvgArrayBoxRenderer implements SvgRenderer {
 			if (!item.duplicated) {
 				group.id = `elem_${item.id}`;
 			}
+			else if (item.duplicateIdentifier != null) {
+				group.id = `elem_${item.id}-duplicate-${item.duplicateIdentifier}`;
+			}
 
 			const rectX = i * this.arraySettings.boxSize;
 			const rectY = 0;

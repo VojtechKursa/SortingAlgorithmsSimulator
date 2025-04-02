@@ -185,7 +185,7 @@ export class MergeSort extends SortingAlgorithm {
 		this.rightQueue = [];
 		for (let i = begin; i < end; i++) {
 			const original = this.array[i];
-			const duplicate = original.duplicate();
+			const duplicate = original.duplicate(true);
 
 			if (i < mid) {
 				this.leftQueue.push(original);

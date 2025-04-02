@@ -190,6 +190,9 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 			if (!item.duplicated) {
 				group.id = `elem_${item.id}`;
 			}
+			else if (item.duplicateIdentifier != null) {
+				group.id = `elem_${item.id}-duplicate-${item.duplicateIdentifier}`;
+			}
 
 			const rectX = i * this.renderSettings.barWidth;
 			const rectY = this.getBarTop(scale);
