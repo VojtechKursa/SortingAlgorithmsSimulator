@@ -36,6 +36,15 @@ export class SvgViewBox {
 		this.acceptedViewBox = true;
 	}
 
+	public static valuesEqual(viewBox1: SvgViewBox, viewBox2: SvgViewBox): boolean {
+		return (
+			viewBox1.startX == viewBox2.startX &&
+			viewBox1.startY == viewBox2.startY &&
+			viewBox1.endX == viewBox2.endX &&
+			viewBox1.endY == viewBox2.endY
+		);
+	}
+
 	public static fromViewBox(viewBox: SVGRect | SVGAnimatedRect): SvgViewBox {
 		if (viewBox instanceof SVGAnimatedRect)
 			viewBox = viewBox.baseVal;

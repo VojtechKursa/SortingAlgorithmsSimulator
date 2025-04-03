@@ -30,7 +30,8 @@ export class IndexedNumber {
 		public readonly id: number,
 		public readonly value: number,
 		index: number | null,
-		public readonly original: IndexedNumber | null = null
+		public readonly original: IndexedNumber | null = null,
+		public readonly duplicateIdentifier: number | null = null,
 	) {
 		this._index = index;
 	}
@@ -43,7 +44,13 @@ export class IndexedNumber {
 	 * @returns Whether the 2 numbers are equal
 	 */
 	public static equals(number1: IndexedNumber, number2: IndexedNumber): boolean {
-		return number1.id === number2.id && number1.value === number2.value && number1.index === number2.index;
+		return (
+			number1.id === number2.id &&
+			number1.value === number2.value &&
+			number1.index === number2.index &&
+			number1.duplicated == number2.duplicated &&
+			number1.duplicateIdentifier == number2.duplicateIdentifier
+		);
 	}
 
 	// Simplifies comparisons ("IndexedNumber > IndexedNumber" instead of "IndexedNumber.value > IndexedNumber.value")
@@ -55,9 +62,30 @@ export class IndexedNumber {
 	 * Creates a duplicate of this {@link IndexedNumber}.
 	 * For use in algorithms that duplicate values, to prevent weird animations.
 	 *
+	 * @param addDuplicateIdentifier - Whether to add the {@link duplicateIdentifier} property to the duplicated number. Defaults to false.
 	 * @returns An {@link IndexedNumber} duplicated from this number.
 	 */
-	public duplicate(): IndexedNumber {
-		return new IndexedNumber(this.id, this.value, this.index, this);
+	public duplicate(addDuplicateIdentifier?: boolean): IndexedNumber;
+	/**
+	 * Creates a duplicate of this {@link IndexedNumber}.
+	 * For use in algorithms that duplicate values, to prevent weird animations.
+	 *
+	 * @param duplicateIdentifier - The value to use as the {@link duplicateIdentifier} property of the duplicated number.
+	 * @returns An {@link IndexedNumber} duplicated from this number.
+	 */
+	public duplicate(duplicateIdentifier: number | null): IndexedNumber;
+	public duplicate(duplicateIdentifier: number | null | boolean = false): IndexedNumber {
+		let resultingDuplicateIdentifier: number | null;
+		if (duplicateIdentifier == null) {
+			resultingDuplicateIdentifier = null;
+		}
+		else if (typeof duplicateIdentifier === "number") {
+			resultingDuplicateIdentifier = duplicateIdentifier;
+		}
+		else {
+			resultingDuplicateIdentifier = duplicateIdentifier ? ((this.duplicateIdentifier ?? 0) + 1) : null;
+		}
+
+		return new IndexedNumber(this.id, this.value, this.index, this, resultingDuplicateIdentifier);
 	}
 }

@@ -39,9 +39,9 @@ export function getCurrentColorMap(): ColorMap {
 	return colors.currentColorMap;
 }
 
-export function getDefaultRenderers(colorMap: ColorMap): SvgRenderer[] {
-	const boxRenderer = new SvgArrayBoxRenderer(colorMap);
-	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap);
+export function getDefaultRenderers(colorMap: ColorMap, reservedVariableSpace: number | undefined = undefined): SvgRenderer[] {
+	const boxRenderer = new SvgArrayBoxRenderer(colorMap, reservedVariableSpace);
+	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap, reservedVariableSpace);
 
 	return [barChartRenderer, boxRenderer];
 }
@@ -97,14 +97,18 @@ export function initSimulator(
 		}
 
 		if (defaultRenderer == undefined || availableRenderers == undefined) {
-			const renderers = getDefaultRenderers(colors.currentColorMap);
+			const defaultRenderers = getDefaultRenderers(colors.currentColorMap);
 
 			if (defaultRenderer == undefined) {
-				defaultRenderer = renderers[0];
+				if (availableRenderers != undefined && availableRenderers.length > 0) {
+					defaultRenderer = availableRenderers[0];
+				} else {
+					defaultRenderer = defaultRenderers[0];
+				}
 			}
 
 			if (availableRenderers == undefined) {
-				availableRenderers = renderers;
+				availableRenderers = defaultRenderers;
 			}
 		}
 

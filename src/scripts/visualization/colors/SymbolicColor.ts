@@ -11,6 +11,7 @@ export const enum SymbolicColor {
 	Element_Highlight_1 = "element-highlight_1",
 	Element_Highlight_2 = "element-highlight_2",
 	Element_Highlight_3 = "element-highlight_3",
+	Element_Unimportant = "element-unimportant",
 	Code_ActiveLine = "code-line_active",
 	Variable_1 = "variable-1",
 	Variable_2 = "variable-2",

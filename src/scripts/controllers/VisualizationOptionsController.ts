@@ -18,11 +18,15 @@ export class VisualizationOptionsController {
 	private readonly rendererSelector: HTMLSelectElement;
 	private readonly animationsCheckbox: HTMLInputElement;
 
-	private readonly renderers: ReadonlyMap<string, SvgRenderer>;
 	private lastRenderer: SvgRenderer | null;
 
 	private readonly animationsEventListeners: AnimationsEnabledChangeHandler[] = [];
 	private readonly rendererEventListeners: RendererChangedHandler[] = [];
+
+	/**
+	 * Map of renderers and their associated identifiers.
+	 */
+	public readonly renderers: ReadonlyMap<string, SvgRenderer>;
 
 	/**
 	 * @param wrapper Wrapper into which to create the controller's UI elements.

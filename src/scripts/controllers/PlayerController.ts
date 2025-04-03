@@ -9,7 +9,7 @@ import { DebuggerController } from "./DebuggerController";
 import { StepKindController } from "./StepKindController";
 import { InterfaceAction, InterfaceActionGroup, InterfaceActionData } from "../keyboard/InterfaceAction";
 import { HtmlSvgDisplayHandler } from "../visualization/rendering/html/HtmlSvgDisplayHandler";
-import { SvgRenderer } from "../visualization/rendering/SvgRenderer";
+import { supportsRange, SvgRenderer } from "../visualization/rendering/SvgRenderer";
 import { StepAction, StepController } from "./StepController";
 import { VisualizationOptionsController } from "./VisualizationOptionsController";
 
@@ -104,6 +104,8 @@ export class PlayerController {
 				this.svgDisplayHandler.updateRenderer(newRenderer);
 			}
 		});
+
+		this.setRangeOfValues();
 	}
 
 	private stepHandler(stepKind: StepKind, stepAction: StepAction): void {
@@ -312,7 +314,22 @@ export class PlayerController {
 	public setInput(input: number[]): void {
 		this.algorithm.setInput(input);
 
+		this.setRangeOfValues();
+
 		this.reset();
+	}
+
+	/**
+	 * Sets the range of array values to all available renderers.
+	 */
+	private setRangeOfValues(): void {
+		const rangeOfValues = this.algorithm.rangeOfValues;
+
+		for (const renderer of this.visualizationOptionsController.renderers) {
+			if (supportsRange(renderer[1])) {
+				renderer[1].setRangeOfValues(rangeOfValues[0], rangeOfValues[1]);
+			}
+		}
 	}
 
 	/**

@@ -3,7 +3,7 @@ import { ColorMap } from "../../colors/ColorMap";
 import { RendererClasses } from "../../css/RendererClasses";
 import { SymbolicColor } from "../../colors/SymbolicColor";
 import { VariableDrawInformation } from "../../../data/Variable";
-import { AlignmentData, AlignmentType, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
+import { AlignmentData, AlignmentType, HasRangeOfValues, SvgRenderer, SvgRenderResult } from "../SvgRenderer";
 import { UnsupportedStepResultError } from "../../../errors/UnsupportedStepResultError";
 import { StepResult } from "../../../data/stepResults/StepResult";
 import { Point2D } from "../../../data/graphical/Point2D";
@@ -31,7 +31,7 @@ class BarChartRenderSettings {
 	) { }
 }
 
-export class SvgArrayBarChartRenderer implements SvgRenderer {
+export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 	public readonly renderSettings = new BarChartRenderSettings();
 	public readonly variableSettings = new VariableRenderSettings(this.renderSettings.barWidth * 0.8, undefined, undefined, undefined, undefined, 0, 2.5);
 
@@ -48,8 +48,12 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
 
-	private readonly defaultMaxY = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
-	private maxY = this.defaultMaxY;
+	private readonly defaultMaxYNoVariables = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
+	private get defaultMaxY(): number {
+		return this.defaultMaxYNoVariables + this.reservedVariablesSpace * this.oneVariableVerticalSpace;
+	}
+
+	private maxY: number;
 
 	private _colorMap: ColorMap;
 	public get colorMap(): ColorMap {
@@ -73,14 +77,25 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 		return "renderer-bar_chart";
 	}
 
+	protected rangeMin: number | undefined = undefined;
+	protected rangeMax: number | undefined = undefined;
+
+	public setRangeOfValues(min: number | undefined, max: number | undefined): void {
+		this.rangeMin = min;
+		this.rangeMax = max;
+	}
+
 
 
 	public constructor(
 		colorMap: ColorMap,
+		public reservedVariablesSpace: number = 0,
+		public reserveVariablesSpaceWithNoVariables: boolean = false,
 		public drawFinalVariables: boolean = false,
 		public drawLastStackLevelVariables: boolean = false,
 	) {
 		this._colorMap = colorMap;
+		this.maxY = this.defaultMaxY;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -126,26 +141,45 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 
 		output.querySelectorAll(`.${RendererClasses.elementWrapperClass}`).forEach(element => element.remove());
 
+		this.currentArrayLength = step.array.length;
+
 		if (step.array.length <= 0)
 			return;
 
-		let arrayMin = step.array[0].value;
-		let arrayMax = step.array[0].value;
-		for (const element of step.array) {
-			if (element.value < arrayMin)
-				arrayMin = element.value;
-			if (element.value > arrayMax)
-				arrayMax = element.value;
+		let arrayMin: number = 0;
+		let arrayMax: number = 0;
+		if (this.rangeMin == undefined || this.rangeMax == undefined) {
+			arrayMin = step.array[0].value;
+			arrayMax = step.array[0].value;
+
+			for (const element of step.array) {
+				if (element.value < arrayMin)
+					arrayMin = element.value;
+				if (element.value > arrayMax)
+					arrayMax = element.value;
+			}
 		}
+
+		if (this.rangeMin != undefined) {
+			arrayMin = this.rangeMin;
+		}
+		if (this.rangeMax != undefined) {
+			arrayMax = this.rangeMax;
+		}
+
 		let shiftBy = arrayMin < 0 ? -arrayMin : 0;
 		if (shiftBy > 0) {
 			arrayMin += shiftBy;
 			arrayMax += shiftBy;
 		}
-		const range = arrayMax - arrayMin;
-		const barScales = step.array.map(val => (val.value + shiftBy - arrayMin) / range);
 
-		this.currentArrayLength = step.array.length;
+		const range = arrayMax - arrayMin;
+		let barScales: readonly number[];
+		if (arrayMin != arrayMax) {
+			barScales = step.array.map(val => (val.value + shiftBy - arrayMin) / range);
+		} else {
+			barScales = step.array.map(() => 1);
+		}
 
 		for (let i = 0; i < step.array.length; i++) {
 			const item = step.array[i];
@@ -155,6 +189,9 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			group.classList.add(RendererClasses.elementWrapperClass);
 			if (!item.duplicated) {
 				group.id = `elem_${item.id}`;
+			}
+			else if (item.duplicateIdentifier != null) {
+				group.id = `elem_${item.id}-duplicate-${item.duplicateIdentifier}`;
 			}
 
 			const rectX = i * this.renderSettings.barWidth;
@@ -166,7 +203,7 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			rect.setAttribute("height", (this.renderSettings.chartHeight - rectY).toString());
 			rect.setAttribute("width", this.renderSettings.barWidth.toString());
 			rect.setAttribute("stroke", this.colorMap.get(SymbolicColor.Element_Border).toString());
-			rect.setAttribute("stroke-width", `${this.renderSettings.borderWidth}px`);
+			rect.setAttribute("stroke-width", this.renderSettings.borderWidth.toString());
 			rect.setAttribute("fill", this.colorMap.get(step.arrayHighlights != null ? step.arrayHighlights.get(i) : SymbolicColor.Element_Background).toString());
 			rect.classList.add(RendererClasses.elementBoxClass);
 			if (group.id != "") {
@@ -181,8 +218,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 			const textBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
 			textBottom.setAttribute("x", (rectX + (this.renderSettings.barWidth / 2)).toString());
 			textBottom.setAttribute("y", textBottomY.toString());
-			textBottom.setAttribute("font-size", `${this.renderSettings.fontMain.fontSize}px`);
-			textBottom.setAttribute("stroke-width", `${this.renderSettings.fontMain.strokeWidth}px`);
+			textBottom.setAttribute("font-size", this.renderSettings.fontMain.fontSize.toString());
+			textBottom.setAttribute("stroke-width", this.renderSettings.fontMain.strokeWidth.toString());
 			textBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 			textBottom.setAttribute("dominant-baseline", "text-bottom");
 			textBottom.setAttribute("text-anchor", "middle");
@@ -208,8 +245,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 				const indexBottom = document.createElementNS("http://www.w3.org/2000/svg", "text");
 				indexBottom.setAttribute("x", (rectX + this.renderSettings.barWidth - this.renderSettings.indexHorizontalMargin).toString());
 				indexBottom.setAttribute("y", (this.renderSettings.chartHeight - this.renderSettings.indexBottomMargin).toString());
-				indexBottom.setAttribute("font-size", `${this.renderSettings.fontIndex.fontSize}px`);
-				indexBottom.setAttribute("stroke-width", `${this.renderSettings.fontIndex.strokeWidth}px`);
+				indexBottom.setAttribute("font-size", this.renderSettings.fontIndex.fontSize.toString());
+				indexBottom.setAttribute("stroke-width", this.renderSettings.fontIndex.strokeWidth.toString());
 				indexBottom.setAttribute("color", this.colorMap.get(SymbolicColor.Element_Foreground).toString());
 				indexBottom.setAttribute("dominant-baseline", "text-bottom");
 				indexBottom.setAttribute("text-anchor", "end");
@@ -243,14 +280,20 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 
 		output.querySelectorAll(`.${RendererClasses.variableWrapperClass}`).forEach(element => element.remove());
 
-		if (step.final && !this.drawFinalVariables)
+		if (step.final && !this.drawFinalVariables) {
+			this.maxY = this.defaultMaxYNoVariables;
 			return;
+		}
 
 		if (this.currentArrayLength == undefined)
 			throw new Error("Attempted to draw variables without drawing an array first");
 
 		const variablesAboveElements = new Array<number>(this.currentArrayLength);
-		this.maxY = this.defaultMaxY;
+		if (step.variables.length > 0 || this.reserveVariablesSpaceWithNoVariables) {
+			this.maxY = this.defaultMaxY;
+		} else {
+			this.maxY = this.defaultMaxYNoVariables;
+		}
 
 		step.variables.forEach(variable => {
 			const drawInformation = variable.getDrawInformation();
@@ -326,8 +369,8 @@ export class SvgArrayBarChartRenderer implements SvgRenderer {
 		text.classList.add(RendererClasses.variableTextClass);
 		text.setAttribute("x", chevronCenterX.toString());
 		text.setAttribute("y", (chevronBorderBottom + this.variableSettings.textMarginTop).toString());
-		text.setAttribute("font-size", `${this.variableSettings.textFont.fontSize}px`);
-		text.setAttribute("stroke-width", `${this.variableSettings.textFont.strokeWidth}px`);
+		text.setAttribute("font-size", this.variableSettings.textFont.fontSize.toString());
+		text.setAttribute("stroke-width", this.variableSettings.textFont.strokeWidth.toString());
 		text.setAttribute("fill", this.colorMap.get(SymbolicColor.Simulator_Foreground).toString());
 		text.setAttribute("text-anchor", "middle");
 		text.setAttribute("dominant-baseline", "text-top");
