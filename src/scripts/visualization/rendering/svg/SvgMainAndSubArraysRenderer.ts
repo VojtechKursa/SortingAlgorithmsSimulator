@@ -167,10 +167,29 @@ export class SvgMainAndSubArraysRenderer implements SvgRenderer, HasRangeOfValue
 
 		svg.appendChild(this.renderMainGroup(mainRender, mainCenterX, finalWidth));
 
-		let baseX: number = 0;
+		const centerSubRenders: boolean = finalWidth != subRendersWidth;
+
+		let shiftingBaseX: number = 0;
+		let subRenderIndex: number = 0;
+		const subRenderCount = subRenders.renders.length;
+		const subRenderEvenWidth = finalWidth / subRenderCount;
 		for (const render of subRenders.renders) {
-			svg.appendChild(this.renderSubGroup(render, baseX, subRendersLabelBase, subRendersCenterLine));
-			baseX += render.render.svg.viewBox.baseVal.width + this.renderSettings.spaceBetweenRenders;
+			const renderWidth = render.render.svg.viewBox.baseVal.width;
+
+			let usedBaseX: number;
+			if (centerSubRenders) {
+				const staticCenterX = (subRenderEvenWidth * subRenderIndex) + (subRenderEvenWidth / 2);
+				const staticBaseX = staticCenterX - (renderWidth / 2);
+				usedBaseX = Math.max(shiftingBaseX, staticBaseX);
+			}
+			else {
+				usedBaseX = shiftingBaseX;
+			}
+
+			svg.appendChild(this.renderSubGroup(render, usedBaseX, subRendersLabelBase, subRendersCenterLine));
+
+			shiftingBaseX = usedBaseX + renderWidth + this.renderSettings.spaceBetweenRenders;
+			subRenderIndex++;
 		}
 
 		const totalHeight = (subRenders.renders.length > 0) ? (subRendersBase + subRendersMaxHeight) : (mainRenderBottom);
