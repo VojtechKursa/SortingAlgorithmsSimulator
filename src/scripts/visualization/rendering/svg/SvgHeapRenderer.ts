@@ -26,7 +26,7 @@ class DotLangNode {
 		let result = this.baseNumber.value.toString();
 
 		if (this.baseNumber.index != null) {
-			result += ` - ${this.baseNumber.index}`;
+			result += ` (${this.baseNumber.index})`;
 		}
 
 		return result;
