@@ -7,6 +7,8 @@ import { AnnotatedArray, StepResultMultiArray } from "../data/stepResults/StepRe
 import { IndexedNumber } from "../data/IndexedNumber";
 import { EmptyQueueError } from "../errors/EmptyQueueError";
 import { Highlights } from "../visualization/Highlights";
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { MergeSortProperties } from "../../sortsConfigs/sorts/MergeSortProperties";
 
 const enum MergeSortState {
 	CompareQueueHeads,
@@ -15,6 +17,10 @@ const enum MergeSortState {
 }
 
 export class MergeSort extends SortingAlgorithm {
+	public override get properties(): SortProperties {
+		return MergeSortProperties;
+	}
+
 	protected callStack: CallStack = new CallStack();
 
 	protected lastFullStep: StepResultMultiArray;
