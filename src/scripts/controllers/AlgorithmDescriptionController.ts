@@ -53,9 +53,7 @@ export class AlgorithmDescriptionController {
 
 		const propertiesWrapper = this.generateProperties();
 
-		const description = document.createElement("div");
-		description.classList.add(AlgorithmDescriptionClasses.descriptionClass);
-		description.textContent = this.properties.longDescription;
+		const description = this.generateDescription();
 
 		const buttonsWrapper = document.createElement("div");
 		buttonsWrapper.classList.add(AlgorithmDescriptionClasses.buttonsWrapperClass);
@@ -73,10 +71,26 @@ export class AlgorithmDescriptionController {
 		closeButton.addEventListener("click", () => this.close());
 	}
 
+	private generateDescription(): HTMLDivElement {
+		const description = document.createElement("div");
+		description.classList.add(AlgorithmDescriptionClasses.descriptionClass);
+
+		const short = document.createElement("div");
+		short.textContent = this.properties.shortDescription;
+
+		const long = document.createElement("div");
+		long.textContent = this.properties.longDescription;
+
+		description.appendChild(short);
+		description.appendChild(long);
+
+		return description;
+	}
+
 	private generateProperties(): HTMLDivElement {
 		const propertiesWrapper = document.createElement("div");
 		propertiesWrapper.classList.add(AlgorithmDescriptionClasses.propertiesClass, "row");
-		
+
 		const propertiesLayoutBreakpoint = "lg";
 
 		const timeComplexityName = "Time complexity";
