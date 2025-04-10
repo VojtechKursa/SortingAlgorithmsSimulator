@@ -1,5 +1,3 @@
-import { FamilySpaceComplexity, FamilyTimeComplexity } from "./Complexity";
-
 export interface CommonSortProperties {
 	readonly name: string;
 	readonly nameMachine: string;

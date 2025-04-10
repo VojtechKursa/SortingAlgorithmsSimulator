@@ -4,6 +4,8 @@ import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { StepKind } from "../data/stepResults/StepKind";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { SelectSortProperties } from "../../sortsConfigs/sorts/SelectSortProperties";
 
 const enum HighlightStateSelectionSort {
 	Selected,
@@ -31,6 +33,10 @@ export class SelectionSort extends SortingAlgorithmArray {
 	protected set min(value: number | undefined) {
 		this.lastMin = this.min;
 		this._min = value;
+	}
+
+	public get properties(): SortProperties {
+		return SelectSortProperties;
 	}
 
 

@@ -46,6 +46,20 @@ select {
 	justify-content: space-between;
 }
 
+#topbar {
+	#algorithm_name_wrapper {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+
+		align-items: center;
+
+		button {
+			margin-left: 1rem;
+		}
+	}
+}
+
 #top_controls {
 	display: flex;
 	flex-direction: row;

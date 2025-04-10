@@ -5,10 +5,16 @@ import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { Variable } from "../data/Variable";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
 import { StepKind } from "../data/stepResults/StepKind";
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { BubbleSortProperties } from "../../sortsConfigs/sorts/BubbleSortProperties";
 
 export class BubbleSort extends SortingAlgorithmArray {
 	protected k?: number;
 	protected swapped?: boolean;
+
+	public get properties(): SortProperties {
+		return BubbleSortProperties;
+	}
 
 	public constructor(input: number[]) {
 		super(input);

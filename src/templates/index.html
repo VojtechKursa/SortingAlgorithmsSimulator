@@ -48,6 +48,7 @@
 							<p class="card-text">{{shortDescription}}</p>
 						</div>
 						<div class="card-footer">
+							<button type="button" class="btn btn-info" data-sort-algorithm="{{nameMachine}}">Description</button>
 							<a href="{{nameMachine}}.html" class="btn btn-primary">Try</a>
 						</div>
 					</div>
@@ -76,7 +77,9 @@
 			</div>
 			{{#each sortFamilies}}
 			<div class="row family" data-bs-toggle="collapse" href="#collapse-wrapper-family-{{nameMachine}}" role="button">
-				<div class="col-md-3 col-5 algorithm-name">{{name}}</div>
+				<div class="col-md-3 col-5 algorithm-name">
+					<span data-sort-family="{{nameMachine}}">{{name}}</span>
+				</div>
 				<div class="col-md-5 col-7 algorithm-complexity-time">
 					<div class="row algorithm-complexity-time">
 						<div class="col-4 algorithm-complexity-time-best">{{complexityString timeComplexity.best}}</div>
@@ -92,7 +95,9 @@
 				{{#each sorts}}
 				<a href="{{nameMachine}}.html" class="row algorithm">
 					<div class="col-md-3 col-5 algorithm-name">
-						<div>{{name}}</div>
+						<div>
+							<span data-sort-algorithm="{{nameMachine}}">{{name}}</span>
+						</div>
 					</div>
 					<div class="col-md-5 col-7 algorithm-complexity-time">
 						<div class="row algorithm-complexity-time">

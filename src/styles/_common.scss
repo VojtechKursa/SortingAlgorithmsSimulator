@@ -23,8 +23,6 @@
 	margin-right: 0;
 }
 
-
-
 .block {
 	display: block;
 }
@@ -104,4 +102,136 @@
 
 .breadcrumb {
 	@include margin-vertical(0.5rem);
+}
+
+.algorithm_description-dialog {
+	min-width: 350px;
+	max-width: var(--bs-breakpoint-lg);
+	width: 90%;
+
+	> * {
+		@include margin-vertical(3rem);
+
+		&:first-child {
+			margin-top: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.header {
+		display: flex;
+
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		align-items: center;
+
+		.buttons_wrapper {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+			justify-content: flex-end;
+			align-items: center;
+
+			> * {
+				margin-left: 0.5rem;
+			}
+		}
+	}
+
+	.properties {
+		--border: 1px solid black;
+		--border-color: black;
+
+		border: var(--border);
+		border-color: var(--border-color);
+
+		.table-name,
+		.table-value {
+			align-content: center;
+
+			border: var(--border);
+			border-color: var(--border-color);
+
+			@include pad-horizontal(0.5rem);
+			@include pad-vertical(0.25rem);
+		}
+
+		.table-entry {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.table-wrapper,
+		.table-wrapper-outer {
+			display: flex;
+			flex-wrap: nowrap;
+		}
+
+		.table-wrapper {
+			flex-direction: column;
+
+			.table-name {
+				width: 66.667%;
+			}
+
+			.table-value {
+				flex-grow: 1;
+			}
+		}
+
+		.table-wrapper-outer {
+			flex-direction: row;
+
+			.table-name {
+				width: 33.333%;
+			}
+
+			.table-wrapper {
+				flex-grow: 1;
+
+				.table-name,
+				.table-value {
+					width: 50%;
+				}
+			}
+		}
+
+		@media (min-width: 992px) {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+
+			justify-content: space-evenly;
+			align-items: center;
+
+			border: none;
+
+			> div {
+				width: 45%;
+
+				border: var(--border);
+				border-color: var(--border-color);
+			}
+		}
+	}
+
+	.description {
+		> * {
+			margin-bottom: 1rem;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}
+
+body[data-bs-theme="dark"] {
+	.properties {
+		--border-color: white;
+	}
 }

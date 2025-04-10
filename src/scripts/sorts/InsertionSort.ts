@@ -5,8 +5,8 @@ import { Highlights } from "../visualization/Highlights";
 import { SymbolicColor } from "../visualization/colors/SymbolicColor";
 import { SortingAlgorithmArray } from "./SortingAlgorithmArray";
 import { StepKind } from "../data/stepResults/StepKind";
-
-//TODO: Fix animations
+import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
+import { InsertSortProperties } from "../../sortsConfigs/sorts/InsertSortProperties";
 
 const enum HighlightStateInsertionSort {
 	Selected,
@@ -19,6 +19,10 @@ export class InsertionSort extends SortingAlgorithmArray {
 	protected i?: number;
 	protected x?: number;
 	protected j?: number;
+
+	public get properties(): SortProperties {
+		return InsertSortProperties;
+	}
 
 	public constructor(input: number[]) {
 		super(input);
