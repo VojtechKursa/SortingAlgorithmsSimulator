@@ -1,5 +1,6 @@
 import { StepIndexes } from "../data/StepIndexes";
 import { StepKind, StepKindHelper } from "../data/stepResults/StepKind";
+import { ButtonFactory } from "../misc/ButtonFactory";
 import { StepControllerClasses } from "../visualization/css/StepControllerClasses";
 
 /**
@@ -84,15 +85,8 @@ class StepControllerElementary {
 		buttonGroup.classList.add("btn-group");
 		buttonGroup.role = "group";
 
-		this.backButton = document.createElement("button");
-		const backIcon = document.createElement("i");
-		backIcon.classList.add("bi", "bi-caret-left-fill");
-		this.backButton.appendChild(backIcon);
-
-		this.nextButton = document.createElement("button");
-		const nextIcon = document.createElement("i");
-		nextIcon.classList.add("bi", "bi-caret-right-fill");
-		this.nextButton.appendChild(nextIcon);
+		this.backButton = ButtonFactory.makeButtonWithIcon("caret-left-fill");
+		this.nextButton = ButtonFactory.makeButtonWithIcon("caret-right-fill");
 
 		for (const button of [this.backButton, this.nextButton]) {
 			button.classList.add("btn", "btn-primary");
@@ -354,17 +348,11 @@ export class StepController {
 		this.stepControllers = controllers;
 
 		// Generate "to beginning" and "to end" buttons
-		this.beginningButton = document.createElement("button");
+		this.beginningButton = ButtonFactory.makeButtonWithIcon("skip-backward-fill");
 		this.beginningButton.id = "step-beginning";
-		const beginningIcon = document.createElement("i");
-		beginningIcon.classList.add("bi", "bi-skip-backward-fill");
-		this.beginningButton.appendChild(beginningIcon);
 
-		this.endButton = document.createElement("button");
+		this.endButton = ButtonFactory.makeButtonWithIcon("skip-forward-fill");
 		this.endButton.id = "step-end";
-		const endIcon = document.createElement("i");
-		endIcon.classList.add("bi", "bi-skip-forward-fill");
-		this.endButton.appendChild(endIcon);
 
 		for (const button of [this.beginningButton, this.endButton]) {
 			button.classList.add("btn", "btn-primary");
