@@ -33,7 +33,7 @@ export class StepResultMultiArray extends StepResult {
 		description: string = "",
 		highlightedCodeLines: ReadOnlyHighlights | number | readonly number[] = new Map<number, SymbolicColor>(),
 		arrays: readonly AnnotatedArray[],
-		variables: Variable[] | undefined,
+		variables: Variable[] | undefined = undefined,
 		stack: CallStack | CallStackFrozen | undefined = undefined,
 	) {
 		const discoveredVariables = new Set<string>();
