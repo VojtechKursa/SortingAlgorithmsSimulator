@@ -176,7 +176,6 @@ export function initSimulator(
 
 		let debuggerCollapseButton = document.getElementById("button_hide_debugger") as HTMLButtonElement;
 
-		let settingsOpenButton = document.getElementById("settings-open") as HTMLButtonElement;
 		let sortDescriptionOpenButton = document.getElementById("description-open") as HTMLButtonElement;
 
 		simulatorPageController = new SimulatorPageController(
@@ -185,7 +184,6 @@ export function initSimulator(
 			collapseWrappers,
 			debuggerCollapseButton,
 			callStackController,
-			settingsOpenButton,
 			sortingAlgorithm.properties,
 			sortDescriptionOpenButton,
 			darkModeHandler,
