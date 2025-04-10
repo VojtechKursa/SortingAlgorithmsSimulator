@@ -12,6 +12,7 @@ import { getBooleanString, getComplexityOrComplexityRangeString } from './src/so
 
 
 const isProduction = process.env.NODE_ENV == 'production';
+const serveOnLocalHost: boolean = true;
 
 
 
@@ -89,7 +90,7 @@ const config: webpack.Configuration = {
 		},
 		compress: true,
 		open: true,
-		host: 'localhost',
+		host: serveOnLocalHost ? 'localhost' : undefined,
 		hot: true
 	},
 	plugins: [
