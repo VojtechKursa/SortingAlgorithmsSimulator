@@ -47,7 +47,7 @@ export class IndexPageController {
 				if (familyName != null) {
 					const properties = sortFamilies.find(family => family.nameMachine == familyName);
 					if (properties != undefined) {
-						new AlgorithmDescriptionController(properties).open();
+						new AlgorithmDescriptionController(properties, false).open();
 					}
 					return;
 				}
@@ -57,7 +57,7 @@ export class IndexPageController {
 					const allAlgorithms = sortFamilies.map(family => family.sorts).flat();
 					const properties = allAlgorithms.find(algorithm => algorithm.nameMachine == algorithmName);
 					if (properties != undefined) {
-						new AlgorithmDescriptionController(properties).open();
+						new AlgorithmDescriptionController(properties, true).open();
 					}
 					return;
 				}

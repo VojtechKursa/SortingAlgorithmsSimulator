@@ -109,7 +109,7 @@ export class SimulatorPageController {
 
 		new ResizeObserver(() => this.visualizationOptionsResizeHandler()).observe(visualizationOptionsWrapper);
 
-		this.algorithmDescriptionController = new AlgorithmDescriptionController(algorithmProperties);
+		this.algorithmDescriptionController = new AlgorithmDescriptionController(algorithmProperties, false);
 		algorithmDescriptionButton.addEventListener("click", () => {
 			this.algorithmDescriptionController.open();
 		});

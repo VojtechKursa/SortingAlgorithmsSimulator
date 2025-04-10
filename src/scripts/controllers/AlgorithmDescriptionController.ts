@@ -2,6 +2,7 @@ import { Complexity, ComplexityRange } from "../../sortsConfigs/definitions/Comp
 import { SortFamilyProperties } from "../../sortsConfigs/definitions/SortFamilyProperties";
 import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
 import { getBooleanString, getComplexityOrComplexityRangeHTML, getComplexityOrComplexityRangeString } from "../../sortsConfigs/definitions/SortPropertyHelpers";
+import { ButtonFactory } from "../misc/ButtonFactory";
 import { AlgorithmDescriptionClasses } from "../visualization/css/AlgorithmDescriptionClasses";
 
 abstract class PropertiesTableEntry {
@@ -28,11 +29,15 @@ class BooleanTableEntry extends PropertiesTableEntry {
 	}
 }
 
+/**
+ * Controller for dialog containing a detailed description of an algorithm or algorithms family.
+ */
 export class AlgorithmDescriptionController {
 	private readonly dialog: HTMLDialogElement;
 
 	public constructor(
-		private readonly properties: SortFamilyProperties | SortProperties
+		private readonly properties: SortFamilyProperties | SortProperties,
+		private readonly generatePlayButton: boolean,
 	) {
 		this.dialog = document.createElement("dialog");
 		this.dialog.classList.add(AlgorithmDescriptionClasses.dialogClass);
@@ -48,27 +53,48 @@ export class AlgorithmDescriptionController {
 	private generateDialog(): void {
 		this.dialog.innerHTML = "";
 
-		const header = document.createElement("h2");
-		header.textContent = this.properties.name;
+		const header = this.generateHeader();
 
 		const propertiesWrapper = this.generateProperties();
 
 		const description = this.generateDescription();
 
-		const buttonsWrapper = document.createElement("div");
-		buttonsWrapper.classList.add(AlgorithmDescriptionClasses.buttonsWrapperClass);
-
-		const closeButton = document.createElement("button");
-		closeButton.textContent = "Close";
-		closeButton.classList.add("btn", "btn-primary");
-		buttonsWrapper.appendChild(closeButton);
-
 		this.dialog.appendChild(header);
 		this.dialog.appendChild(propertiesWrapper);
 		this.dialog.appendChild(description);
-		this.dialog.appendChild(buttonsWrapper);
+	}
+
+	private generateHeader(): HTMLDivElement {
+		const header = document.createElement("div");
+		header.classList.add(AlgorithmDescriptionClasses.headerClass);
+
+		const headerText = document.createElement("h2");
+		headerText.textContent = this.properties.name;
+
+		const buttonsWrapper = this.generateButtons();
+
+		header.appendChild(headerText);
+		header.appendChild(buttonsWrapper);
+
+		return header;
+	}
+
+	private generateButtons(): HTMLDivElement {
+		const buttonsWrapper = document.createElement("div");
+		buttonsWrapper.classList.add(AlgorithmDescriptionClasses.buttonsWrapperClass);
+
+		if (this.generatePlayButton) {
+			const playButton = ButtonFactory.makeButtonWithIcon("play-fill", ["btn", "btn-outline-success"], false);
+			playButton.href = `${this.properties.nameMachine}.html`;
+			buttonsWrapper.appendChild(playButton);
+		}
+
+		const closeButton = ButtonFactory.makeButtonWithIcon("x-lg", ["btn", "btn-outline-danger"]);
+		buttonsWrapper.appendChild(closeButton);
 
 		closeButton.addEventListener("click", () => this.close());
+
+		return buttonsWrapper;
 	}
 
 	private generateDescription(): HTMLDivElement {
@@ -89,9 +115,7 @@ export class AlgorithmDescriptionController {
 
 	private generateProperties(): HTMLDivElement {
 		const propertiesWrapper = document.createElement("div");
-		propertiesWrapper.classList.add(AlgorithmDescriptionClasses.propertiesClass, "row");
-
-		const propertiesLayoutBreakpoint = "lg";
+		propertiesWrapper.classList.add(AlgorithmDescriptionClasses.propertiesClass);
 
 		const timeComplexityName = "Time complexity";
 		const timeComplexities = [
@@ -107,28 +131,28 @@ export class AlgorithmDescriptionController {
 		];
 
 		const timeComplexityWrapper = document.createElement("div");
-		timeComplexityWrapper.classList.add("col-12", `col-${propertiesLayoutBreakpoint}-6`, "row", AlgorithmDescriptionClasses.tableWrapperClass);
+		timeComplexityWrapper.classList.add(AlgorithmDescriptionClasses.tableWrapperOuterClass);
 		propertiesWrapper.appendChild(timeComplexityWrapper);
 
 		const timeComplexityLabel = document.createElement("div");
-		timeComplexityLabel.classList.add("col-4", AlgorithmDescriptionClasses.tableNameClass);
+		timeComplexityLabel.classList.add(AlgorithmDescriptionClasses.tableNameClass);
 		timeComplexityLabel.textContent = timeComplexityName;
 		timeComplexityWrapper.appendChild(timeComplexityLabel);
 
 		const timeComplexitiesWrapper = document.createElement("div");
-		timeComplexitiesWrapper.classList.add("col-8", AlgorithmDescriptionClasses.tableWrapperClass);
+		timeComplexitiesWrapper.classList.add(AlgorithmDescriptionClasses.tableWrapperClass);
 		timeComplexityWrapper.appendChild(timeComplexitiesWrapper);
 
 		for (const complexity of timeComplexities) {
 			const row = document.createElement("div");
-			row.classList.add("row");
+			row.classList.add(AlgorithmDescriptionClasses.tableEntryClass);
 
 			const name = document.createElement("div");
-			name.classList.add("col-6", AlgorithmDescriptionClasses.tableNameClass);
+			name.classList.add(AlgorithmDescriptionClasses.tableNameClass);
 			name.textContent = complexity.name;
 
 			const value = document.createElement("div");
-			value.classList.add("col-6", AlgorithmDescriptionClasses.tableValueClass);
+			value.classList.add(AlgorithmDescriptionClasses.tableValueClass);
 			value.innerHTML = complexity.value == undefined ? "?" : getComplexityOrComplexityRangeHTML(complexity.value);
 
 			row.appendChild(name);
@@ -136,24 +160,20 @@ export class AlgorithmDescriptionController {
 			timeComplexitiesWrapper.appendChild(row);
 		}
 
-		const spacer = document.createElement("div");
-		spacer.classList.add("col-0", `col-${propertiesLayoutBreakpoint}-1`, AlgorithmDescriptionClasses.spacerClass);
-		propertiesWrapper.appendChild(spacer);
-
 		const otherPropertiesWrapper = document.createElement("div");
-		otherPropertiesWrapper.classList.add("col-12", `col-${propertiesLayoutBreakpoint}-5`, AlgorithmDescriptionClasses.tableWrapperClass);
+		otherPropertiesWrapper.classList.add(AlgorithmDescriptionClasses.tableWrapperClass);
 		propertiesWrapper.appendChild(otherPropertiesWrapper);
 
 		for (const property of otherProperties) {
 			const row = document.createElement("div");
-			row.classList.add("row");
+			row.classList.add(AlgorithmDescriptionClasses.tableEntryClass);
 
 			const name = document.createElement("div");
-			name.classList.add("col-8", AlgorithmDescriptionClasses.tableNameClass);
+			name.classList.add(AlgorithmDescriptionClasses.tableNameClass);
 			name.textContent = property.name;
 
 			const value = document.createElement("div");
-			value.classList.add("col-4", AlgorithmDescriptionClasses.tableValueClass);
+			value.classList.add(AlgorithmDescriptionClasses.tableValueClass);
 
 			if (property instanceof ComplexityTableEntry) {
 				value.innerHTML = property.value == undefined ? "?" : getComplexityOrComplexityRangeHTML(property.value);
@@ -169,12 +189,18 @@ export class AlgorithmDescriptionController {
 		return propertiesWrapper;
 	}
 
+	/**
+	 * Opens the dialog controlled by this controller.
+	 */
 	public open(): void {
 		document.body.appendChild(this.dialog);
 		document.body.classList.add("blur");
 		this.dialog.showModal();
 	}
 
+	/**
+	 * Closes the dialog controlled by this controller.
+	 */
 	public close(): void {
 		this.dialog.close();
 	}
