@@ -62,6 +62,7 @@ export class SimulatorPageController {
 		private readonly collapseWrappers: CollapseWrappers,
 		debuggerCollapseButton: HTMLButtonElement,
 		private readonly callStackController: CallStackController,
+		private readonly settingsOpenButton: HTMLButtonElement,
 		algorithmProperties: SortProperties,
 		algorithmDescriptionButton: HTMLButtonElement,
 		darkModeHandler: DarkModeHandler,
