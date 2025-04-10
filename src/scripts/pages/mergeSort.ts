@@ -1,16 +1,11 @@
 import { MergeSort } from "../sorts/MergeSort";
-import { SvgMainAndSubArraysRenderer } from "../visualization/rendering/svg/SvgMainAndSubArraysRenderer";
-import { getCurrentColorMap, getDefaultRenderers, initSimulator } from "./simulator";
+import { getDefaultMainAndSubRenderers } from "./complexSimulator";
+import { getCurrentColorMap, initSimulator } from "./simulator";
 
 document.addEventListener("DOMContentLoaded", () => {
 	const colors = getCurrentColorMap();
 
-	const defaultRenderers = getDefaultRenderers(colors, 2);
-	const renderers: SvgMainAndSubArraysRenderer[] = [];
-
-	for (const renderer of defaultRenderers) {
-		renderers.push(new SvgMainAndSubArraysRenderer(renderer));
-	}
+	const renderers = getDefaultMainAndSubRenderers(colors, 2);
 
 	initSimulator(new MergeSort([]), undefined, renderers)
 });

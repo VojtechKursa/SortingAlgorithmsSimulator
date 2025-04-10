@@ -41,7 +41,7 @@ export function getCurrentColorMap(): ColorMap {
 
 export function getDefaultRenderers(colorMap: ColorMap, reservedVariableSpace: number | undefined = undefined): SvgRenderer[] {
 	const boxRenderer = new SvgArrayBoxRenderer(colorMap, reservedVariableSpace);
-	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap, reservedVariableSpace);
+	const barChartRenderer = new SvgArrayBarChartRenderer(colorMap, undefined, reservedVariableSpace);
 
 	return [barChartRenderer, boxRenderer];
 }

@@ -15,9 +15,9 @@ class BarChartRenderSettings {
 	public readonly mainFontHeight = this.fontMain.fontSize * FontProperties.fontSizeCorrectionMultiplier;
 
 	public constructor(
+		public readonly chartHeight: number = 50,
 		public readonly barWidth: number = 10,
 		public readonly minimumBarHeight: number = 10,
-		public readonly chartHeight: number = 100,
 		public readonly horizontalMargin: number = 10,
 		public readonly borderWidth: number = 0.5,
 		public readonly fontMain: FontProperties = new FontProperties(4, 0.5),
@@ -32,10 +32,10 @@ class BarChartRenderSettings {
 }
 
 export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
-	public readonly renderSettings = new BarChartRenderSettings();
-	public readonly variableSettings = new VariableRenderSettings(this.renderSettings.barWidth * 0.8, undefined, undefined, undefined, undefined, 0, 2.5);
+	public readonly renderSettings;
+	public readonly variableSettings;
 
-	public readonly oneVariableVerticalSpace = getOneVariableVerticalSpace(this.variableSettings);
+	public readonly oneVariableVerticalSpace;
 
 	private _currentArrayLength: number | undefined;
 	public get currentArrayLength(): number | undefined {
@@ -48,7 +48,7 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 	private lastRenderedStep: StepResultArray | undefined;
 	private readonly resultMemory: SvgRenderResult;
 
-	private readonly defaultMaxYNoVariables = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
+	private readonly defaultMaxYNoVariables;
 	private get defaultMaxY(): number {
 		return this.defaultMaxYNoVariables + this.reservedVariablesSpace * this.oneVariableVerticalSpace;
 	}
@@ -89,6 +89,7 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 
 	public constructor(
 		colorMap: ColorMap,
+		chartHeight: number | undefined = undefined,
 		public reservedVariablesSpace: number = 0,
 		public reserveVariablesSpaceWithNoVariables: boolean = false,
 		public drawFinalVariables: boolean = false,
@@ -96,6 +97,11 @@ export class SvgArrayBarChartRenderer implements SvgRenderer, HasRangeOfValues {
 	) {
 		this._colorMap = colorMap;
 		this.maxY = this.defaultMaxY;
+
+		this.renderSettings = new BarChartRenderSettings(chartHeight);
+		this.variableSettings = new VariableRenderSettings(this.renderSettings.barWidth * 0.8, undefined, undefined, undefined, undefined, 0, 2.5);
+		this.oneVariableVerticalSpace = getOneVariableVerticalSpace(this.variableSettings);
+		this.defaultMaxYNoVariables = this.renderSettings.chartHeight + this.renderSettings.borderWidth;
 
 		this.resultMemory = new SvgRenderResult(
 			document.createElementNS("http://www.w3.org/2000/svg", "svg"),
