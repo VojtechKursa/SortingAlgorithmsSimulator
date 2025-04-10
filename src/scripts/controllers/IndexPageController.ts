@@ -1,4 +1,5 @@
 import sortFamilies from "../../sortsConfigs/sortFamilies";
+import { isMobileBrowser } from "../misc/DetectMobileBrowser";
 import { hiddenClass } from "../visualization/css/GenericClasses";
 import { AlgorithmDescriptionController } from "./AlgorithmDescriptionController";
 
@@ -37,7 +38,12 @@ export class IndexPageController {
 			gridModeButton.classList.add("active");
 		});
 
-		tableModeButton.click();
+		if (isMobileBrowser(navigator.userAgent)) {
+			gridModeButton.click();
+		}
+		else {
+			tableModeButton.click();
+		}
 
 		const descriptionTriggers = document.querySelectorAll(`[${IndexPageController.sortFamilyData}],[${IndexPageController.sortAlgorithmData}]`);
 		for (const trigger of descriptionTriggers) {
