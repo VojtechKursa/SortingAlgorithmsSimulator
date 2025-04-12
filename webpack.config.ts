@@ -7,13 +7,13 @@ import path from 'path';
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin';
 import Handlebars from 'handlebars';
 
+import { port, host } from './webpack.devServer.config';
+
 import sortFamilies from './src/sortsConfigs/sortFamilies';
 import { getBooleanString, getComplexityOrComplexityRangeString } from './src/sortsConfigs/definitions/SortPropertyHelpers';
 
 
 const isProduction = process.env.NODE_ENV == 'production';
-const serveOnLocalHost: boolean = true;
-
 
 
 const htmlBundlerPluginConfig: HtmlBundlerPlugin.PluginOptions = {
@@ -90,8 +90,9 @@ const config: webpack.Configuration = {
 		},
 		compress: true,
 		open: true,
-		host: serveOnLocalHost ? 'localhost' : undefined,
-		hot: true
+		hot: true,
+		host: host,
+		port: port,
 	},
 	plugins: [
 		new HtmlBundlerPlugin(htmlBundlerPluginConfig),
