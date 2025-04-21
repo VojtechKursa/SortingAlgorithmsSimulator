@@ -25,6 +25,10 @@ const htmlBundlerPluginConfig: HtmlBundlerPlugin.PluginOptions = {
 			data: {
 				sortFamilies: sortFamilies
 			}
+		},
+
+		guide: {
+			import: "src/templates/guide.html",
 		}
 	},
 	js: {

@@ -1,0 +1,53 @@
+@use "common";
+
+main {
+	margin-top: 1rem;
+}
+
+h1 {
+	margin-top: 2rem;
+}
+
+h2 {
+	margin-top: 1rem;
+}
+
+h3 {
+	margin-top: 0.5rem;
+}
+
+.keybinds-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+
+	table.keybinds {
+		max-width: fit-content;
+
+		td {
+			@include common.pad-horizontal(1em);
+		}
+
+		thead,
+		tbody {
+			tr {
+				td:nth-child(2) {
+					text-align: center;
+				}
+			}
+		}
+
+		thead {
+			font-weight: bold;
+		}
+
+		tbody {
+			tr {
+				td:nth-child(2) {
+					font-family: monospace;
+					color: var(--bs-info-text-emphasis);
+				}
+			}
+		}
+	}
+}
