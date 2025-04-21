@@ -1,6 +1,7 @@
 @use "common";
 
-$border: 2px solid black;
+$border-width: 2px;
+$border: $border-width solid black;
 
 :root {
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
@@ -263,8 +264,6 @@ select {
 }
 
 body {
-	min-width: 420px;
-
 	&.vertical1 {
 		#row_main {
 			display: block;
@@ -327,6 +326,9 @@ body {
 }
 
 #row_main {
+	$canvas-min-width: 400px;
+	$state_renderer-min-width: calc($canvas-min-width + var(--bs-gutter-x) + $border-width);
+
 	display: flex;
 	flex-flow: row;
 
@@ -334,7 +336,7 @@ body {
 	text-align: center;
 
 	max-width: calc(100vw - var(--bs-gutter-x) - var(--scrollbar-width));
-	min-width: 400px;
+	min-width: calc($state_renderer-min-width + 10px);
 
 	#visualization_options_wrapper {
 		flex-grow: 1;
@@ -391,6 +393,8 @@ body {
 
 	#state_renderer {
 		flex-grow: 1;
+		flex-basis: $state_renderer-min-width;
+		min-width: $state_renderer-min-width;
 
 		display: flex;
 		flex-flow: column;
@@ -402,6 +406,7 @@ body {
 		#canvas_wrapper {
 			width: 100%;
 			flex-grow: 1;
+			min-width: $canvas-min-width;
 
 			align-content: start;
 
@@ -426,8 +431,11 @@ body {
 	}
 
 	#debugger_collection-wrapper {
+		min-width: 0;
+
 		#debugger_collection {
 			flex-grow: 1;
+			min-width: 0;
 
 			padding-left: calc(var(--bs-gutter-x) / 2);
 
