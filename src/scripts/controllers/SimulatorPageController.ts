@@ -123,8 +123,10 @@ export class SimulatorPageController {
 		const breakpointVertical1 = this.callStackController.isPresent ? this.vertical1LayoutBreakpointWithStack : this.vertical1LayoutBreakpointWithoutStack;
 		const breakpointVertical2 = this.callStackController.isPresent ? this.vertical2LayoutBreakpointWithStack : this.vertical2LayoutBreakpointWithoutStack;
 
-		const shouldBeVertical1 = window.innerWidth < breakpointVertical1;
-		const shouldBeVertical2 = window.innerWidth < breakpointVertical2;
+		const width = Math.min(window.innerWidth, window.outerWidth);
+
+		const shouldBeVertical1 = width < breakpointVertical1;
+		const shouldBeVertical2 = width < breakpointVertical2;
 
 		if (shouldBeVertical1) {
 			document.body.classList.add(bodyVertical1LayoutClass);
