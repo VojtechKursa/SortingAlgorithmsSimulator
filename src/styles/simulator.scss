@@ -282,8 +282,8 @@ body.vertical2 {
 		#debugger_row {
 			flex-wrap: wrap;
 
-			#debugger_wrapper {
-				padding-right: 0 !important;
+			#debugger {
+				margin-right: 0 !important;
 				width: 100%;
 			}
 
@@ -428,51 +428,49 @@ body.vertical2 {
 				display: flex;
 				flex-direction: row;
 
-				#debugger_wrapper {
+				#debugger {
 					flex-grow: 1;
 
-					padding-right: calc(var(--bs-gutter-x) / 2);
+					margin-right: calc(var(--bs-gutter-x) / 2);
 
-					#debugger {
-						color: var(--bs-body-color);
-						background-color: var(--debugger-bg);
+					color: var(--bs-body-color);
+					background-color: var(--debugger-bg);
 
-						text-align: left;
-						align-content: center;
+					text-align: left;
+					align-content: center;
 
-						padding-right: 1rem;
+					padding-right: 1rem;
 
-						.code-line {
-							display: flex;
-							flex-direction: row;
-							flex-wrap: nowrap;
-							justify-content: flex-start;
-							align-items: center;
+					.code-line {
+						display: flex;
+						flex-direction: row;
+						flex-wrap: nowrap;
+						justify-content: flex-start;
+						align-items: center;
 
-							font-family: monospace;
+						font-family: monospace;
 
-							.code-header {
-								width: 3em;
+						.code-header {
+							width: 3em;
 
-								background-color: var(--bs-tertiary-bg);
+							background-color: var(--bs-tertiary-bg);
 
-								text-align: right;
-								padding-right: 0.5em;
+							text-align: right;
+							padding-right: 0.5em;
 
-								user-select: none; /* Make the text un-selectable */
-							}
-
-							.code-text {
-								flex-grow: 1;
-
-								padding-left: 0.5em;
-								white-space: pre;
-							}
+							user-select: none; /* Make the text un-selectable */
 						}
 
-						.code-line_active {
-							background-color: var(--color-code-line_active);
+						.code-text {
+							flex-grow: 1;
+
+							padding-left: 0.5em;
+							white-space: pre;
 						}
+					}
+
+					.code-line_active {
+						background-color: var(--color-code-line_active);
 					}
 				}
 
