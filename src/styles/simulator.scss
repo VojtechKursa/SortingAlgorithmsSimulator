@@ -439,8 +439,6 @@ body.vertical2 {
 					text-align: left;
 					align-content: center;
 
-					padding-right: 1rem;
-
 					.code-line {
 						display: flex;
 						flex-direction: row;
@@ -451,7 +449,11 @@ body.vertical2 {
 						font-family: monospace;
 
 						.code-header {
-							width: 3em;
+							$width: 3em;
+
+							width: $width;
+							min-width: $width;
+							max-width: $width;
 
 							background-color: var(--bs-tertiary-bg);
 
@@ -465,6 +467,8 @@ body.vertical2 {
 							flex-grow: 1;
 
 							padding-left: 0.5em;
+							padding-right: 1em;
+
 							white-space: pre;
 						}
 					}
