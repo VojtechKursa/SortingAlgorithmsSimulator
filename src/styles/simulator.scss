@@ -437,14 +437,20 @@ body {
 			flex-grow: 1;
 			min-width: 0;
 
+			display: flex;
+			flex-direction: column;
+
 			padding-left: calc(var(--bs-gutter-x) / 2);
 
 			#debugger_row {
 				display: flex;
 				flex-direction: row;
+				height: 100%;
 
 				#debugger {
 					flex-grow: 1;
+
+					height: fit-content;
 
 					margin-right: calc(var(--bs-gutter-x) / 2);
 
