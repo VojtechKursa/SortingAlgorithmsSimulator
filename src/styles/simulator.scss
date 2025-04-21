@@ -329,6 +329,8 @@ body.vertical2 {
 	border: $border;
 	text-align: center;
 
+	max-width: calc(100vw - var(--bs-gutter-x) - 15px);
+
 	#visualization_options_wrapper {
 		flex-grow: 1;
 
@@ -439,12 +441,17 @@ body.vertical2 {
 					text-align: left;
 					align-content: center;
 
+					overflow-x: auto;
+
 					.code-line {
 						display: flex;
 						flex-direction: row;
 						flex-wrap: nowrap;
 						justify-content: flex-start;
 						align-items: center;
+
+						white-space: nowrap;
+						overflow: visible;
 
 						font-family: monospace;
 
