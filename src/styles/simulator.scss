@@ -129,7 +129,6 @@ select {
 	flex-direction: row;
 
 	padding-right: 1rem;
-	padding-bottom: 0.5rem;
 
 	.step_control-wrapper-vertical {
 		display: flex;
@@ -338,6 +337,10 @@ body {
 	max-width: calc(100vw - var(--bs-gutter-x) - var(--scrollbar-width));
 	min-width: calc($state_renderer-min-width + 10px);
 
+	#stepping {
+		padding-bottom: 1rem;
+	}
+
 	#visualization_options_wrapper {
 		flex-grow: 1;
 
@@ -345,6 +348,8 @@ body {
 		flex-direction: row;
 
 		justify-content: flex-end;
+
+		padding-bottom: 1rem;
 
 		&.wrapped {
 			justify-content: flex-start;
