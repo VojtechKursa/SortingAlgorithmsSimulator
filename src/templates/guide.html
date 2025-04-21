@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+	<title>SAS - Guide</title>
+
+	<link href="bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+	<link href="bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
+
+	<link href="../styles/guide.scss" rel="stylesheet">
+	<script src="../scripts/pages/guide.ts" defer></script>
+</head>
+
+<body data-bs-theme="dark">
+	<div id="topbar" class="container-fluid">
+		<div id="algorithm_name_wrapper">
+			<a class="navbar-brand" href="">Sorting algorithms simulator - Guide</a>
+		</div>
+		<div id="topbar-buttons_wrapper">
+			<button id="dark_mode-toggle" type="button" class="btn btn-primary"></button>
+		</div>
+	</div>
+
+	<div class="container-fluid navbar-wrapper">
+		<div id="navbar">
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Menu</a></li>
+					<li class="breadcrumb-item" active>Guide</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+
+	<main class="container-fluid">
+		<section class="page_description">
+			<h1>Main page</h1>
+			<p>
+				The main page is available in 2 modes of display:
+			<ul>
+				<li>A <b>grid</b> containing all available algorithm variations - Primary display mode for smaller
+					displays</li>
+				<li>A <b>table</b>, containing a list of all algorithms and their properties.</li>
+			</ul>
+			</p>
+			<p>
+				In the table mode, clicking on a row of an algorithm in the table opens a collapsible table underneath,
+				which contains all available variations of the selected algorithm with their respective properties.
+				Clicking on the name of an algorithm or algorithm variation ("?" appears next to the cursor when
+				hovering over
+				the name) opens a description dialog of the selected algorithm or algorithm variation.
+			</p>
+		</section>
+
+		<section class="page_description">
+			<h1>Simulator page</h1>
+			<p>
+				The simulator page contains a simulator of a selected algorithm variation. The description dialog can
+				be accessed by clicking the
+				<button class="btn btn-outline-info"><i class="bi bi-question-circle"></i></button>
+				button next to the algorithm variation's name in the header of the page.
+			</p>
+
+			<h2>Step kinds</h2>
+			<p>
+				There are several kinds of steps you can choose to step through the algorithm in:
+
+			<ul>
+				<li><b>Code</b> - A step in algorithm's pseudocode</li>
+				<li><b>Significant</b> - A significant step in the algorithm, like comparing or swapping values or
+					calling methods.</li>
+				<ul>
+					<li>This is the default step kind.</li>
+				</ul>
+				<li><b>Algorithmic</b> - A step that contains a possible change in position of values in the internal
+					data structure.</li>
+			</ul>
+			</p>
+
+			<h2>Continuous step controls and step kind selector</h2>
+			<p>
+				The upper part of the page contains control elements for automatically stepping through an algorithm.
+				Use the play control elements to let the simulator "play" the algorithm. The algorithm is stepped
+				through in the steps selected in the step kind selector, which is right next to the play controls.
+				The step kind selector also controls which steps are stepped through when using keyboard to step
+				through the algorithm.
+			</p>
+
+			<h2>Visualization section</h2>
+			<p>
+				The central part of the simulator is dedicated to the algorithm visualizer and a debugger section.
+			</p>
+
+			<h3>Visualizer</h3>
+			<p>
+				The algorithm visualizer visualizes the current state of the algorithm. When stepping through the
+				algorithm, it is continuously updated to show the current state in each step.
+			</p>
+			<p>
+				In the upper part, there are buttons for manually stepping through an algorithm in
+				<b>Algorithmic</b> (A) and <b>Significant</b> (S) steps.
+				The step controls also contain buttons to skip to the beginning or the end of an algorithm.
+				Between the step buttons are step counters, which shows the current step number and a total step count
+				for the associated step.
+				<i>
+					The step count is only known after reaching the end of an algorithm. Before that, the total step
+					count simply shows "?".
+				</i>
+			</p>
+			<p>
+				Next to the step controls are renderer settings, where the current renderer can be changed and
+				animations can be turned on or off.
+			</p>
+			<p>
+				The bottom includes a space for a textual description of the current step.
+			</p>
+
+			<h3>Debugger</h3>
+			<p>
+				The debugger section imitates a debugger and can be used to closely follow the algorithms's code.
+				It features a display of the selected algorithm's pseudocode with highlighting of the current
+				instruction. There is also a table of variables which shows the variables of an algorithm in the current
+				scope.
+			</p>
+			<p>
+				<em>Some</em> algorithms also have a call stack tracker in this section. The call stack tracker shows
+				the current state of the algorithm's call stack, represented by names of functions at the respective
+				levels of the call stack, along with variables and their values at the respective levels.
+			</p>
+			<p>
+				At the top of the debugger section is a step control element, which controls steps of the
+				<b>Code</b> (C) kind, along with associated step counter.
+			</p>
+			<p>
+				The whole debugger section can be hidden. The variable and call stack displays can also be hidden
+				independently.
+			</p>
+
+			<h2>Input and reset buttons</h2>
+			<p>
+				Below the visualization section are buttons for resetting the algorithm and setting an input of the
+				algorithm. The input button opens a dialog that allows the user to set the input values for the
+				simulator.
+			</p>
+
+			<h2>Keyboard controls</h2>
+			<p>
+				The simulator can partially be controlled through keyboard inputs. This is the list of possible actions,
+				along with their default key binds.
+			</p>
+
+			<div class="container-fluid keybinds-wrapper">
+				<table class="keybinds table table-bordered table-striped">
+					<thead>
+						<tr>
+							<td>Function</td>
+							<td>Key</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Select next step kind</td>
+							<td>E</td>
+						</tr>
+						<tr>
+							<td>Select previous step kind</td>
+							<td>Q</td>
+						</tr>
+						<tr>
+							<td>Step forward by selected step</td>
+							<td>D</td>
+						</tr>
+						<tr>
+							<td>Step back by selected step</td>
+							<td>A</td>
+						</tr>
+						<tr>
+							<td>Play / Pause</td>
+							<td>Space</td>
+						</tr>
+						<tr>
+							<td>Select Algorithmic step kind</td>
+							<td>Alpha1</td>
+						</tr>
+						<tr>
+							<td>Select Significant step kind</td>
+							<td>Alpha2</td>
+						</tr>
+						<tr>
+							<td>Select Code step kind</td>
+							<td>Alpha3</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+	</main>
+</body>
+
+</html>
