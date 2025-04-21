@@ -333,7 +333,7 @@ body {
 	border: $border;
 	text-align: center;
 
-	max-width: calc(100vw - var(--bs-gutter-x) - 15px);
+	max-width: calc(100vw - var(--bs-gutter-x) - var(--scrollbar-width));
 	min-width: 400px;
 
 	#visualization_options_wrapper {
