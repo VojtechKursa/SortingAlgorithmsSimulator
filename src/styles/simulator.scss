@@ -1,6 +1,7 @@
 @use "common";
 
-$border: 2px solid black;
+$border-width: 2px;
+$border: $border-width solid black;
 
 :root {
 	--color-code-line_active: rgba(255, 255, 0, 0.5);
@@ -128,7 +129,6 @@ select {
 	flex-direction: row;
 
 	padding-right: 1rem;
-	padding-bottom: 0.5rem;
 
 	.step_control-wrapper-vertical {
 		display: flex;
@@ -262,60 +262,62 @@ select {
 	}
 }
 
-body.vertical1 {
-	#row_main {
-		display: block;
+body {
+	&.vertical1 {
+		#row_main {
+			display: block;
+		}
+
+		#state_renderer {
+			height: fit-content;
+
+			border-right: none !important;
+			border-bottom: $border;
+		}
 	}
 
-	#state_renderer {
-		height: fit-content;
+	&.vertical2 {
+		#debugger_collection {
+			@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
 
-		border-right: none !important;
-		border-bottom: $border;
-	}
-}
+			#debugger_row {
+				flex-wrap: wrap;
 
-body.vertical2 {
-	#debugger_collection {
-		@include common.pad-horizontal(calc(var(--bs-gutter-x) / 2));
+				#debugger {
+					margin-right: 0 !important;
+					width: 100%;
+				}
 
-		#debugger_row {
-			flex-wrap: wrap;
+				#variable_watch-hide_wrapper,
+				#call_stack-hide_wrapper {
+					margin-top: 1em;
 
-			#debugger_wrapper {
-				padding-right: 0 !important;
-				width: 100%;
-			}
+					width: 50%;
 
-			#variable_watch-hide_wrapper,
-			#call_stack-hide_wrapper {
-				margin-top: 1em;
+					.collapse,
+					.collapsing {
+						> div {
+							// wrappers
+							@include common.pad-vertical(1em);
 
-				width: 50%;
+							table {
+								width: 100%;
 
-				.collapse,
-				.collapsing {
-					> div {
-						// wrappers
-						@include common.pad-vertical(1em);
-
-						table {
-							width: 100%;
-
-							td {
-								width: 50%;
+								td {
+									width: 50%;
+								}
 							}
 						}
 					}
 				}
-			}
 
-			#variable_watch-hide_wrapper {
-				padding-right: 1em;
+				#variable_watch-hide_wrapper {
+					padding-right: 1em;
 
-				&:has(+ #call_stack-hide_wrapper.hidden) {
-					width: 100%;
-					padding-right: 0;
+					&:has(+ #call_stack-hide_wrapper.hidden) {
+						width: 100%;
+						padding-right: 0;
+					}
 				}
 			}
 		}
@@ -323,11 +325,21 @@ body.vertical2 {
 }
 
 #row_main {
+	$canvas-min-width: 400px;
+	$state_renderer-min-width: calc($canvas-min-width + var(--bs-gutter-x) + $border-width);
+
 	display: flex;
 	flex-flow: row;
 
 	border: $border;
 	text-align: center;
+
+	max-width: calc(100vw - var(--bs-gutter-x) - var(--scrollbar-width));
+	min-width: calc($state_renderer-min-width + 10px);
+
+	#stepping {
+		padding-bottom: 1rem;
+	}
 
 	#visualization_options_wrapper {
 		flex-grow: 1;
@@ -336,6 +348,8 @@ body.vertical2 {
 		flex-direction: row;
 
 		justify-content: flex-end;
+
+		padding-bottom: 1rem;
 
 		&.wrapped {
 			justify-content: flex-start;
@@ -384,6 +398,8 @@ body.vertical2 {
 
 	#state_renderer {
 		flex-grow: 1;
+		flex-basis: $state_renderer-min-width;
+		min-width: $state_renderer-min-width;
 
 		display: flex;
 		flex-flow: column;
@@ -395,6 +411,7 @@ body.vertical2 {
 		#canvas_wrapper {
 			width: 100%;
 			flex-grow: 1;
+			min-width: $canvas-min-width;
 
 			align-content: start;
 
@@ -419,57 +436,76 @@ body.vertical2 {
 	}
 
 	#debugger_collection-wrapper {
+		min-width: 0;
+
 		#debugger_collection {
 			flex-grow: 1;
+			min-width: 0;
+
+			display: flex;
+			flex-direction: column;
 
 			padding-left: calc(var(--bs-gutter-x) / 2);
 
 			#debugger_row {
 				display: flex;
 				flex-direction: row;
+				height: 100%;
 
-				#debugger_wrapper {
+				#debugger {
 					flex-grow: 1;
 
-					padding-right: calc(var(--bs-gutter-x) / 2);
+					height: fit-content;
 
-					#debugger {
-						color: var(--bs-body-color);
-						background-color: var(--debugger-bg);
+					margin-right: calc(var(--bs-gutter-x) / 2);
 
-						text-align: left;
-						align-content: center;
+					color: var(--bs-body-color);
+					background-color: var(--debugger-bg);
 
-						padding-right: 1rem;
+					text-align: left;
+					align-content: center;
 
-						.code-line {
-							display: grid;
-							grid-template-columns: 3em auto;
+					overflow-x: auto;
 
-							font-family: monospace;
+					.code-line {
+						display: flex;
+						flex-direction: row;
+						flex-wrap: nowrap;
+						justify-content: flex-start;
+						align-items: center;
 
-							.code-header {
-								grid-column: 1;
+						white-space: nowrap;
+						overflow: visible;
 
-								background-color: var(--bs-tertiary-bg);
+						font-family: monospace;
 
-								text-align: right;
-								padding-right: 0.5em;
+						.code-header {
+							$width: 3em;
 
-								user-select: none; /* Make the text un-selectable */
-							}
+							width: $width;
+							min-width: $width;
+							max-width: $width;
 
-							.code-text {
-								grid-column: 2;
+							background-color: var(--bs-tertiary-bg);
 
-								padding-left: 0.5em;
-								white-space: pre;
-							}
+							text-align: right;
+							padding-right: 0.5em;
+
+							user-select: none; /* Make the text un-selectable */
 						}
 
-						.code-line_active {
-							background-color: var(--color-code-line_active);
+						.code-text {
+							flex-grow: 1;
+
+							padding-left: 0.5em;
+							padding-right: 1em;
+
+							white-space: pre;
 						}
+					}
+
+					.code-line_active {
+						background-color: var(--color-code-line_active);
 					}
 				}
 

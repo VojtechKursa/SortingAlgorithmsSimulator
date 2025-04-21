@@ -2,6 +2,7 @@ import { SortProperties } from "../../sortsConfigs/definitions/SortProperties";
 import { CollapseWrappers } from "../data/collections/htmlElementCollections/CollapseWrappers";
 import { KeyboardSettings } from "../keyboard/KeyboardSettings";
 import { KeyPress } from "../keyboard/KeyPress";
+import { ScrollBarWidthMeasurer } from "../misc/ScrollBarWidthMeasurer";
 import { flexWrappedClass } from "../visualization/css/GenericClasses";
 import { bodyVertical1LayoutClass, bodyVertical2LayoutClass } from "../visualization/css/LayoutClasses";
 import { AlgorithmDescriptionController } from "./AlgorithmDescriptionController";
@@ -45,6 +46,11 @@ export class SimulatorPageController {
 	private readonly algorithmDescriptionController: AlgorithmDescriptionController;
 
 	/**
+	 * The {@link ScrollBarWidthMeasurer} used to measure the width of the page's scrollbar during resizes.
+	 */
+	private readonly scrollBarWidthMeasurer: ScrollBarWidthMeasurer;
+
+	/**
 	 * @param playerController - The player controller for the simulator.
 	 * @param inputController - The input dialog controller for the simulator.
 	 * @param collapseWrappers - The wrappers for the collapsible elements in the simulator.
@@ -68,6 +74,8 @@ export class SimulatorPageController {
 		private readonly keyboardSettings: KeyboardSettings,
 		private readonly visualizationOptionsWrapper: HTMLDivElement
 	) {
+		this.scrollBarWidthMeasurer = new ScrollBarWidthMeasurer(true);
+
 		darkModeHandler.addEventHandler(dark => {
 			playerController.setDarkMode(dark);
 		});
@@ -118,13 +126,18 @@ export class SimulatorPageController {
 	 * Handles the resize event of the window.
 	 */
 	private resizeHandler() {
+		const scrollBarWidth = this.scrollBarWidthMeasurer.scrollBarWidth;
+		document.body.style.setProperty("--scrollbar-width", `${scrollBarWidth}px`);
+
 		const horizontalCollapseClass = "collapse-horizontal";
 
 		const breakpointVertical1 = this.callStackController.isPresent ? this.vertical1LayoutBreakpointWithStack : this.vertical1LayoutBreakpointWithoutStack;
 		const breakpointVertical2 = this.callStackController.isPresent ? this.vertical2LayoutBreakpointWithStack : this.vertical2LayoutBreakpointWithoutStack;
 
-		const shouldBeVertical1 = window.innerWidth < breakpointVertical1;
-		const shouldBeVertical2 = window.innerWidth < breakpointVertical2;
+		const width = Math.min(window.innerWidth, window.outerWidth);
+
+		const shouldBeVertical1 = width < breakpointVertical1;
+		const shouldBeVertical2 = width < breakpointVertical2;
 
 		if (shouldBeVertical1) {
 			document.body.classList.add(bodyVertical1LayoutClass);
