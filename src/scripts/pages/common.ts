@@ -17,5 +17,3 @@ export function initCommon(): InitCommonResult {
 
 	return initResult;
 }
-
-// TODO: Implement settings
