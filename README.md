@@ -61,6 +61,10 @@ To start the server use the command:
 npm run serve
 ```
 
+Note that depending on your system configuration, your default browser may open and automatically navigate to the URL of the newly created server.
+**The first load may take several seconds**, because the server is started before the building of the project is finished, so the server has to wait for the building process
+to complete before it starts handling incoming requests. Subsequent requests should be handled instantaneously.
+
 #### Development server configuration
 
 The address and port of the development server can be configured by changing the relevant constants in the `webpack.devServer.config.ts` file in the root directory of this repository.
