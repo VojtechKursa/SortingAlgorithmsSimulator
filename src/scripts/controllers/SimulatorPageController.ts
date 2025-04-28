@@ -56,11 +56,11 @@ export class SimulatorPageController {
 	 * @param collapseWrappers - The wrappers for the collapsible elements in the simulator.
 	 * @param debuggerCollapseButton - The button element used to collapse the debugger.
 	 * @param callStackController - The call stack controller for the simulator.
-	 * @param settingsOpenButton - The button element used to open the settings dialog.
 	 * @param algorithmProperties - The properties of the sorting algorithm used in the current simulator.
 	 * @param algorithmDescriptionButton - The button element used to open the algorithm description dialog.
 	 * @param darkModeHandler - The dark mode handler for the simulator.
 	 * @param keyboardSettings - The current keyboard settings used to control the simulator.
+	 * @param visualizationOptionsWrapper - The wrapper containing the visualization options elements.
 	 */
 	public constructor(
 		private readonly playerController: PlayerController,

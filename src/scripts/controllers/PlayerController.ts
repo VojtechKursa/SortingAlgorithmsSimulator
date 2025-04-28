@@ -46,14 +46,13 @@ export class PlayerController {
 
 	/**
 	 * @param algorithm - The sorting algorithm to be controlled.
-	 * @param playerControls - The control elements for controlling the sorting algorithm's steps.
-	 * @param debuggerControls - The control elements for the debugger, controlling the sorting algorithm's code steps.
+	 * @param stepController - The controller responsible for managing steps through the algorithm.
 	 * @param debuggerController - The controller responsible for managing the debugger UI.
 	 * @param continuousControls - The controller responsible for managing the UI and state of continuous controls (playing).
 	 * @param stepKindController - The controller responsible for keeping track of the currently selected StepKind.
 	 * @param htmlDisplayHandlers - The handlers for updating parts of the HTML document with the current state of the sorting algorithm.
 	 * @param svgDisplayHandler - The handler for displaying the state of the algorithm in SVG image.
-	 * @param renderers - The SVG renderers available for the given algorithm.
+	 * @param visualizationOptionsController - The controller responsible for managing visualization options.
 	 * @param colors - The color settings for the page.
 	 * @param resetButton - The button element for resetting the state of the sorting algorithm.
 	 *
