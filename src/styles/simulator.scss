@@ -616,3 +616,13 @@ body {
 		}
 	}
 }
+
+.error_dialog-button_wrapper {
+	@extend .dialog_buttons;
+
+	justify-content: flex-end;
+
+	button {
+		width: 50%;
+	}
+}

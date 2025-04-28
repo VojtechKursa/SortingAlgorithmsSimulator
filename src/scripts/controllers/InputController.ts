@@ -7,6 +7,7 @@ import { InputFunctionRandom } from "../input/presets/functions/InputFunctionRan
 import { InputFunctionReversed } from "../input/presets/functions/InputFunctionReversed";
 import { InputFunctionSorted } from "../input/presets/functions/InputFunctionSorted";
 import { InputPreset } from "../input/presets/InputPreset";
+import { errorDialogButtonWrapperClass } from "../visualization/css/InputDialogClasses";
 import { PlayerController } from "./PlayerController";
 
 /**
@@ -130,12 +131,51 @@ export class InputController {
 	 * Loads the input from the currently selected input method into the simulator.
 	 */
 	public async loadInput() {
-		let input = await this.getCurrentMethod().getInput();
+		let input: number[] | null;
+
+		try {
+			input = await this.getCurrentMethod().getInput();
+		}
+		catch (error) {
+			const message = error instanceof Error ? error.message : "";
+			this.showErrorDialog(message);
+			return;
+		}
 
 		if (input != null) {
 			this.playerController.setInput(input);
 			this.dialog.close();
 		}
+	}
+
+	private showErrorDialog(errorMessage: string): void {
+		const dialog = document.createElement("dialog");
+
+		const header = document.createElement("h2");
+		header.innerText = "Error";
+
+		const text = document.createElement("p");
+		text.innerText = errorMessage;
+
+		const buttonWrapper = document.createElement("div");
+		buttonWrapper.classList.add(errorDialogButtonWrapperClass);
+
+		const exitButton = document.createElement("button");
+		exitButton.classList.add("btn", "btn-danger");
+		exitButton.textContent = "Close";
+		exitButton.addEventListener("click", () => dialog.close());
+		buttonWrapper.appendChild(exitButton);
+
+		dialog.appendChild(header);
+		dialog.appendChild(text);
+		dialog.appendChild(buttonWrapper);
+
+		dialog.addEventListener("close", () => {
+			dialog.remove();
+		});
+
+		document.body.appendChild(dialog);
+		dialog.showModal();
 	}
 
 	/**
