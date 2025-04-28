@@ -114,6 +114,9 @@ export class SimulatorPageController {
 
 		this.resizeHandler();
 
+		// Reapply dark mode to fix incorrect dark mode on simulator page during first load
+		darkModeHandler.DarkMode = darkModeHandler.DarkMode;
+
 		new ResizeObserver(() => this.visualizationOptionsResizeHandler()).observe(visualizationOptionsWrapper);
 
 		this.algorithmDescriptionController = new AlgorithmDescriptionController(algorithmProperties, false);
