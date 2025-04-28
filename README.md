@@ -8,7 +8,7 @@ This application was developed as part of my Bachelor Thesis.
 ### Install prerequisites
 
 To build this web application, first you need to install dependencies.
-If you don't have Node.js installed, install it according to the instructions on this webpage.
+If you don't have Node.js installed, install it according to the instructions on the [Node.js webpage](https://nodejs.org/en/download).
 Afterwards, run a command to install the required packages based on your package manager, for example for NPM it's:
 
 ```sh
